@@ -51,6 +51,15 @@ Requirements: JDK 17+, Android SDK (platform 36), NDK 28.2.13676358, CMake 3.22.
 python3 tools/check_licenses.py                      # dependency and asset licenses
 ```
 
+### Release signing
+
+Copy `keystore.properties.example` to `keystore.properties` (ignored by git) and fill in the keystore path, alias and passwords. Release builds are signed with it; without it they are left unsigned.
+
+```bash
+./gradlew :app:bundleProdRelease     # app/build/outputs/bundle/prodRelease/app-prod-release.aab
+./gradlew :app:signingReport         # shows which key signs each variant
+```
+
 ## Repository layout
 
 | Path | Contents |
