@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "75db0b8a-6726-564d-9e58-c7dbc5b72a4c",
+  "name": "Ink Roll",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.95,
+    "rotationMode": "fixed",
+    "rotation": 0.8,
+    "roundness": 0.4
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 40
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 1
+  },
+  "roll": {
+    "enabled": true,
+    "amount": 1
+  }
+}

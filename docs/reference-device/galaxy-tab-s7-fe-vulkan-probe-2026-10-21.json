@@ -1,0 +1,468 @@
+{
+  "egl": {
+    "doubleBuffered": {
+      "swapMs": {
+        "count": 90,
+        "max": 21.177448,
+        "median": 1.942968,
+        "min": 0.308073,
+        "p90": 2.35
+      }
+    },
+    "frontBufferSwitch": {
+      "enterSwapAndWaitMs": {
+        "count": 10,
+        "max": 58.382969,
+        "median": 57.426354,
+        "min": 56.915886,
+        "p90": 58.382969
+      },
+      "enterVisibleMs": {
+        "count": 10,
+        "max": 57.440156,
+        "median": 56.812657,
+        "min": 56.022396,
+        "p90": 57.440156
+      },
+      "frontGpuMs": {
+        "count": 300,
+        "max": 3.865364,
+        "median": 2.632865,
+        "min": 2.424114,
+        "p90": 2.918906
+      },
+      "frontSwapMs": {
+        "count": 300,
+        "max": 1.150052,
+        "median": 0.179635,
+        "min": 0.122292,
+        "p90": 0.272135
+      },
+      "leaveSwapMs": {
+        "count": 10,
+        "max": 2.750104,
+        "median": 2.553541,
+        "min": 2.345157,
+        "p90": 2.750104
+      },
+      "leaveVisibleMs": {
+        "count": 0
+      },
+      "notSingleBuffered": 0
+    },
+    "singleBufferSupported": true
+  },
+  "vulkan": {
+    "device": {
+      "apiVersion": "1.1.128",
+      "driverVersion": 2149539840,
+      "extensions": {
+        "VK_ANDROID_external_memory_android_hardware_buffer": true,
+        "VK_EXT_descriptor_indexing": false,
+        "VK_GOOGLE_display_timing": true,
+        "VK_KHR_dynamic_rendering": false,
+        "VK_KHR_incremental_present": true,
+        "VK_KHR_push_descriptor": true,
+        "VK_KHR_shader_float16_int8": true,
+        "VK_KHR_shared_presentable_image": true,
+        "VK_KHR_swapchain": true,
+        "VK_KHR_synchronization2": false,
+        "VK_KHR_timeline_semaphore": false
+      },
+      "features": {
+        "fragmentStoresAndAtomics": true,
+        "independentBlend": true,
+        "samplerAnisotropy": true,
+        "shaderStorageImageWriteWithoutFormat": true
+      },
+      "formats": {
+        "r32f": {
+          "blend": true,
+          "blitDestination": true,
+          "blitSource": true,
+          "colorAttachment": true,
+          "linearFilter": false,
+          "sampled": true,
+          "storage": true
+        },
+        "r32ui": {
+          "blend": false,
+          "blitDestination": true,
+          "blitSource": true,
+          "colorAttachment": true,
+          "linearFilter": false,
+          "sampled": true,
+          "storage": true
+        },
+        "r8": {
+          "blend": true,
+          "blitDestination": true,
+          "blitSource": true,
+          "colorAttachment": true,
+          "linearFilter": true,
+          "sampled": true,
+          "storage": true
+        },
+        "rg32f": {
+          "blend": true,
+          "blitDestination": true,
+          "blitSource": true,
+          "colorAttachment": true,
+          "linearFilter": false,
+          "sampled": true,
+          "storage": true
+        },
+        "rgba16f": {
+          "blend": true,
+          "blitDestination": true,
+          "blitSource": true,
+          "colorAttachment": true,
+          "linearFilter": true,
+          "sampled": true,
+          "storage": true
+        },
+        "rgba8": {
+          "blend": true,
+          "blitDestination": true,
+          "blitSource": true,
+          "colorAttachment": true,
+          "linearFilter": true,
+          "sampled": true,
+          "storage": true
+        }
+      },
+      "limits": {
+        "maxBoundDescriptorSets": 4,
+        "maxComputeWorkGroupInvocations": 1024,
+        "maxImageDimension2D": 16384,
+        "maxImageDimension3D": 2048,
+        "maxMemoryAllocationCount": 4096,
+        "maxPerStageDescriptorSamplers": 524288,
+        "maxPushConstantsSize": 128,
+        "maxUniformBufferRange": 65536,
+        "minUniformBufferOffsetAlignment": 64,
+        "timestampComputeAndGraphics": true,
+        "timestampPeriod": 52.08333206176758
+      },
+      "memoryHeaps": [
+        {
+          "deviceLocal": true,
+          "megabytes": 5424
+        },
+        {
+          "deviceLocal": true,
+          "megabytes": 256
+        }
+      ],
+      "name": "Adreno (TM) 619",
+      "rgba16f3dLut": true
+    },
+    "displayP3": {
+      "doubleBuffered": true,
+      "format": 37,
+      "frontBuffered": true,
+      "offered": true
+    },
+    "doubleBuffered": {
+      "acquireMs": {
+        "count": 90,
+        "max": 15.283542,
+        "median": 0.533125,
+        "min": 0.015677,
+        "p90": 3.022552
+      },
+      "createMs": 11.39849,
+      "gpuMs": {
+        "count": 90,
+        "max": 17.115781,
+        "median": 15.020677,
+        "min": 1.602969,
+        "p90": 16.009375
+      },
+      "images": 3,
+      "presentIntervalMs": {
+        "count": 3,
+        "max": 16.657969,
+        "median": 16.587656,
+        "min": 16.553177,
+        "p90": 16.657969
+      },
+      "refreshCycleMs": 16.618271,
+      "setupMs": 14.194167
+    },
+    "frontBufferHold": {
+      "supported": true,
+      "swapchainStatus": 0
+    },
+    "frontBufferLeave": {
+      "background": {
+        "drawGpuMeanwhileMs": {
+          "count": 88,
+          "max": 3.849583,
+          "median": 2.588907,
+          "min": 2.319636,
+          "p90": 2.891094
+        },
+        "drawsMeanwhile": {
+          "count": 10,
+          "max": 10.0,
+          "median": 9.0,
+          "min": 6.0,
+          "p90": 10.0
+        },
+        "failures": [],
+        "renderThreadHeldMs": {
+          "count": 10,
+          "max": 11.636146,
+          "median": 6.694323,
+          "min": 5.244635,
+          "p90": 11.636146
+        },
+        "untilDoubleBufferedMs": {
+          "count": 10,
+          "max": 85.246979,
+          "median": 77.430469,
+          "min": 47.030677,
+          "p90": 85.246979
+        }
+      },
+      "twoImages": {
+        "afterGpuMsCycle0": 12.231198,
+        "afterGpuMsCycle1": 14.769948,
+        "afterGpuMsCycle2": 13.836041,
+        "afterGpuMsCycle3": 12.947448,
+        "afterGpuMsCycle4": 14.187239,
+        "afterGpuMsCycle5": 13.037083,
+        "afterGpuMsCycle6": 15.157083,
+        "afterGpuMsCycle7": 15.084114,
+        "afterGpuMsCycle8": 15.545208,
+        "afterGpuMsCycle9": 15.208594,
+        "failures": [],
+        "renderThreadHeldMs": {
+          "count": 10,
+          "max": 54.182813,
+          "median": 39.03026,
+          "min": 24.862448,
+          "p90": 54.182813
+        },
+        "untilDoubleBufferedMs": {
+          "count": 10,
+          "max": 54.190209,
+          "median": 39.036094,
+          "min": 24.866927,
+          "p90": 54.190209
+        }
+      }
+    },
+    "frontBufferSwitch": {
+      "enterCreateMs": {
+        "count": 10,
+        "max": 33.350521,
+        "median": 12.372187,
+        "min": 4.800417,
+        "p90": 33.350521
+      },
+      "enterFirstFrameMs": {
+        "count": 10,
+        "max": 4.511875,
+        "median": 4.158803,
+        "min": 3.284687,
+        "p90": 4.511875
+      },
+      "enterTotalMs": {
+        "count": 10,
+        "max": 40.265261,
+        "median": 20.026302,
+        "min": 9.539739,
+        "p90": 40.265261
+      },
+      "failures": [],
+      "frontGpuMs": {
+        "count": 300,
+        "max": 3.51776,
+        "median": 2.530625,
+        "min": 2.247864,
+        "p90": 2.834635
+      },
+      "frontPresentMs": {
+        "count": 300,
+        "max": 0.217865,
+        "median": 0.038021,
+        "min": 0.022083,
+        "p90": 0.057968
+      },
+      "leaveCreateMs": {
+        "count": 10,
+        "max": 72.470156,
+        "median": 61.134375,
+        "min": 27.087968,
+        "p90": 72.470156
+      },
+      "leaveTotalMs": {
+        "count": 10,
+        "max": 81.762135,
+        "median": 68.614792,
+        "min": 32.3025,
+        "p90": 81.762135
+      },
+      "leaveVisibleMs": {
+        "count": 0
+      },
+      "retireMs": {
+        "count": 20,
+        "max": 2.193177,
+        "median": 1.161667,
+        "min": 0.372083,
+        "p90": 2.049948
+      },
+      "supported": true
+    },
+    "initializeMs": 43.913698,
+    "instance": {
+      "getSurfaceCapabilities2": true,
+      "swapchainColorSpace": true
+    },
+    "queue": {
+      "count": 3,
+      "family": 0,
+      "timestampValidBits": 48
+    },
+    "readback": {
+      "rgba16f": {
+        "correct": true,
+        "gpuMs": {
+          "count": 6,
+          "max": 18.929427,
+          "median": 10.022656,
+          "min": 9.367292,
+          "p90": 18.929427
+        },
+        "hostCached": true,
+        "lastPixelHalfBits": [
+          15360,
+          14336,
+          13312,
+          15360
+        ],
+        "megabytes": 32.0,
+        "memcpyMs": {
+          "count": 6,
+          "max": 21.624896,
+          "median": 10.648438,
+          "min": 8.440677,
+          "p90": 21.624896
+        }
+      },
+      "rgba8": {
+        "correct": true,
+        "gpuMs": {
+          "count": 6,
+          "max": 11.443541,
+          "median": 5.803906,
+          "min": 5.274428,
+          "p90": 11.443541
+        },
+        "hostCached": true,
+        "lastPixel": [
+          255,
+          128,
+          0,
+          255
+        ],
+        "megabytes": 16.0,
+        "memcpyMs": {
+          "count": 6,
+          "max": 5.970729,
+          "median": 3.914375,
+          "min": 3.848385,
+          "p90": 5.970729
+        }
+      }
+    },
+    "surface": {
+      "extent": [
+        1600,
+        2458
+      ],
+      "formats": [
+        {
+          "colorSpace": 0,
+          "format": 37
+        },
+        {
+          "colorSpace": 0,
+          "format": 43
+        },
+        {
+          "colorSpace": 1000104013,
+          "format": 37
+        },
+        {
+          "colorSpace": 1000104013,
+          "format": 43
+        },
+        {
+          "colorSpace": 1000104005,
+          "format": 37
+        },
+        {
+          "colorSpace": 1000104001,
+          "format": 37
+        },
+        {
+          "colorSpace": 1000104001,
+          "format": 43
+        },
+        {
+          "colorSpace": 0,
+          "format": 4
+        },
+        {
+          "colorSpace": 1000104013,
+          "format": 4
+        },
+        {
+          "colorSpace": 0,
+          "format": 97
+        },
+        {
+          "colorSpace": 1000104013,
+          "format": 97
+        },
+        {
+          "colorSpace": 1000104002,
+          "format": 97
+        },
+        {
+          "colorSpace": 1000104014,
+          "format": 97
+        },
+        {
+          "colorSpace": 0,
+          "format": 64
+        },
+        {
+          "colorSpace": 1000104013,
+          "format": 64
+        },
+        {
+          "colorSpace": 1000104001,
+          "format": 64
+        }
+      ],
+      "imageCount": [
+        2,
+        64
+      ],
+      "presentModes": [
+        "mailbox",
+        "fifo",
+        "sharedDemandRefresh",
+        "sharedContinuousRefresh"
+      ],
+      "sharedPresentUsage": 159,
+      "transform": 1,
+      "usage": 159
+    }
+  }
+}

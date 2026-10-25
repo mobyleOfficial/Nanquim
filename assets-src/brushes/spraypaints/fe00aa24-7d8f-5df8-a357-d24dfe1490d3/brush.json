@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "fe00aa24-7d8f-5df8-a357-d24dfe1490d3",
+  "name": "Burst",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.15
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.3,
+    "count": 1
+  },
+  "dynamics": {
+    "flow": {
+      "min": 0.3,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  },
+  "particles": {
+    "rate": 4,
+    "lifetimeMs": 400,
+    "initialSpeed": 250,
+    "speedJitter": 0.7,
+    "direction": "outward",
+    "drag": 0.4,
+    "sizeStart": 0.2,
+    "sizeEnd": 0.05,
+    "opacityStart": 0.9,
+    "opacityEnd": 0.3
+  }
+}

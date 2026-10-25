@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "c285d912-0707-54b8-afba-bdfe8d2ad259",
+  "name": "Disco",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.4
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.5,
+    "count": 2
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "jitter": 0.3
+    }
+  },
+  "render": {
+    "accumulation": "buildUp"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 200
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  },
+  "colorDynamics": {
+    "hueJitter": 0.5,
+    "brightnessJitter": 0.2
+  }
+}

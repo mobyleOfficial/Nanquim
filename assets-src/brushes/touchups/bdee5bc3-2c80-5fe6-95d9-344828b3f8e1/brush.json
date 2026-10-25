@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "bdee5bc3-2c80-5fe6-95d9-344828b3f8e1",
+  "name": "Zombie Skin",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.4
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 0.9,
+    "blend": "subtract"
+  },
+  "dynamics": {
+    "opacity": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  },
+  "colorDynamics": {
+    "hueJitter": 0.03
+  }
+}

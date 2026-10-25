@@ -1,0 +1,54 @@
+{
+  "format": 1,
+  "id": "966ab0fc-265c-563a-9b63-a836b6a3e101",
+  "name": "Lightpen",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.4
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "blend": "add",
+    "luminanceBlending": true,
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 80
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 20,
+      "end": 50,
+      "minSize": 0.1,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 20,
+      "end": 50,
+      "minSize": 0.1,
+      "shape": 0.0
+    }
+  }
+}

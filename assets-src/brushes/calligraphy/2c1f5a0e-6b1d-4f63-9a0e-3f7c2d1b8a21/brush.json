@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "id": "2c1f5a0e-6b1d-4f63-9a0e-3f7c2d1b8a21",
+  "name": "Monoline",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.5
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 1.0,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 50
+  },
+  "defaults": {
+    "size": 0.2,
+    "opacity": 1
+  }
+}

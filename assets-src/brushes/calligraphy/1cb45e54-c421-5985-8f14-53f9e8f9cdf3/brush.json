@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "1cb45e54-c421-5985-8f14-53f9e8f9cdf3",
+  "name": "Chalk",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.4
+  },
+  "shape": {
+    "texture": "shape.png",
+    "hardness": 1,
+    "rotationMode": "random",
+    "rotation": 0.0,
+    "roundness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 80
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 0.9
+  }
+}

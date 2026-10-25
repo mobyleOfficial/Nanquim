@@ -1,0 +1,41 @@
+{
+  "format": 1,
+  "id": "daf55b75-fec1-5f08-b50f-22f0583fc65d",
+  "name": "Tawny",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.2
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 0.9
+  },
+  "dynamics": {
+    "opacity": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  },
+  "colorDynamics": {
+    "hueJitter": 0.02
+  }
+}

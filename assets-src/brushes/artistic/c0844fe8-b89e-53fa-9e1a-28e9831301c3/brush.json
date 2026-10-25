@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "c0844fe8-b89e-53fa-9e1a-28e9831301c3",
+  "name": "Quoll",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.7
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.3,
+    "count": 2
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "jitter": 0.5
+    }
+  },
+  "render": {
+    "accumulation": "buildUp"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 200
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  }
+}

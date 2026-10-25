@@ -1,0 +1,41 @@
+{
+  "format": 1,
+  "id": "074f9055-e5a5-5308-a93f-218a707dcf60",
+  "name": "Pulse",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.6
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.2
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear",
+      "jitter": 0.6
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "blend": "add",
+    "luminanceBlending": true,
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

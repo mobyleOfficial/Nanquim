@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "011e89d4-15f2-5efe-b464-2c73e289aa94",
+  "name": "Smoke",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.12
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.3,
+    "rotationJitter": 1
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "jitter": 0.5
+    },
+    "opacity": {
+      "min": 0.1,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "glazeLight"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 600
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  }
+}

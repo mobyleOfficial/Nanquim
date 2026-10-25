@@ -1,0 +1,36 @@
+{
+  "format": 1,
+  "id": "67b7cb4a-50dc-5cdd-ac00-61d5a6344ce7",
+  "name": "Spires",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.3
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "fixed",
+    "scatter": 0.3,
+    "rotation": -1.5708,
+    "count": 2
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "jitter": 0.3
+    }
+  },
+  "render": {
+    "accumulation": "buildUp"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  }
+}

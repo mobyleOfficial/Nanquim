@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "id": "5294f129-a848-5af7-aac0-ee366c9882e6",
+  "name": "Triangulum",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.9
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 1
+  },
+  "dynamics": {
+    "opacity": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.5,
+    "opacity": 1
+  }
+}

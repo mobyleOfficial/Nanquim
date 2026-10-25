@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "8842c352-50ec-5caf-ac15-71e0ab7ed58a",
+  "name": "Grit Roll",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.6
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 1,
+    "scale": 1,
+    "depth": 1
+  },
+  "dynamics": {
+    "opacity": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.5,
+    "opacity": 1
+  },
+  "roll": {
+    "enabled": true,
+    "amount": 1
+  }
+}

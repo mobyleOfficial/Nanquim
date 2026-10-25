@@ -1,0 +1,6 @@
+# LF everywhere (CI runs on Linux); Windows batch files keep CRLF.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.jar binary
+*.png binary
+*.lz4 binary

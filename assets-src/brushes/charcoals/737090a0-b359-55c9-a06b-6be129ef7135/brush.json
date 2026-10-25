@@ -1,0 +1,48 @@
+{
+  "format": 1,
+  "id": "737090a0-b359-55c9-a06b-6be129ef7135",
+  "name": "Charcoal Block",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.08,
+    "streamline": 0.05
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke",
+    "scatter": 0.03,
+    "roundness": 0.35
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 0.7
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.8,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.3
+    },
+    "opacity": {
+      "min": 0.25,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.7
+  },
+  "render": {
+    "accumulation": "glazeIntense"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 200
+  },
+  "defaults": {
+    "size": 0.5,
+    "opacity": 1
+  }
+}

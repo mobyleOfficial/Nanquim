@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "id": "743a7573-d2f5-5b11-8b9c-95d3187716e2",
+  "name": "Mad Splashes",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.8,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.6
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "wetMix": {
+    "enabled": true,
+    "dilution": 0.1,
+    "pull": 0.2,
+    "attack": 0.8,
+    "charge": 1.0,
+    "wetnessJitter": 0.2
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "wetEdges": 0.6
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  }
+}

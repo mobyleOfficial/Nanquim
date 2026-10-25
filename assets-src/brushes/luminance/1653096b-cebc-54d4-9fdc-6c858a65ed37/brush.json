@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "1653096b-cebc-54d4-9fdc-6c858a65ed37",
+  "name": "Lightbrush",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "blend": "add",
+    "luminanceBlending": true,
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 200
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

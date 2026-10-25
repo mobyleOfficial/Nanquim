@@ -1,0 +1,60 @@
+{
+  "format": 1,
+  "id": "2666a8b1-695e-53f7-b915-bc004e772cf8",
+  "name": "Little Pine",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.1,
+    "streamline": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.5
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.3
+    },
+    "opacity": {
+      "min": 0.5,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.5
+  },
+  "render": {
+    "accumulation": "glazeIntense"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 30
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 15,
+      "end": 40,
+      "minSize": 0.2,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 15,
+      "end": 40,
+      "minSize": 0.2,
+      "shape": 0.0
+    }
+  }
+}

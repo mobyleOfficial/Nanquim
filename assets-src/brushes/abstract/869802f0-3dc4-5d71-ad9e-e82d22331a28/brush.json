@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "869802f0-3dc4-5d71-ad9e-e82d22331a28",
+  "name": "Storm Bay",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.3
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke",
+    "scatter": 0.5,
+    "count": 3
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "jitter": 0.3
+    }
+  },
+  "render": {
+    "accumulation": "buildUp"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 200
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  }
+}

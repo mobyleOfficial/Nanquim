@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "c7affa05-57d2-5b0d-a7b3-7a154592837c",
+  "name": "Glimmer",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.7
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.7,
+    "count": 3
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear",
+      "jitter": 0.8
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "blend": "add",
+    "luminanceBlending": true,
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

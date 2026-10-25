@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "id": "86302acb-32c1-5a00-b1b9-2563193679cc",
+  "name": "Decimals",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.6
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 1
+  },
+  "dynamics": {
+    "opacity": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.5,
+    "opacity": 1
+  }
+}

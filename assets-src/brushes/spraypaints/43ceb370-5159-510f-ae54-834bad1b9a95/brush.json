@@ -1,0 +1,34 @@
+{
+  "format": 1,
+  "id": "43ceb370-5159-510f-ae54-834bad1b9a95",
+  "name": "Splatter",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 1.0
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.5
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "jitter": 0.3
+    }
+  },
+  "render": {
+    "accumulation": "buildUp"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 600
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  }
+}

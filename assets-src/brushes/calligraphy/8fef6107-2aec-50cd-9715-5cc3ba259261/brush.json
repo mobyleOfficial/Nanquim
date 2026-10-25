@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "8fef6107-2aec-50cd-9715-5cc3ba259261",
+  "name": "Water Pen",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.4
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.5,
+    "rotationMode": "followStroke",
+    "rotation": 0.0,
+    "roundness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.2,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeLight"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 60
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "id": "711155db-555a-583a-bff7-f1e85e5f89ab",
+  "name": "Diagonal",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.6
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 1
+  },
+  "dynamics": {
+    "opacity": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.5,
+    "opacity": 1
+  }
+}

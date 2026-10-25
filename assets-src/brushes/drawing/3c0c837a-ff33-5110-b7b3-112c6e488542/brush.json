@@ -1,0 +1,36 @@
+{
+  "format": 1,
+  "id": "3c0c837a-ff33-5110-b7b3-112c6e488542",
+  "name": "Eaglehawk",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.08,
+    "streamline": 0.35,
+    "jitterLateral": 0.1
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1.0,
+    "scatter": 0.15,
+    "count": 2
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 25
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  }
+}

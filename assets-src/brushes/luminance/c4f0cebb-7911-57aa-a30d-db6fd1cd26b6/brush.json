@@ -1,0 +1,44 @@
+{
+  "format": 1,
+  "id": "c4f0cebb-7911-57aa-a30d-db6fd1cd26b6",
+  "name": "Nebula",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.12
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.4
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "blend": "add",
+    "luminanceBlending": true,
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 800
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  },
+  "colorDynamics": {
+    "hueJitter": 0.15,
+    "secondaryColorJitter": 0.6
+  }
+}

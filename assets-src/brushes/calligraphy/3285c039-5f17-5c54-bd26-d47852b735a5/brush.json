@@ -1,0 +1,41 @@
+{
+  "format": 1,
+  "id": "3285c039-5f17-5c54-bd26-d47852b735a5",
+  "name": "Blotchy",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.15,
+    "streamline": 0.4
+  },
+  "shape": {
+    "texture": "shape.png",
+    "hardness": 1,
+    "rotationMode": "random",
+    "rotation": 0.0,
+    "roundness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 70
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 1,
+    "depth": 0.5
+  }
+}

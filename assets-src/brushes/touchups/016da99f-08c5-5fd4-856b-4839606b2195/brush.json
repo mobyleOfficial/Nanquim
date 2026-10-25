@@ -1,0 +1,37 @@
+{
+  "format": 1,
+  "id": "016da99f-08c5-5fd4-856b-4839606b2195",
+  "name": "Painter's Touch",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

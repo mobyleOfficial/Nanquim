@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "e72e3503-1c56-5192-9bc2-c88f78a0a0d2",
+  "name": "Blotch",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.9,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "wetMix": {
+    "enabled": true,
+    "dilution": 0.2,
+    "pull": 0.2,
+    "attack": 0.8,
+    "charge": 1.0,
+    "wetnessJitter": 0.2
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "wetEdges": 0.6
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  }
+}

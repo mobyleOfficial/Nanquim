@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "id": "2c1f5a0e-6b1d-4f63-9a0e-3f7c2d1b8a32",
+  "name": "Hard Airbrush",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.9
+  },
+  "dynamics": {
+    "flow": {
+      "min": 0.3,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 500
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

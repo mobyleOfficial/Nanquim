@@ -1,0 +1,36 @@
+{
+  "format": 1,
+  "id": "79d6e904-8c31-55fa-baa7-ec21044ec62d",
+  "name": "Hard Rain",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.3
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "fixed",
+    "scatter": 0.8,
+    "rotation": 1.25,
+    "count": 4
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "jitter": 0.5
+    }
+  },
+  "render": {
+    "accumulation": "buildUp"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  }
+}

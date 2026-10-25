@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "21a0b4d9-e5aa-54d1-be4c-1ad74c8fe0b3",
+  "name": "Tarkine",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.6
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 0.8,
+    "blend": "subtract"
+  },
+  "dynamics": {
+    "opacity": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.5,
+    "opacity": 1
+  }
+}

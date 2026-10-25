@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "9474d0fb-b194-509b-b7cc-a85cc99b2af8",
+  "name": "Classic Pencil",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.1,
+    "streamline": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.75
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.6
+    },
+    "opacity": {
+      "min": 0.15,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.6
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 20
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

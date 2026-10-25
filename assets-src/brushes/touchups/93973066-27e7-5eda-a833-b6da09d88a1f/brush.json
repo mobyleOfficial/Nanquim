@@ -1,0 +1,51 @@
+{
+  "format": 1,
+  "id": "93973066-27e7-5eda-a833-b6da09d88a1f",
+  "name": "Fine Hair",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.02,
+    "streamline": 0.3
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.5,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 120
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 20,
+      "end": 60,
+      "minSize": 0.05,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 20,
+      "end": 60,
+      "minSize": 0.05,
+      "shape": 0.0
+    }
+  }
+}

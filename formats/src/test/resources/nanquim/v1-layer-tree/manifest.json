@@ -1,0 +1,208 @@
+{
+  "activeLayerId": null,
+  "app": {
+    "name": "nanquim-cli",
+    "version": "0"
+  },
+  "background": {
+    "color": [
+      0.9200000166893005,
+      0.8999999761581421,
+      0.8600000143051147,
+      1.0
+    ],
+    "hidden": false
+  },
+  "canvas": {
+    "colorProfile": {
+      "icc": null,
+      "name": "sRGB IEC61966-2.1"
+    },
+    "dpi": 132,
+    "height": 256,
+    "pixelFormat": "rgba8_premul_srgb",
+    "tileSize": 256,
+    "unit": "px",
+    "width": 512
+  },
+  "extensions": {},
+  "format": "nanquim",
+  "id": "00000000-0000-4000-8000-000000000000",
+  "layers": [
+    {
+      "blend": "passThrough",
+      "children": [
+        {
+          "alphaLock": false,
+          "blend": "normal",
+          "clipping": false,
+          "hidden": false,
+          "id": "00000000-0000-4000-8000-00000000000b",
+          "locked": false,
+          "name": "Layer 11",
+          "opacity": 1.0,
+          "type": "raster"
+        },
+        {
+          "alphaLock": false,
+          "blend": "multiply",
+          "clipping": false,
+          "hidden": false,
+          "id": "00000000-0000-4000-8000-00000000000c",
+          "locked": false,
+          "name": "Layer 12",
+          "opacity": 1.0,
+          "type": "raster"
+        }
+      ],
+      "collapsed": false,
+      "hidden": false,
+      "id": "00000000-0000-4000-8000-00000000000a",
+      "locked": false,
+      "name": "Group 10",
+      "opacity": 0.5,
+      "type": "group"
+    },
+    {
+      "blend": "multiply",
+      "children": [
+        {
+          "alphaLock": false,
+          "blend": "normal",
+          "clipping": false,
+          "hidden": false,
+          "id": "00000000-0000-4000-8000-000000000015",
+          "locked": false,
+          "name": "Layer 21",
+          "opacity": 1.0,
+          "type": "raster"
+        },
+        {
+          "alphaLock": false,
+          "blend": "normal",
+          "clipping": true,
+          "hidden": false,
+          "id": "00000000-0000-4000-8000-000000000016",
+          "locked": false,
+          "name": "Layer 22",
+          "opacity": 1.0,
+          "type": "raster"
+        },
+        {
+          "alphaLock": false,
+          "blend": "multiply",
+          "clipping": true,
+          "hidden": false,
+          "id": "00000000-0000-4000-8000-000000000017",
+          "locked": false,
+          "name": "Layer 23",
+          "opacity": 0.699999988079071,
+          "type": "raster"
+        }
+      ],
+      "collapsed": false,
+      "hidden": false,
+      "id": "00000000-0000-4000-8000-000000000014",
+      "locked": false,
+      "name": "Group 20",
+      "opacity": 0.800000011920929,
+      "type": "group"
+    },
+    {
+      "alphaLock": false,
+      "blend": "normal",
+      "clipping": false,
+      "hidden": false,
+      "id": "00000000-0000-4000-8000-00000000001f",
+      "locked": false,
+      "mask": {
+        "enabled": true,
+        "id": "00000000-0000-4000-8000-000000000020",
+        "inverted": false
+      },
+      "name": "Layer 31",
+      "opacity": 1.0,
+      "type": "raster"
+    },
+    {
+      "alphaLock": false,
+      "blend": "normal",
+      "clipping": false,
+      "hidden": false,
+      "id": "00000000-0000-4000-8000-000000000021",
+      "locked": false,
+      "mask": {
+        "enabled": true,
+        "id": "00000000-0000-4000-8000-000000000022",
+        "inverted": true
+      },
+      "name": "Layer 33",
+      "opacity": 1.0,
+      "type": "raster"
+    },
+    {
+      "alphaLock": false,
+      "blend": "normal",
+      "clipping": false,
+      "hidden": false,
+      "id": "00000000-0000-4000-8000-000000000023",
+      "locked": false,
+      "mask": {
+        "enabled": false,
+        "id": "00000000-0000-4000-8000-000000000024",
+        "inverted": false
+      },
+      "name": "Layer 35",
+      "opacity": 0.6000000238418579,
+      "type": "raster"
+    },
+    {
+      "alphaLock": true,
+      "blend": "normal",
+      "clipping": false,
+      "hidden": false,
+      "id": "00000000-0000-4000-8000-000000000029",
+      "locked": false,
+      "name": "Layer 41",
+      "opacity": 1.0,
+      "type": "raster"
+    },
+    {
+      "alphaLock": false,
+      "blend": "normal",
+      "clipping": false,
+      "hidden": false,
+      "id": "00000000-0000-4000-8000-00000000002a",
+      "locked": false,
+      "name": "Layer 42",
+      "opacity": 1.0,
+      "type": "raster"
+    },
+    {
+      "alphaLock": false,
+      "blend": "normal",
+      "clipping": false,
+      "hidden": true,
+      "id": "00000000-0000-4000-8000-00000000002b",
+      "locked": false,
+      "name": "Layer 43",
+      "opacity": 1.0,
+      "type": "raster"
+    },
+    {
+      "alphaLock": false,
+      "blend": "overlay",
+      "clipping": false,
+      "hidden": false,
+      "id": "00000000-0000-4000-8000-00000000002c",
+      "locked": false,
+      "name": "Layer 44",
+      "opacity": 1.0,
+      "type": "raster"
+    }
+  ],
+  "minReaderVersion": 1,
+  "name": "layer_tree",
+  "referenceLayerId": null,
+  "version": 1
+}

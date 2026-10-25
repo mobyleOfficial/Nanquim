@@ -1,0 +1,13 @@
+{
+  "comment": "Swatches every fixture must hold, in this order (README.md). rgb is sRGB 0-1 as Nanquim reads it; tolerance is per channel. space says how the swatch must be stored in the file: the gray ones decide how grayscale swatches are read (README.md).",
+  "swatches": [
+    {"name": "Red", "rgb": [1, 0, 0], "tolerance": 0.02},
+    {"name": "Gray 25", "rgb": [0.75, 0.75, 0.75], "tolerance": 0.12, "space": "gray"},
+    {"name": "Black K", "rgb": [0, 0, 0], "tolerance": 0.15, "space": "gray"},
+    {"name": "White K", "rgb": [1, 1, 1], "tolerance": 0.05, "space": "gray"},
+    {"name": "Cyan ink", "rgb": [0, 1, 1], "tolerance": 0.05},
+    {"name": "Lab mid", "rgb": [0.466, 0.466, 0.466], "tolerance": 0.03},
+    {"name": "Green", "rgb": [0, 1, 0], "tolerance": 0.02}
+  ],
+  "files": ["photoshop.aco", "photoshop.ase", "illustrator.ase"]
+}

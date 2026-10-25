@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "id": "56014860-49f3-52b5-874b-c1220d122b8d",
+  "name": "Syrup",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.6
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.4,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 60
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 1
+  }
+}

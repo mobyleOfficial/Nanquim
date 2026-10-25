@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "id": "e97536fb-4688-5410-b5c7-80db32b32cc2",
+  "name": "Water Drip",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.9,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "fixed",
+    "scatter": 0.3
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "wetMix": {
+    "enabled": true,
+    "dilution": 0.1,
+    "pull": 0.2,
+    "attack": 0.8,
+    "charge": 1.0,
+    "wetnessJitter": 0.2
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "wetEdges": 0.5
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  }
+}

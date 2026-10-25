@@ -1,0 +1,36 @@
+{
+  "format": 1,
+  "id": "87e5aa75-91e5-512b-bce6-4fc1a35c998e",
+  "name": "Marquee",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.4
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1,
+    "rotationMode": "fixed",
+    "rotation": 0.6109,
+    "roundness": 0.3
+  },
+  "dynamics": {
+    "size": {
+      "min": 1.0,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 60
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

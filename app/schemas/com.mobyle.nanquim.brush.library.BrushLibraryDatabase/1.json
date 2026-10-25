@@ -1,0 +1,240 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "efa5b35f18438e6566d6d16c7f5225e2",
+    "entities": [
+      {
+        "tableName": "brush_groups",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT, `builtInKey` TEXT, `position` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "builtInKey",
+            "columnName": "builtInKey",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "brush_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brushId` TEXT NOT NULL, `groupId` TEXT NOT NULL, `position` INTEGER NOT NULL, `name` TEXT NOT NULL, `builtInPath` TEXT, `hasOverride` INTEGER NOT NULL, `pinned` INTEGER NOT NULL, `lastUsedAt` INTEGER, PRIMARY KEY(`brushId`))",
+        "fields": [
+          {
+            "fieldPath": "brushId",
+            "columnName": "brushId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupId",
+            "columnName": "groupId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "builtInPath",
+            "columnName": "builtInPath",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "hasOverride",
+            "columnName": "hasOverride",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinned",
+            "columnName": "pinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUsedAt",
+            "columnName": "lastUsedAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "brushId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_brush_entries_groupId",
+            "unique": false,
+            "columnNames": [
+              "groupId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_brush_entries_groupId` ON `${TABLE_NAME}` (`groupId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "brush_tool_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brushId` TEXT NOT NULL, `tool` TEXT NOT NULL, `sizeSlider` REAL NOT NULL, `opacitySlider` REAL NOT NULL, PRIMARY KEY(`brushId`, `tool`))",
+        "fields": [
+          {
+            "fieldPath": "brushId",
+            "columnName": "brushId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tool",
+            "columnName": "tool",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sizeSlider",
+            "columnName": "sizeSlider",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "opacitySlider",
+            "columnName": "opacitySlider",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "brushId",
+            "tool"
+          ]
+        }
+      },
+      {
+        "tableName": "slider_presets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brushId` TEXT NOT NULL, `tool` TEXT NOT NULL, `slider` TEXT NOT NULL, `position` INTEGER NOT NULL, `value` REAL NOT NULL, PRIMARY KEY(`brushId`, `tool`, `slider`, `position`))",
+        "fields": [
+          {
+            "fieldPath": "brushId",
+            "columnName": "brushId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tool",
+            "columnName": "tool",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "slider",
+            "columnName": "slider",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "brushId",
+            "tool",
+            "slider",
+            "position"
+          ]
+        }
+      },
+      {
+        "tableName": "tool_brushes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tool` TEXT NOT NULL, `brushId` TEXT NOT NULL, PRIMARY KEY(`tool`))",
+        "fields": [
+          {
+            "fieldPath": "tool",
+            "columnName": "tool",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "brushId",
+            "columnName": "brushId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "tool"
+          ]
+        }
+      },
+      {
+        "tableName": "seeded_built_in_brushes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brushId` TEXT NOT NULL, PRIMARY KEY(`brushId`))",
+        "fields": [
+          {
+            "fieldPath": "brushId",
+            "columnName": "brushId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "brushId"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'efa5b35f18438e6566d6d16c7f5225e2')"
+    ]
+  }
+}

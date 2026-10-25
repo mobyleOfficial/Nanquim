@@ -1,0 +1,48 @@
+{
+  "format": 1,
+  "id": "03decc80-b84b-5802-ba22-7f8f174aeed3",
+  "name": "Blackburn",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": "shape.png",
+    "hardness": 0.85,
+    "rotationMode": "random"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 40
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 10,
+      "end": 30,
+      "minSize": 0.2,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 10,
+      "end": 30,
+      "minSize": 0.2,
+      "shape": 0.0
+    }
+  }
+}

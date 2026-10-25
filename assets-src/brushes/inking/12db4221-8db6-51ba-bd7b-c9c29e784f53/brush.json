@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "12db4221-8db6-51ba-bd7b-c9c29e784f53",
+  "name": "Marker Roll",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.8,
+    "rotationMode": "fixed",
+    "rotation": 0.8,
+    "roundness": 0.5
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.8,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 50
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 0.75
+  },
+  "roll": {
+    "enabled": true,
+    "amount": 1
+  }
+}

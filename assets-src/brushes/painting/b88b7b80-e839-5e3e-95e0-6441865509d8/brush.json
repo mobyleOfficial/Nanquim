@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "id": "b88b7b80-e839-5e3e-95e0-6441865509d8",
+  "name": "Flat Brush",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke",
+    "roundness": 0.6
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.8,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.6,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "blendUniform"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

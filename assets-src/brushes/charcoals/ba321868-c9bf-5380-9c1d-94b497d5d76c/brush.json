@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "ba321868-c9bf-5380-9c1d-94b497d5d76c",
+  "name": "2B Compressed",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.08,
+    "streamline": 0.05
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.03
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 0.5
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.3
+    },
+    "opacity": {
+      "min": 0.25,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.7
+  },
+  "render": {
+    "accumulation": "glazeIntense"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 60
+  },
+  "defaults": {
+    "size": 0.5,
+    "opacity": 1
+  }
+}

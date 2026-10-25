@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "ca1e3f9b-e278-5f21-afb1-541c98909c5f",
+  "name": "Peppermint",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.1,
+    "streamline": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.6
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.6
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.5
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 15
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

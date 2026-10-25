@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "2c1f5a0e-6b1d-4f63-9a0e-3f7c2d1b8a02",
+  "name": "6B Pencil",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.08,
+    "streamline": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 0.6
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.8
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.6
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 60
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "format": 1,
+  "id": "3d311ae8-00c6-53bb-becd-c38cf48be789",
+  "name": "Clouds",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.25
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "jitter": 0.4
+    },
+    "opacity": {
+      "min": 0.2
+    }
+  },
+  "render": {
+    "accumulation": "glazeLight"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 800
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  }
+}

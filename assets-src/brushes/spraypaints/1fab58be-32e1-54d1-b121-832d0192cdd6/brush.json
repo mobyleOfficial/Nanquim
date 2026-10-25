@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "1fab58be-32e1-54d1-b121-832d0192cdd6",
+  "name": "Fine Nozzle",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.15
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.1,
+    "count": 1
+  },
+  "dynamics": {
+    "flow": {
+      "min": 0.3,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 120
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "format": 1,
+  "id": "0fd977eb-8ccf-5c07-aea8-aba41a7c9add",
+  "name": "Summit Script",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.4
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1,
+    "rotationMode": "fixed",
+    "rotation": 0.7854,
+    "roundness": 0.15
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 60
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 20,
+      "end": 40,
+      "minSize": 0.2,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 20,
+      "end": 40,
+      "minSize": 0.2,
+      "shape": 0.0
+    }
+  }
+}

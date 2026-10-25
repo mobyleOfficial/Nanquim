@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "49f348ed-cd1c-52b9-ad53-dfbc921cf00b",
+  "name": "Tarraleah",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.4,
+    "streamline": 0
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.9,
+    "scatter": 0.6,
+    "count": 3
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:soft",
+      "jitter": 0.6
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 30
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  },
+  "colorDynamics": {
+    "brightnessJitter": 0.2
+  }
+}

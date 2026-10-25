@@ -1,0 +1,36 @@
+{
+  "format": 1,
+  "id": "e50689f1-c1c7-55c9-848e-7413a5c84d58",
+  "name": "Script",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.3
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1,
+    "rotationMode": "fixed",
+    "rotation": 0.5236,
+    "roundness": 0.2
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 60
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

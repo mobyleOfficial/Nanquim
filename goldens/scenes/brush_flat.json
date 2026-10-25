@@ -1,0 +1,32 @@
+{
+ "format": 1,
+ "documentId": "golden-brush-flat",
+ "canvas": {
+  "width": 512,
+  "height": 256,
+  "background": [
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "layers": 1,
+ "actions": [
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 48,
+   "opacity": 1,
+   "color": [
+    0.1,
+    0.3,
+    0.6,
+    1
+   ],
+   "brushPackage": "../brushes/test-flat",
+   "trace": "round_brush_s_curve.trace"
+  }
+ ]
+}
