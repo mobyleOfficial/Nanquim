@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "95e57224-b539-57bd-b690-d0e3474b4506",
+  "name": "Soft Pastel",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.06,
+    "streamline": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1,
+    "depth": 0.6
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.6
+    },
+    "opacity": {
+      "min": 0.15,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.5
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 120
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

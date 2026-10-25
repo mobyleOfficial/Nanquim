@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "c1d5795d-3260-5c80-b528-ca23966e42b1",
+  "name": "Artist Crayon",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.1,
+    "streamline": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.5,
+    "blend": "subtract"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.6
+    },
+    "opacity": {
+      "min": 0.15,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.5
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 60
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

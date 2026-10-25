@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "7be048d3-1e6d-5f52-b31c-ee79358b6ce4",
+  "name": "Vineyard",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.1,
+    "streamline": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.5
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.6
+    },
+    "opacity": {
+      "min": 0.15,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.8
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 70
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  }
+}

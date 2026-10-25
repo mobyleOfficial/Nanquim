@@ -1,0 +1,195 @@
+{
+  "comment": "Approved dependencies. Keys are Maven 'group:artifact' patterns (fnmatch), plugin ids, or native/tool names. scope: app = shipped in the APK; test/build = never shipped.",
+  "maven": {
+    "androidx.core:*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.activity:*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.compose:*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.compose.ui:*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.compose.foundation:*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.compose.material3:*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.camera:*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "org.jetbrains.kotlinx:kotlinx-coroutines-*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "org.jetbrains.kotlinx:kotlinx-serialization-*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.test.ext:*": {
+      "license": "Apache-2.0",
+      "scope": "test"
+    },
+    "androidx.benchmark:*": {
+      "license": "Apache-2.0",
+      "scope": "test"
+    },
+    "androidx.test.uiautomator:*": {
+      "license": "Apache-2.0",
+      "scope": "test"
+    },
+    "org.junit.jupiter:*": {
+      "license": "EPL-2.0",
+      "scope": "test"
+    },
+    "org.junit.platform:*": {
+      "license": "EPL-2.0",
+      "scope": "test"
+    },
+    "androidx.test:*": {
+      "license": "Apache-2.0",
+      "scope": "test"
+    },
+    "androidx.input:*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.room:room-runtime": {
+      "license": "Apache-2.0",
+      "scope": "app",
+      "source": "Brush library database"
+    },
+    "androidx.room:room-ktx": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.room:room-compiler": {
+      "license": "Apache-2.0",
+      "scope": "build"
+    },
+    "androidx.glance:*": {
+      "license": "Apache-2.0",
+      "scope": "app"
+    },
+    "androidx.work:*": {
+      "license": "Apache-2.0",
+      "scope": "app",
+      "source": "Timelapse export as a foreground job"
+    },
+    "com.google.firebase:firebase-bom": {
+      "license": "Apache-2.0",
+      "scope": "app",
+      "source": "Firebase versions"
+    },
+    "com.google.firebase:firebase-crashlytics-ndk": {
+      "license": "Apache-2.0",
+      "scope": "app",
+      "source": "Crash reports, Kotlin and native; pulls play-services-basement (Android SDK License)"
+    },
+    "com.google.firebase:firebase-analytics": {
+      "license": "Android-SDK-License",
+      "scope": "app",
+      "source": "Usage analytics; closed Google Play services measurement library"
+    }
+  },
+  "plugins": {
+    "com.android.*": {
+      "license": "Apache-2.0",
+      "scope": "build"
+    },
+    "org.jetbrains.kotlin.*": {
+      "license": "Apache-2.0",
+      "scope": "build"
+    },
+    "com.google.devtools.ksp": {
+      "license": "Apache-2.0",
+      "scope": "build",
+      "source": "Kotlin Symbol Processing, runs the Room compiler"
+    },
+    "com.google.gms.google-services": {
+      "license": "Apache-2.0",
+      "scope": "build",
+      "source": "Reads app/google-services.json"
+    },
+    "com.google.firebase.crashlytics": {
+      "license": "Apache-2.0",
+      "scope": "build",
+      "source": "Crashlytics mapping and native symbol upload"
+    }
+  },
+  "native": {
+    "lz4": {
+      "license": "BSD-2-Clause",
+      "scope": "app",
+      "source": "engine/third_party/lz4 (v1.10.0, vendored: lz4, lz4hc, lz4frame, xxhash)"
+    },
+    "lcms2": {
+      "license": "MIT",
+      "scope": "app",
+      "source": "engine/third_party/lcms2 (v2.19.1, vendored: include/ and src/)"
+    },
+    "miniz": {
+      "license": "MIT",
+      "scope": "app",
+      "source": "engine/third_party/miniz (v3.0.2, vendored: amalgamated miniz.c/miniz.h)"
+    },
+    "googletest": {
+      "license": "BSD-3-Clause",
+      "scope": "test",
+      "source": "engine/src/test/cpp/CMakeLists.txt"
+    },
+    "stb_image": {
+      "license": "MIT",
+      "scope": "app",
+      "source": "engine/third_party/stb (stb_image 2.30 decodes brush textures in the engine; stb_image_write 1.16 encodes JPEG pages of PDF exports in the engine and writes PNGs on the host; vendored; dual MIT / public domain)"
+    },
+    "nlohmann_json": {
+      "license": "MIT",
+      "scope": "app",
+      "source": "engine/third_party/nlohmann_json (v3.12.0 single header, vendored; scene files in the engine and the CLI)"
+    },
+    "glslang": {
+      "license": "BSD-3-Clause",
+      "scope": "app",
+      "source": "The NDK's sources/third_party/shaderc/third_party/glslang (11.11.0), built by engine/src/main/cpp/CMakeLists.txt: GLSL to SPIR-V for the Vulkan backend; a few SPIRV headers (bitutils.h, hex_float.h) are Apache-2.0"
+    },
+    "shaderc_util": {
+      "license": "Apache-2.0",
+      "scope": "app",
+      "source": "The NDK's sources/third_party/shaderc/libshaderc_util/src/resources.cc only (glslang's default resource limits)"
+    },
+    "harfbuzz": {
+      "license": "MIT",
+      "scope": "app",
+      "source": "engine/third_party/harfbuzz (14.6.0, vendored: the src/ files harfbuzz.cc builds)"
+    },
+    "freetype": {
+      "license": "FTL",
+      "scope": "app",
+      "source": "engine/third_party/freetype (2.15.0, vendored: include/ and the base, sfnt, truetype, cff, psaux, pshinter, psnames, smooth modules; used under the FreeType License)"
+    },
+    "sheenbidi": {
+      "license": "Apache-2.0",
+      "scope": "app",
+      "source": "engine/third_party/sheenbidi (3.0.0, vendored: Headers/ and Source/)"
+    }
+  },
+  "tools": {
+    "ktlint": {
+      "license": "MIT",
+      "scope": "build",
+      "source": ".github/workflows/ci.yml"
+    }
+  }
+}

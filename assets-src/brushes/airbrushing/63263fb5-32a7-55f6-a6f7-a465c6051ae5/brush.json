@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "id": "63263fb5-32a7-55f6-a6f7-a465c6051ae5",
+  "name": "Medium Airbrush",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.4
+  },
+  "dynamics": {
+    "flow": {
+      "min": 0.2,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "flow": 0.4
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 500
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

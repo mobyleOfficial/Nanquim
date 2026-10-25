@@ -1,0 +1,57 @@
+{
+  "format": 1,
+  "id": "33d388ec-c655-59a3-87c7-0b92fbe61aec",
+  "name": "Copperhead",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": "shape.png",
+    "hardness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    },
+    "opacity": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 45
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.5
+  },
+  "taper": {
+    "stylus": {
+      "start": 30,
+      "end": 60,
+      "minSize": 0.05,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 30,
+      "end": 60,
+      "minSize": 0.05,
+      "shape": 0.0
+    }
+  }
+}

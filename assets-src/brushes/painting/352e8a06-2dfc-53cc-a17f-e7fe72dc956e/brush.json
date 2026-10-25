@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "352e8a06-2dfc-53cc-a17f-e7fe72dc956e",
+  "name": "Watercolor",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    }
+  },
+  "wetMix": {
+    "enabled": true,
+    "dilution": 0.5,
+    "pull": 0.3,
+    "attack": 0.8,
+    "charge": 1.0,
+    "wetnessJitter": 0.2
+  },
+  "render": {
+    "accumulation": "glazeLight",
+    "wetEdges": 0.6
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "format": 1,
+  "id": "6f1d1c3e-0b6c-4c39-9c39-6b1b7a0e0001",
+  "name": "Test Pencil",
+  "author": "Nanquim",
+  "license": "MIT",
+  "curves": { "depthByPressure": [[0, 1], [1, 0.4]] },
+  "path": { "spacing": 0.08 },
+  "shape": { "texture": "shape.png", "rotationMode": "random", "filtering": "improved" },
+  "grain": { "texture": "grain.png", "movement": 0, "scale": 1.5, "depth": 0.9,
+             "pressureDepth": "curve:depthByPressure", "pressureDepthAmount": 1 },
+  "dynamics": {
+    "size": { "min": 0.4, "pressure": "curve:linear" },
+    "opacity": { "min": 0.2, "pressure": "curve:soft" }
+  },
+  "render": { "accumulation": "glazeUniform" }
+}

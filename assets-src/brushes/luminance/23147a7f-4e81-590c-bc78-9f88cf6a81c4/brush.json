@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "23147a7f-4e81-590c-bc78-9f88cf6a81c4",
+  "name": "Bokeh Lights",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.9
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.8,
+    "count": 2
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear",
+      "jitter": 0.7
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "blend": "add",
+    "luminanceBlending": true,
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 500
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  },
+  "colorDynamics": {
+    "hueJitter": 0.1,
+    "brightnessJitter": 0.3
+  }
+}

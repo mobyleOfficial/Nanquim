@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "aecae1ac-ab18-5bde-9acb-6c5df822f8b4",
+  "name": "Technical Pencil",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.1,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.4
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0
+    },
+    "opacity": {
+      "min": 0.15,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 12
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "format": 1,
+  "id": "445e62b1-3ec3-5c1c-9c43-469c97290ebd",
+  "name": "Freycinet",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.6,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.5
+  },
+  "taper": {
+    "stylus": {
+      "start": 20,
+      "end": 50,
+      "minSize": 0.1,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 20,
+      "end": 50,
+      "minSize": 0.1,
+      "shape": 0.0
+    }
+  }
+}

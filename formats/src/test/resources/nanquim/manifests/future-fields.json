@@ -1,0 +1,38 @@
+{
+  "format": "nanquim",
+  "version": 2,
+  "minReaderVersion": 1,
+  "app": { "name": "Some Future Nanquim", "version": "9.0.0" },
+  "id": "6f1c0000-0000-4000-8000-000000000001",
+  "name": "Future",
+  "createdAt": "2026-10-14T12:00:00Z",
+  "modifiedAt": "2026-10-14T13:00:00Z",
+  "canvas": {
+    "width": 3000, "height": 2000, "dpi": 300, "unit": "mm", "tileSize": 256,
+    "pixelFormat": "rgba8_premul_srgb",
+    "colorProfile": { "name": "sRGB IEC61966-2.1", "icc": null },
+    "bleed": 3
+  },
+  "background": { "color": [0.1, 0.2, 0.3, 1], "hidden": true },
+  "activeLayerId": "b0000000-0000-4000-8000-000000000002",
+  "referenceLayerId": "a0000000-0000-4000-8000-000000000001",
+  "layers": [
+    { "type": "raster", "id": "a0000000-0000-4000-8000-000000000001", "name": "Sketch", "opacity": 0.5,
+      "blend": "multiply", "hidden": false, "locked": true, "alphaLock": true, "clipping": false,
+      "mask": { "id": "a1000000-0000-4000-8000-000000000001", "enabled": false, "inverted": true, "density": 0.7 },
+      "contentBounds": [0, 0, 1024, 768], "futureLayerField": { "x": 1 } },
+    { "type": "group", "id": "c0000000-0000-4000-8000-000000000003", "name": "Group", "opacity": 1,
+      "blend": "screen", "hidden": false, "locked": false, "collapsed": true, "color": "red",
+      "children": [
+        { "type": "text", "id": "b0000000-0000-4000-8000-000000000002", "name": "Title",
+          "textModel": "text/b0000000-0000-4000-8000-000000000002.json", "opacity": 1,
+          "blend": "normal", "hidden": false, "locked": false, "alphaLock": false, "clipping": true }
+      ] }
+  ],
+  "selection": { "active": "selections/s1", "saved": [ { "id": "s1", "name": "Selection 1" } ] },
+  "guides": { "grid": { "size": 50 } },
+  "stats": { "strokeCount": 42, "timeSpentSeconds": 3600, "undoCount": 7 },
+  "author": { "name": "Someone", "url": "" },
+  "animation": { "enabled": false },
+  "extensions": { "org.example.tool": { "setting": true } }
+}

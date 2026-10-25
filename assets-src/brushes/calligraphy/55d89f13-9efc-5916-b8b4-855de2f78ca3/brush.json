@@ -1,0 +1,36 @@
+{
+  "format": 1,
+  "id": "55d89f13-9efc-5916-b8b4-855de2f78ca3",
+  "name": "Streaks",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.4
+  },
+  "shape": {
+    "texture": "shape.png",
+    "hardness": 1,
+    "rotationMode": "fixed",
+    "rotation": 0.5236,
+    "roundness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 70
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

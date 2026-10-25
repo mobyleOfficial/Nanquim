@@ -1,0 +1,41 @@
+{
+  "format": 1,
+  "id": "a92c888b-dbf5-58f4-842c-7d4cfb07b12e",
+  "name": "Bristle Roll",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.6,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "blendUniform"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  },
+  "roll": {
+    "enabled": true,
+    "amount": 1
+  }
+}

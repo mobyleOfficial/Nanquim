@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "id": "c4ad647a-6104-5567-a820-d16ea60c8d3f",
+  "name": "Wattlebird",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.4
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 1,
+    "scale": 1,
+    "depth": 0.9
+  },
+  "dynamics": {
+    "opacity": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "a0abe7c5-7e77-588f-b1dc-951068b9270a",
+  "name": "Water Bleed",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.05,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.3
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear"
+    },
+    "bleed": {
+      "pressure": "curve:linear",
+      "pressureAmount": 0.6
+    }
+  },
+  "wetMix": {
+    "enabled": true,
+    "dilution": 0.6,
+    "pull": 0.4,
+    "attack": 0.8,
+    "charge": 1.0,
+    "wetnessJitter": 0.2
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "wetEdges": 0.5
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.45,
+    "opacity": 1
+  }
+}

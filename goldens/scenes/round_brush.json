@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "documentId": "golden-round-brush",
+  "canvas": { "width": 512, "height": 256, "background": [1, 1, 1, 1] },
+  "layers": 2,
+  "actions": [
+    { "type": "stroke", "tool": "paint", "layer": 1, "size": 28, "opacity": 1,
+      "color": [0.10, 0.20, 0.55, 1], "trace": "round_brush_s_curve.trace" },
+    { "type": "stroke", "tool": "paint", "layer": 2, "size": 14, "opacity": 0.6,
+      "color": [0.85, 0.25, 0.10, 1], "brush": { "accumulation": "buildUp", "hardness": 0.3 },
+      "trace": "round_brush_fast_diagonal.trace" },
+    { "type": "stroke", "tool": "erase", "layer": 1, "size": 18, "opacity": 1,
+      "trace": "round_brush_eraser_line.trace" }
+  ]
+}

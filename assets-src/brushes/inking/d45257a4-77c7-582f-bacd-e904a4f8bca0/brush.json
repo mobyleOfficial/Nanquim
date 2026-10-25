@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "d45257a4-77c7-582f-bacd-e904a4f8bca0",
+  "name": "Pandani",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": "shape.png",
+    "hardness": 1.0,
+    "rotationMode": "followStroke"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 50
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 1
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.5
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "958ab067-fa3e-535e-a96d-904b09f2afad",
+  "name": "Driven Snow",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.15
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.6,
+    "count": 3,
+    "rotationJitter": 0.3
+  },
+  "dynamics": {
+    "flow": {
+      "min": 0.3,
+      "pressure": "curve:linear"
+    },
+    "size": {
+      "jitter": 0.6
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

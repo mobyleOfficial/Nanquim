@@ -1,0 +1,70 @@
+# Gradle / Android
+.gradle/
+build/
+out/
+.kotlin/
+local.properties
+captures/
+*.apk
+*.aab
+*.ap_
+*.hprof
+
+# Native
+.cxx/
+.externalNativeBuild/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.fleet/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Signing material never goes in the repository.
+*.jks
+*.keystore
+keystore.properties
+
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.p12
+*.pfx
+*.key
+secrets.properties
+service-account*.json
+
+# Firebase config; each checkout brings its own.
+app/google-services.json
+
+# Artwork and brush files made in other apps; only the generated fuzz seeds are kept.
+*.procreate
+*.brushset
+*.brush
+*.swatches
+*.psd
+*.psb
+*.clip
+*.kra
+*.sai
+!engine/src/fuzz/corpus/**
+
+# Device captures and logs
+*.pftrace
+*.perfetto-trace
+*.log

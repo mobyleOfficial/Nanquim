@@ -1,0 +1,51 @@
+{
+  "format": 1,
+  "id": "286e2f3e-c81a-5b93-bc00-6e14cb591cf8",
+  "name": "Flowing Hair",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.02,
+    "streamline": 0.6
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.5,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 120
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 40,
+      "end": 90,
+      "minSize": 0.02,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 40,
+      "end": 90,
+      "minSize": 0.02,
+      "shape": 0.0
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "9c575fb3-e6e8-5c9f-b5e4-ab3062e22d9b",
+  "name": "Medium Nozzle",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.15
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.15,
+    "count": 2
+  },
+  "dynamics": {
+    "flow": {
+      "min": 0.3,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 250
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

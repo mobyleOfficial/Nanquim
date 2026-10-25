@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "03d4342c-23c3-560e-9c29-88761b3ce587",
+  "name": "Thylacine",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": "shape.png",
+    "hardness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 50
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 1
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 1,
+    "scale": 1.5,
+    "depth": 0.6
+  }
+}

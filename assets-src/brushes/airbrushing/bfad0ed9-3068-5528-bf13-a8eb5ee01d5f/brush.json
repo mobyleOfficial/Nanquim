@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "id": "bfad0ed9-3068-5528-bf13-a8eb5ee01d5f",
+  "name": "Hard Blend",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.95
+  },
+  "dynamics": {
+    "flow": {
+      "min": 0.2,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeLight",
+    "flow": 0.3
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 500
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "2c1f5a0e-6b1d-4f63-9a0e-3f7c2d1b8a12",
+  "name": "Gel Pen",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.95
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 30
+  },
+  "defaults": {
+    "size": 0.2,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 10,
+      "end": 15,
+      "minSize": 0.2,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 10,
+      "end": 15,
+      "minSize": 0.2,
+      "shape": 0.0
+    }
+  }
+}

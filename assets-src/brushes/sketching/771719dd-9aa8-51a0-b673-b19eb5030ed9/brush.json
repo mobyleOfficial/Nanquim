@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "771719dd-9aa8-51a0-b673-b19eb5030ed9",
+  "name": "Soft Graphite",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.1,
+    "streamline": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random"
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.5
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.6
+    },
+    "opacity": {
+      "min": 0.2,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.5
+  },
+  "render": {
+    "accumulation": "glazeLight"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 50
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  }
+}

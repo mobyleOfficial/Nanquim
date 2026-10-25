@@ -1,0 +1,52 @@
+{
+  "format": 1,
+  "id": "bf68793d-0cc2-5269-b330-2f81dd2cb866",
+  "name": "Charcoal Roll",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.08,
+    "streamline": 0.05
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "fixed",
+    "scatter": 0.03,
+    "roundness": 0.5
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 1.5,
+    "depth": 0.6
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear",
+      "tilt": "curve:linear",
+      "tiltAmount": 0.3
+    },
+    "opacity": {
+      "min": 0.25,
+      "pressure": "curve:soft"
+    },
+    "tiltGradation": 0.7
+  },
+  "render": {
+    "accumulation": "glazeIntense"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 80
+  },
+  "defaults": {
+    "size": 0.5,
+    "opacity": 1
+  },
+  "roll": {
+    "enabled": true,
+    "amount": 1
+  }
+}

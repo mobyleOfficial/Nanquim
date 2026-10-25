@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "4125df6c-df5c-5043-8bb5-d46865d137aa",
+  "name": "Studio Pen",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 40
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 20,
+      "end": 50,
+      "minSize": 0.2,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 20,
+      "end": 50,
+      "minSize": 0.2,
+      "shape": 0.0
+    }
+  }
+}

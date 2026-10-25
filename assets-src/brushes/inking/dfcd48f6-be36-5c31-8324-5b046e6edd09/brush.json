@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "id": "dfcd48f6-be36-5c31-8324-5b046e6edd09",
+  "name": "Ink Flow",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.5
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.05,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 50
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 40,
+      "end": 80,
+      "minSize": 0.05,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 40,
+      "end": 80,
+      "minSize": 0.05,
+      "shape": 0.0
+    }
+  }
+}

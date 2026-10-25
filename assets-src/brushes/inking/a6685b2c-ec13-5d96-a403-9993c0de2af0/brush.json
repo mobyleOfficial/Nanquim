@@ -1,0 +1,51 @@
+{
+  "format": 1,
+  "id": "a6685b2c-ec13-5d96-a403-9993c0de2af0",
+  "name": "Ink Bleed",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    },
+    "bleed": {
+      "pressure": "curve:linear",
+      "pressureAmount": 0.6
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 50
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 1
+  },
+  "taper": {
+    "stylus": {
+      "start": 20,
+      "end": 40,
+      "minSize": 0.1,
+      "shape": 0.0
+    },
+    "finger": {
+      "start": 20,
+      "end": 40,
+      "minSize": 0.1,
+      "shape": 0.0
+    }
+  }
+}

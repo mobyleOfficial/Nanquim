@@ -1,0 +1,34 @@
+{
+  "format": 1,
+  "id": "c37c16c8-3f60-5bc4-b9ec-3ca265b86194",
+  "name": "Sawtooth",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke",
+    "scatter": 0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.6,
+      "pressure": "curve:linear",
+      "jitter": 0.3
+    }
+  },
+  "render": {
+    "accumulation": "buildUp"
+  },
+  "limits": {
+    "minSize": 4,
+    "maxSize": 150
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  }
+}

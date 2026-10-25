@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "f5882d62-bc65-5b65-a1bf-3ae3559de525",
+  "name": "Shale Brush",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.4
+  },
+  "shape": {
+    "texture": "shape.png",
+    "hardness": 1,
+    "rotationMode": "fixed",
+    "rotation": 0.6981,
+    "roundness": 0.4
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.4,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 70
+  },
+  "defaults": {
+    "size": 0.3,
+    "opacity": 1
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 0,
+    "scale": 2,
+    "depth": 0.6
+  }
+}

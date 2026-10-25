@@ -1,0 +1,916 @@
+{
+ "format": 1,
+ "documentId": "golden-brush-stamp",
+ "canvas": {
+  "width": 512,
+  "height": 272,
+  "background": [
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "layers": 1,
+ "actions": [
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 72,
+   "opacity": 1,
+   "color": [
+    0.15,
+    0.25,
+    0.7,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/shape.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     56,
+     48,
+     1.0,
+     0.0
+    ],
+    [
+     56,
+     48,
+     1.0,
+     16.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 72,
+   "opacity": 1,
+   "color": [
+    0.15,
+    0.25,
+    0.7,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/shape.png",
+     "rotationMode": "fixed",
+     "rotation": 0.8
+    },
+    "stamp": {
+     "enabled": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     152,
+     48,
+     1.0,
+     0.0
+    ],
+    [
+     152,
+     48,
+     1.0,
+     16.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 72,
+   "opacity": 1,
+   "color": [
+    0.15,
+    0.25,
+    0.7,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/shape.png",
+     "rotationMode": "fixed",
+     "roundness": 0.5
+    },
+    "stamp": {
+     "enabled": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     248,
+     48,
+     1.0,
+     0.0
+    ],
+    [
+     248,
+     48,
+     1.0,
+     16.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 72,
+   "opacity": 1,
+   "color": [
+    0.15,
+    0.25,
+    0.7,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/shape.png",
+     "rotationMode": "fixed",
+     "invert": true
+    },
+    "stamp": {
+     "enabled": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     344,
+     48,
+     1.0,
+     0.0
+    ],
+    [
+     344,
+     48,
+     1.0,
+     16.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 72,
+   "opacity": 1,
+   "color": [
+    0.15,
+    0.25,
+    0.7,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/shape.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     440.0,
+     48.0,
+     1.0,
+     0.0
+    ],
+    [
+     446.0,
+     51.0,
+     1.0,
+     8.0
+    ],
+    [
+     452.0,
+     54.0,
+     1.0,
+     16.0
+    ],
+    [
+     458.0,
+     57.0,
+     1.0,
+     24.0
+    ],
+    [
+     464.0,
+     60.0,
+     1.0,
+     32.0
+    ],
+    [
+     470.0,
+     63.0,
+     1.0,
+     40.0
+    ],
+    [
+     476.0,
+     66.0,
+     1.0,
+     48.0
+    ],
+    [
+     482.0,
+     69.0,
+     1.0,
+     56.0
+    ],
+    [
+     488.0,
+     72.0,
+     1.0,
+     64.0
+    ],
+    [
+     494.0,
+     75.0,
+     1.0,
+     72.0
+    ],
+    [
+     500.0,
+     78.0,
+     1.0,
+     80.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 72,
+   "opacity": 1,
+   "color": [
+    0.75,
+    0.2,
+    0.2,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/shape.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true,
+     "placeOnRelease": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     56.0,
+     136.0,
+     1.0,
+     0.0
+    ],
+    [
+     60.0,
+     136.0,
+     1.0,
+     8.0
+    ],
+    [
+     64.0,
+     136.0,
+     1.0,
+     16.0
+    ],
+    [
+     68.0,
+     136.0,
+     1.0,
+     24.0
+    ],
+    [
+     72.0,
+     136.0,
+     1.0,
+     32.0
+    ],
+    [
+     76.0,
+     136.0,
+     1.0,
+     40.0
+    ],
+    [
+     80.0,
+     136.0,
+     1.0,
+     48.0
+    ],
+    [
+     84.0,
+     136.0,
+     1.0,
+     56.0
+    ],
+    [
+     88.0,
+     136.0,
+     1.0,
+     64.0
+    ],
+    [
+     92.0,
+     136.0,
+     1.0,
+     72.0
+    ],
+    [
+     96.0,
+     136.0,
+     1.0,
+     80.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 72,
+   "opacity": 1,
+   "color": [
+    0.75,
+    0.2,
+    0.2,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/shape.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true,
+     "placeOnRelease": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     152.0,
+     136.0,
+     1.0,
+     0.0
+    ],
+    [
+     152.0,
+     140.0,
+     1.0,
+     8.0
+    ],
+    [
+     152.0,
+     144.0,
+     1.0,
+     16.0
+    ],
+    [
+     152.0,
+     148.0,
+     1.0,
+     24.0
+    ],
+    [
+     152.0,
+     152.0,
+     1.0,
+     32.0
+    ],
+    [
+     152.0,
+     156.0,
+     1.0,
+     40.0
+    ],
+    [
+     152.0,
+     160.0,
+     1.0,
+     48.0
+    ],
+    [
+     152.0,
+     164.0,
+     1.0,
+     56.0
+    ],
+    [
+     152.0,
+     168.0,
+     1.0,
+     64.0
+    ],
+    [
+     152.0,
+     172.0,
+     1.0,
+     72.0
+    ],
+    [
+     152.0,
+     176.0,
+     1.0,
+     80.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 72,
+   "opacity": 1,
+   "color": [
+    0.75,
+    0.2,
+    0.2,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/shape.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true,
+     "placeOnRelease": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     248.0,
+     136.0,
+     1.0,
+     0.0
+    ],
+    [
+     244.0,
+     136.0,
+     1.0,
+     8.0
+    ],
+    [
+     240.0,
+     136.0,
+     1.0,
+     16.0
+    ],
+    [
+     236.0,
+     136.0,
+     1.0,
+     24.0
+    ],
+    [
+     232.0,
+     136.0,
+     1.0,
+     32.0
+    ],
+    [
+     228.0,
+     136.0,
+     1.0,
+     40.0
+    ],
+    [
+     224.0,
+     136.0,
+     1.0,
+     48.0
+    ],
+    [
+     220.0,
+     136.0,
+     1.0,
+     56.0
+    ],
+    [
+     216.0,
+     136.0,
+     1.0,
+     64.0
+    ],
+    [
+     212.0,
+     136.0,
+     1.0,
+     72.0
+    ],
+    [
+     208.0,
+     136.0,
+     1.0,
+     80.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 72,
+   "opacity": 1,
+   "color": [
+    0.75,
+    0.2,
+    0.2,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/shape.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true,
+     "placeOnRelease": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     344.0,
+     136.0,
+     1.0,
+     0.0
+    ],
+    [
+     341.0,
+     133.0,
+     1.0,
+     8.0
+    ],
+    [
+     338.0,
+     130.0,
+     1.0,
+     16.0
+    ],
+    [
+     335.0,
+     127.0,
+     1.0,
+     24.0
+    ],
+    [
+     332.0,
+     124.0,
+     1.0,
+     32.0
+    ],
+    [
+     329.0,
+     121.0,
+     1.0,
+     40.0
+    ],
+    [
+     326.0,
+     118.0,
+     1.0,
+     48.0
+    ],
+    [
+     323.0,
+     115.0,
+     1.0,
+     56.0
+    ],
+    [
+     320.0,
+     112.0,
+     1.0,
+     64.0
+    ],
+    [
+     317.0,
+     109.0,
+     1.0,
+     72.0
+    ],
+    [
+     314.0,
+     106.0,
+     1.0,
+     80.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 80,
+   "opacity": 1,
+   "color": [
+    0.1,
+    0.8,
+    0.2,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/color.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true,
+     "keepColors": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     56,
+     224,
+     1.0,
+     0.0
+    ],
+    [
+     56,
+     224,
+     1.0,
+     16.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 80,
+   "opacity": 1,
+   "color": [
+    0.1,
+    0.8,
+    0.2,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/color.png",
+     "rotationMode": "fixed",
+     "rotation": -1.2
+    },
+    "stamp": {
+     "enabled": true,
+     "keepColors": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     152,
+     224,
+     1.0,
+     0.0
+    ],
+    [
+     152,
+     224,
+     1.0,
+     16.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 80,
+   "opacity": 0.5,
+   "color": [
+    0.1,
+    0.8,
+    0.2,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/color.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true,
+     "keepColors": true
+    },
+    "render": {
+     "accumulation": "glazeLight"
+    }
+   },
+   "samples": [
+    [
+     248,
+     224,
+     1.0,
+     0.0
+    ],
+    [
+     248,
+     224,
+     1.0,
+     16.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 80,
+   "opacity": 1,
+   "color": [
+    0.1,
+    0.8,
+    0.2,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/color.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true,
+     "keepColors": true
+    },
+    "render": {
+     "accumulation": "buildUp",
+     "gammaCorrect": true
+    }
+   },
+   "samples": [
+    [
+     344,
+     224,
+     1.0,
+     0.0
+    ],
+    [
+     344,
+     224,
+     1.0,
+     16.0
+    ]
+   ]
+  },
+  {
+   "type": "stroke",
+   "tool": "paint",
+   "layer": 1,
+   "size": 80,
+   "opacity": 1,
+   "color": [
+    0.1,
+    0.8,
+    0.2,
+    1
+   ],
+   "brush": {
+    "format": 1,
+    "shape": {
+     "texture": "../brushes/test-stamp/color.png",
+     "rotationMode": "fixed"
+    },
+    "stamp": {
+     "enabled": true,
+     "keepColors": true,
+     "placeOnRelease": true
+    },
+    "render": {
+     "accumulation": "buildUp"
+    }
+   },
+   "samples": [
+    [
+     440.0,
+     224.0,
+     1.0,
+     0.0
+    ],
+    [
+     440.0,
+     228.0,
+     1.0,
+     8.0
+    ],
+    [
+     440.0,
+     232.0,
+     1.0,
+     16.0
+    ],
+    [
+     440.0,
+     236.0,
+     1.0,
+     24.0
+    ],
+    [
+     440.0,
+     240.0,
+     1.0,
+     32.0
+    ],
+    [
+     440.0,
+     244.0,
+     1.0,
+     40.0
+    ],
+    [
+     440.0,
+     248.0,
+     1.0,
+     48.0
+    ],
+    [
+     440.0,
+     252.0,
+     1.0,
+     56.0
+    ],
+    [
+     440.0,
+     256.0,
+     1.0,
+     64.0
+    ],
+    [
+     440.0,
+     260.0,
+     1.0,
+     72.0
+    ],
+    [
+     440.0,
+     264.0,
+     1.0,
+     80.0
+    ]
+   ]
+  }
+ ]
+}

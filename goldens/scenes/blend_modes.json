@@ -1,0 +1,1630 @@
+{
+ "format": 1,
+ "documentId": "golden-blend-modes",
+ "canvas": {
+  "width": 448,
+  "height": 256,
+  "background": [
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "layers": [
+  {
+   "type": "group",
+   "id": 1,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 2
+    },
+    {
+     "type": "raster",
+     "id": 3,
+     "blend": "normal"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 4,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 5
+    },
+    {
+     "type": "raster",
+     "id": 6,
+     "blend": "multiply"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 7,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 8
+    },
+    {
+     "type": "raster",
+     "id": 9,
+     "blend": "screen"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 10,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 11
+    },
+    {
+     "type": "raster",
+     "id": 12,
+     "blend": "overlay"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 13,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 14
+    },
+    {
+     "type": "raster",
+     "id": 15,
+     "blend": "darken"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 16,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 17
+    },
+    {
+     "type": "raster",
+     "id": 18,
+     "blend": "lighten"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 19,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 20
+    },
+    {
+     "type": "raster",
+     "id": 21,
+     "blend": "colorDodge"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 22,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 23
+    },
+    {
+     "type": "raster",
+     "id": 24,
+     "blend": "colorBurn"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 25,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 26
+    },
+    {
+     "type": "raster",
+     "id": 27,
+     "blend": "hardLight"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 28,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 29
+    },
+    {
+     "type": "raster",
+     "id": 30,
+     "blend": "softLight"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 31,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 32
+    },
+    {
+     "type": "raster",
+     "id": 33,
+     "blend": "difference"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 34,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 35
+    },
+    {
+     "type": "raster",
+     "id": 36,
+     "blend": "exclusion"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 37,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 38
+    },
+    {
+     "type": "raster",
+     "id": 39,
+     "blend": "add"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 40,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 41
+    },
+    {
+     "type": "raster",
+     "id": 42,
+     "blend": "subtract"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 43,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 44
+    },
+    {
+     "type": "raster",
+     "id": 45,
+     "blend": "divide"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 46,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 47
+    },
+    {
+     "type": "raster",
+     "id": 48,
+     "blend": "linearBurn"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 49,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 50
+    },
+    {
+     "type": "raster",
+     "id": 51,
+     "blend": "vividLight"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 52,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 53
+    },
+    {
+     "type": "raster",
+     "id": 54,
+     "blend": "linearLight"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 55,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 56
+    },
+    {
+     "type": "raster",
+     "id": 57,
+     "blend": "pinLight"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 58,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 59
+    },
+    {
+     "type": "raster",
+     "id": 60,
+     "blend": "hardMix"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 61,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 62
+    },
+    {
+     "type": "raster",
+     "id": 63,
+     "blend": "hue"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 64,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 65
+    },
+    {
+     "type": "raster",
+     "id": 66,
+     "blend": "saturation"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 67,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 68
+    },
+    {
+     "type": "raster",
+     "id": 69,
+     "blend": "color"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 70,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 71
+    },
+    {
+     "type": "raster",
+     "id": 72,
+     "blend": "luminosity"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 73,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 74
+    },
+    {
+     "type": "raster",
+     "id": 75,
+     "blend": "darkerColor"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "id": 76,
+   "blend": "normal",
+   "children": [
+    {
+     "type": "raster",
+     "id": 77
+    },
+    {
+     "type": "raster",
+     "id": 78,
+     "blend": "lighterColor"
+    }
+   ]
+  }
+ ],
+ "actions": [
+  {
+   "type": "fill",
+   "layer": 2,
+   "rect": [
+    0,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 3,
+   "rect": [
+    0,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 5,
+   "rect": [
+    64,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 6,
+   "rect": [
+    64,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 8,
+   "rect": [
+    128,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 9,
+   "rect": [
+    128,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 11,
+   "rect": [
+    192,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 12,
+   "rect": [
+    192,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 14,
+   "rect": [
+    256,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 15,
+   "rect": [
+    256,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 17,
+   "rect": [
+    320,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 18,
+   "rect": [
+    320,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 20,
+   "rect": [
+    384,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 21,
+   "rect": [
+    384,
+    0,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 23,
+   "rect": [
+    0,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 24,
+   "rect": [
+    0,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 26,
+   "rect": [
+    64,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 27,
+   "rect": [
+    64,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 29,
+   "rect": [
+    128,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 30,
+   "rect": [
+    128,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 32,
+   "rect": [
+    192,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 33,
+   "rect": [
+    192,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 35,
+   "rect": [
+    256,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 36,
+   "rect": [
+    256,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 38,
+   "rect": [
+    320,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 39,
+   "rect": [
+    320,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 41,
+   "rect": [
+    384,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 42,
+   "rect": [
+    384,
+    64,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 44,
+   "rect": [
+    0,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 45,
+   "rect": [
+    0,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 47,
+   "rect": [
+    64,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 48,
+   "rect": [
+    64,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 50,
+   "rect": [
+    128,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 51,
+   "rect": [
+    128,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 53,
+   "rect": [
+    192,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 54,
+   "rect": [
+    192,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 56,
+   "rect": [
+    256,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 57,
+   "rect": [
+    256,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 59,
+   "rect": [
+    320,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 60,
+   "rect": [
+    320,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 62,
+   "rect": [
+    384,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 63,
+   "rect": [
+    384,
+    128,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 65,
+   "rect": [
+    0,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 66,
+   "rect": [
+    0,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 68,
+   "rect": [
+    64,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 69,
+   "rect": [
+    64,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 71,
+   "rect": [
+    128,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 72,
+   "rect": [
+    128,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 74,
+   "rect": [
+    192,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 75,
+   "rect": [
+    192,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  },
+  {
+   "type": "fill",
+   "layer": 77,
+   "rect": [
+    256,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    0.9,
+    0.15,
+    0.2,
+    1
+   ],
+   "toColor": [
+    0.1,
+    0.75,
+    0.95,
+    0.4
+   ],
+   "direction": "horizontal"
+  },
+  {
+   "type": "fill",
+   "layer": 78,
+   "rect": [
+    256,
+    192,
+    64,
+    64
+   ],
+   "color": [
+    1.0,
+    0.85,
+    0.1,
+    0.3
+   ],
+   "toColor": [
+    0.25,
+    0.2,
+    0.7,
+    1
+   ],
+   "direction": "vertical"
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "format": 1,
+ "documentId": "golden-text-hebrew",
+ "canvas": {
+  "width": 520,
+  "height": 140,
+  "background": [
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "layers": 1,
+ "actions": [
+  {
+   "type": "text",
+   "layer": 1,
+   "dpi": 72,
+   "fonts": {
+    "NotoSans-Regular": "../fonts/NotoSans-Regular-subset.ttf",
+    "NotoSerif-Regular": "../fonts/NotoSerif-Regular-subset.ttf",
+    "NotoSansArabic-Regular": "../fonts/NotoSansArabic-Regular-subset.ttf",
+    "NotoSansHebrew-Regular": "../fonts/NotoSansHebrew-Regular-test.ttf",
+    "NotoSansCJKjp-Regular": "../fonts/NotoSansCJKjp-Regular-subset.otf"
+   },
+   "fallbacks": [
+    "NotoSans-Regular",
+    "NotoSansArabic-Regular",
+    "NotoSansHebrew-Regular",
+    "NotoSansCJKjp-Regular"
+   ],
+   "model": {
+    "format": 1,
+    "content": [
+     {
+      "text": "שלום עולם (abc) 2026!",
+      "style": "s0"
+     }
+    ],
+    "styles": {
+     "s0": {
+      "fontId": "NotoSansHebrew-Regular",
+      "sizePt": 40,
+      "color": [
+       0.35,
+       0.1,
+       0.4,
+       1
+      ]
+     }
+    },
+    "paragraph": {
+     "alignment": "right",
+     "lineHeight": 1.2,
+     "vertical": false,
+     "direction": "auto"
+    },
+    "box": {
+     "mode": "fixed",
+     "width": 480,
+     "height": 100
+    },
+    "transform": [
+     1,
+     0,
+     0,
+     1,
+     20,
+     20
+    ]
+   }
+  }
+ ]
+}

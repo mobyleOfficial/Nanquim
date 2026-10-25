@@ -1,0 +1,14 @@
+{
+  "format": 1,
+  "id": "6f1d1c3e-0b6c-4c39-9c39-6b1b7a0e0002",
+  "name": "Test Flat",
+  "author": "Nanquim",
+  "license": "MIT",
+  "path": { "spacing": 0.06 },
+  "shape": { "texture": "shape.png", "rotationMode": "fixed", "rotation": 0.7, "roundness": 0.6,
+             "count": 2, "scatter": 0.1 },
+  "grain": { "texture": "grain.png", "mode": "moving", "scale": 2, "depth": 0.5,
+             "blend": "height" },
+  "dynamics": { "size": { "min": 0.6, "pressure": "curve:linear" } },
+  "render": { "accumulation": "wash" }
+}

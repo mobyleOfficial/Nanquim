@@ -1,0 +1,14 @@
+# modernize and bugprone checks.
+# Disabled: trailing return types and C arrays (style; EGL attribute lists are C arrays),
+# designated initializers (C++20; the engine is C++17), swappable parameters (noisy for
+# x/y and color component parameters).
+Checks: >
+  -*,
+  bugprone-*,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  -modernize-avoid-c-arrays,
+  -modernize-use-designated-initializers,
+  -bugprone-easily-swappable-parameters
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*/src/main/cpp/.*'

@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "id": "5a2fe4bf-334d-541a-9bc2-ea617a6d1438",
+  "name": "Old Brush",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0.2
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "followStroke"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.6,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform"
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 300
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  },
+  "grain": {
+    "texture": "grain.png",
+    "movement": 1,
+    "scale": 1,
+    "depth": 0.6
+  }
+}

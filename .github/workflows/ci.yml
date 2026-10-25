@@ -1,0 +1,133 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NDK_VERSION: "28.2.13676358"
+  CMAKE_VERSION: "3.22.1"
+  KTLINT_VERSION: "1.7.1"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: gradle/actions/wrapper-validation@v4
+
+      - run: chmod +x gradlew
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Android SDK packages
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platforms;android-36" "ndk;${NDK_VERSION}" "cmake;${CMAKE_VERSION}"
+          echo "LLVM_BIN=$ANDROID_HOME/ndk/${NDK_VERSION}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> "$GITHUB_ENV"
+
+      - name: Install host build tools
+        run: sudo apt-get update && sudo apt-get install --yes ninja-build
+
+      - name: Build (debug, release, benchmark)
+        run: ./gradlew assembleDebug assembleRelease :benchmarks:assembleBenchmark
+
+      - name: Kotlin unit tests
+        run: ./gradlew test
+
+      - name: C++ unit tests (host)
+        run: ./gradlew :engine:hostTest
+
+      - name: Android Lint
+        run: ./gradlew :app:lintProdDebug
+
+      - name: clang-tidy
+        run: |
+          android_database_directory="$(dirname "$(find engine/.cxx -path '*Debug*arm64-v8a*' -name compile_commands.json | head -n 1)")"
+          "$LLVM_BIN/clang-tidy" -p "$android_database_directory" --quiet $(find engine/src/main/cpp -name '*.cpp')
+          "$LLVM_BIN/clang-tidy" -p engine/build/hostTest --quiet $(find engine/src/test/cpp engine/src/reference engine/src/cli -name '*.cpp')
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
+
+  style:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang-format (same LLVM as the NDK toolchain)
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;${NDK_VERSION}"
+
+      - name: clang-format
+        run: |
+          find engine/src -name '*.cpp' -o -name '*.h' | xargs \
+            "$ANDROID_HOME/ndk/${NDK_VERSION}/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-format" --dry-run --Werror
+
+      - name: ktlint
+        run: |
+          curl --silent --show-error --location --output ktlint \
+            "https://github.com/pinterest/ktlint/releases/download/${KTLINT_VERSION}/ktlint"
+          chmod +x ktlint
+          ./ktlint "**/src/**/*.kt" "**/*.gradle.kts" "*.gradle.kts"
+
+  fuzz:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang and libFuzzer
+        run: sudo apt-get update && sudo apt-get install --yes clang libclang-rt-18-dev cmake ninja-build
+      - name: Build the harnesses
+        run: |
+          cmake -S engine/src/test/cpp -B engine/build/fuzz -G Ninja -DNANQUIM_FUZZ=ON \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+          cmake --build engine/build/fuzz --target $(cd engine/src/fuzz/corpus && printf 'fuzz_%s ' *)
+      - name: Fuzz
+        run: |
+          for corpus in engine/src/fuzz/corpus/*/; do
+            name="$(basename "$corpus")"
+            mkdir -p "engine/build/fuzz/found/$name"
+            "engine/build/fuzz/fuzz_$name" -max_total_time=300 -timeout=10 -rss_limit_mb=2048 \
+              "engine/build/fuzz/found/$name" "$corpus"
+          done
+      - name: Upload crashes
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crashes
+          path: |
+            crash-*
+            leak-*
+            timeout-*
+
+  licenses:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: License check
+        run: python3 tools/check_licenses.py
+      - name: GPU calls only in the GL backend
+        run: python3 tools/check_gpu_calls.py
+      - name: MCP bridge tests
+        run: python3 tools/mcp/test_nanquim_mcp.py

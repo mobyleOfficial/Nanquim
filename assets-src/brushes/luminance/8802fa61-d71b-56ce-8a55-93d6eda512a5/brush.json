@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "8802fa61-d71b-56ce-8a55-93d6eda512a5",
+  "name": "Flare",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.8
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "fixed"
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "blend": "add",
+    "luminanceBlending": true,
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 500
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

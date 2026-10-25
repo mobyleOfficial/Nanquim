@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "id": "bd3dfff4-db97-5a0e-9d3d-6ccbdf8a0e62",
+  "name": "Fine Tip",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.3
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.8,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 15
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 1
+  }
+}

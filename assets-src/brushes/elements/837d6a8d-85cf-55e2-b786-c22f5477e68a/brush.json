@@ -1,0 +1,45 @@
+{
+  "format": 1,
+  "id": "837d6a8d-85cf-55e2-b786-c22f5477e68a",
+  "name": "Flames",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.1
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "fixed",
+    "scatter": 0.15
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.5,
+      "pressure": "curve:linear"
+    },
+    "opacity": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "buildUp",
+    "blend": "add",
+    "luminanceBlending": true,
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 400
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  },
+  "colorDynamics": {
+    "hueJitter": 0.04,
+    "brightnessJitter": 0.2,
+    "secondaryColorJitter": 0.5
+  }
+}

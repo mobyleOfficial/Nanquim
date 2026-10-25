@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "e6dda894-e3e9-593e-8f38-7c6bc0d25eb0",
+  "name": "Stubble",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.15
+  },
+  "shape": {
+    "texture": "shape.png",
+    "rotationMode": "random",
+    "scatter": 0.3,
+    "count": 2
+  },
+  "dynamics": {
+    "flow": {
+      "min": 0.3,
+      "pressure": "curve:linear"
+    }
+  },
+  "render": {
+    "accumulation": "glazeUniform",
+    "flow": 0.6
+  },
+  "limits": {
+    "minSize": 2,
+    "maxSize": 80
+  },
+  "defaults": {
+    "size": 0.35,
+    "opacity": 1
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "format": 1,
+  "id": "79667abf-4570-5d00-a609-42a6cb8dc02e",
+  "name": "Plimsoll",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.03,
+    "streamline": 0,
+    "jitterLateral": 0.6
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 1.0
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.3,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 30
+  },
+  "defaults": {
+    "size": 0.4,
+    "opacity": 1
+  },
+  "colorDynamics": {
+    "secondaryColorJitter": 0.5
+  }
+}

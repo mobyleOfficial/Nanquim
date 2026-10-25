@@ -1,0 +1,36 @@
+{
+  "format": 1,
+  "id": "471f9f59-7711-5671-842c-99a6eef4aab7",
+  "name": "Marker",
+  "author": "Nanquim contributors",
+  "license": "MIT",
+  "createdAt": "2026-10-14T00:00:00Z",
+  "path": {
+    "spacing": 0.04,
+    "streamline": 0.35
+  },
+  "shape": {
+    "texture": null,
+    "hardness": 0.7,
+    "rotationMode": "fixed",
+    "rotation": 0.8,
+    "roundness": 0.6
+  },
+  "dynamics": {
+    "size": {
+      "min": 0.8,
+      "pressure": "curve:soft"
+    }
+  },
+  "render": {
+    "accumulation": "wash"
+  },
+  "limits": {
+    "minSize": 1,
+    "maxSize": 50
+  },
+  "defaults": {
+    "size": 0.25,
+    "opacity": 0.75
+  }
+}
