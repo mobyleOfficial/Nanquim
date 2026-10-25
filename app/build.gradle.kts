@@ -1,5 +1,6 @@
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -14,6 +15,13 @@ if (firebaseConfigured) {
     apply(plugin = libs.plugins.google.services.get().pluginId)
     apply(plugin = libs.plugins.firebase.crashlytics.get().pluginId)
 }
+
+val keystoreProperties =
+    Properties().apply {
+        val keystorePropertiesFile = rootProject.file("keystore.properties")
+        if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use(::load)
+    }
+val releaseKeystore = keystoreProperties.getProperty("storeFile")?.let(rootProject::file)?.takeIf { it.exists() }
 
 android {
     namespace = "com.mobyle.nanquim"
@@ -37,11 +45,23 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         debug {
             buildConfigField("boolean", "DEVELOPER_TOOLS", "true")
         }
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             buildConfigField("boolean", "DEVELOPER_TOOLS", "false")
