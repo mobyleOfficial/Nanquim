@@ -29,16 +29,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -185,138 +189,152 @@ private fun LayerRowView(
             selected -> MaterialTheme.colorScheme.secondaryContainer
             else -> Color.Transparent
         }
+    // Highlighted rows sit on a container color, so their text and controls must use the
+    // matching "on" color; otherwise light mode puts dark text on a dark-gray row.
+    val highlighted = active || selected
+    val rowContent = if (highlighted) MaterialTheme.colorScheme.contentColorFor(background) else LocalContentColor.current
+    val rowSecondary = if (highlighted) rowContent.copy(alpha = 0.75f) else MaterialTheme.colorScheme.onSurfaceVariant
+    val checkboxColors =
+        if (highlighted) {
+            CheckboxDefaults.colors(checkedColor = rowContent, uncheckedColor = rowContent, checkmarkColor = background)
+        } else {
+            CheckboxDefaults.colors()
+        }
     Box {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .height(ROW_HEIGHT)
-                .offset { IntOffset(0, dragOffset.roundToInt()) }
-                .graphicsLayer { if (dragOffset != 0f) shadowElevation = 8f }
-                .background(background)
-                .pointerInput(node.id) {
-                    var travel = 0f
-                    detectHorizontalDragGestures(
-                        onDragStart = { travel = 0f },
-                        onHorizontalDrag = { _, amount -> travel += amount },
-                        onDragEnd = {
-                            when {
-                                travel > SWIPE_THRESHOLD_PX ->
-                                    onCommand(
-                                        DocumentCommandIds.LAYER_TOGGLE_SELECTED,
-                                        mapOf("layerId" to node.id),
-                                    )
-                                travel < -SWIPE_THRESHOLD_PX -> quickActions = true
-                            }
-                        },
-                    )
-                }.pointerInput(node.id, rows) {
-                    detectDragGesturesAfterLongPress(
-                        onDrag = { change, amount ->
-                            change.consume()
-                            dragOffset += amount.y
-                        },
-                        onDragEnd = {
-                            moveRow(row, rows, dragOffset / rowHeightPx, onCommand)
-                            dragOffset = 0f
-                        },
-                        onDragCancel = { dragOffset = 0f },
-                    )
-                }.onSecondaryClick {
-                    if (!active) onCommand(DocumentCommandIds.LAYER_SELECT, mapOf("layerId" to node.id))
-                    menuOpen = true
-                }.clickable {
-                    if (active) {
+        CompositionLocalProvider(LocalContentColor provides rowContent) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .height(ROW_HEIGHT)
+                    .offset { IntOffset(0, dragOffset.roundToInt()) }
+                    .graphicsLayer { if (dragOffset != 0f) shadowElevation = 8f }
+                    .background(background)
+                    .pointerInput(node.id) {
+                        var travel = 0f
+                        detectHorizontalDragGestures(
+                            onDragStart = { travel = 0f },
+                            onHorizontalDrag = { _, amount -> travel += amount },
+                            onDragEnd = {
+                                when {
+                                    travel > SWIPE_THRESHOLD_PX ->
+                                        onCommand(
+                                            DocumentCommandIds.LAYER_TOGGLE_SELECTED,
+                                            mapOf("layerId" to node.id),
+                                        )
+                                    travel < -SWIPE_THRESHOLD_PX -> quickActions = true
+                                }
+                            },
+                        )
+                    }.pointerInput(node.id, rows) {
+                        detectDragGesturesAfterLongPress(
+                            onDrag = { change, amount ->
+                                change.consume()
+                                dragOffset += amount.y
+                            },
+                            onDragEnd = {
+                                moveRow(row, rows, dragOffset / rowHeightPx, onCommand)
+                                dragOffset = 0f
+                            },
+                            onDragCancel = { dragOffset = 0f },
+                        )
+                    }.onSecondaryClick {
+                        if (!active) onCommand(DocumentCommandIds.LAYER_SELECT, mapOf("layerId" to node.id))
                         menuOpen = true
-                    } else {
-                        onCommand(DocumentCommandIds.LAYER_SELECT, mapOf("layerId" to node.id))
-                    }
-                }.padding(start = 8.dp + INDENT * row.depth, end = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            if (node is RasterLayer && node.clipping) {
-                Text("↳", style = MaterialTheme.typography.bodyLarge)
-            }
-            if (node is LayerGroup) {
-                val label = stringResource(if (node.collapsed) R.string.layers_expand_group else R.string.layers_collapse_group)
-                Text(
-                    if (node.collapsed) "▸" else "▾",
-                    modifier =
+                    }.clickable {
+                        if (active) {
+                            menuOpen = true
+                        } else {
+                            onCommand(DocumentCommandIds.LAYER_SELECT, mapOf("layerId" to node.id))
+                        }
+                    }.padding(start = 8.dp + INDENT * row.depth, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                if (node is RasterLayer && node.clipping) {
+                    Text("↳", style = MaterialTheme.typography.bodyLarge)
+                }
+                if (node is LayerGroup) {
+                    val label = stringResource(if (node.collapsed) R.string.layers_expand_group else R.string.layers_collapse_group)
+                    Text(
+                        if (node.collapsed) "▸" else "▾",
+                        modifier =
+                            Modifier
+                                .clickable {
+                                    onCommand(
+                                        DocumentCommandIds.LAYER_SET_COLLAPSED,
+                                        mapOf(
+                                            "layerId" to node.id,
+                                            "collapsed" to !node.collapsed,
+                                        ),
+                                    )
+                                }.padding(6.dp)
+                                .semantics { contentDescription = label },
+                    )
+                } else {
+                    Thumbnail(session, node.id, mask = false, highlighted = active && !document.maskSelected)
+                }
+                val layerMask = (node as? RasterLayer)?.mask
+                if (layerMask != null) {
+                    val maskLabel = stringResource(R.string.layers_select_mask)
+                    Box(
                         Modifier
-                            .clickable {
-                                onCommand(
-                                    DocumentCommandIds.LAYER_SET_COLLAPSED,
-                                    mapOf(
-                                        "layerId" to node.id,
-                                        "collapsed" to !node.collapsed,
-                                    ),
-                                )
-                            }.padding(6.dp)
-                            .semantics { contentDescription = label },
-                )
-            } else {
-                Thumbnail(session, node.id, mask = false, highlighted = active && !document.maskSelected)
-            }
-            val layerMask = (node as? RasterLayer)?.mask
-            if (layerMask != null) {
-                val maskLabel = stringResource(R.string.layers_select_mask)
+                            .clickable { onCommand(DocumentCommandIds.LAYER_SELECT, mapOf("layerId" to node.id, "mask" to true)) }
+                            .semantics { contentDescription = maskLabel },
+                    ) {
+                        Thumbnail(
+                            session,
+                            layerMask.id,
+                            mask = true,
+                            highlighted = active && document.maskSelected,
+                            disabled = !layerMask.enabled,
+                        )
+                    }
+                }
+                Column(Modifier.weight(1f)) {
+                    Text(node.name, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
+                    val flags =
+                        buildList {
+                            if (node.locked) add(stringResource(R.string.layers_flag_locked))
+                            if (node is RasterLayer && node.alphaLock) add(stringResource(R.string.layers_flag_alpha_lock))
+                            if (node is RasterLayer && node.assisted) add(stringResource(R.string.layers_flag_assisted))
+                            if (node is RasterLayer && node.isReference) add(stringResource(R.string.layers_flag_reference))
+                            if (node is RasterLayer && node.isPrivate) add(stringResource(R.string.layers_private_marker))
+                            if (session.documentSession?.soloLayerId == node.id) add(stringResource(R.string.layers_flag_solo))
+                        }
+                    if (flags.isNotEmpty()) {
+                        Text(flags.joinToString(" · "), style = MaterialTheme.typography.labelSmall, color = rowSecondary)
+                    }
+                }
+                val blendLabel = stringResource(R.string.layers_blend_and_opacity, stringResource(blendNameRes(node.blend)))
                 Box(
                     Modifier
-                        .clickable { onCommand(DocumentCommandIds.LAYER_SELECT, mapOf("layerId" to node.id, "mask" to true)) }
-                        .semantics { contentDescription = maskLabel },
+                        .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                        .clickable { onBlend(node) }
+                        .semantics(mergeDescendants = true) { contentDescription = blendLabel },
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Thumbnail(
-                        session,
-                        layerMask.id,
-                        mask = true,
-                        highlighted = active && document.maskSelected,
-                        disabled = !layerMask.enabled,
-                    )
+                    Text(node.blend.abbreviation, style = MaterialTheme.typography.labelLarge)
                 }
-            }
-            Column(Modifier.weight(1f)) {
-                Text(node.name, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
-                val flags =
-                    buildList {
-                        if (node.locked) add(stringResource(R.string.layers_flag_locked))
-                        if (node is RasterLayer && node.alphaLock) add(stringResource(R.string.layers_flag_alpha_lock))
-                        if (node is RasterLayer && node.assisted) add(stringResource(R.string.layers_flag_assisted))
-                        if (node is RasterLayer && node.isReference) add(stringResource(R.string.layers_flag_reference))
-                        if (node is RasterLayer && node.isPrivate) add(stringResource(R.string.layers_private_marker))
-                        if (session.documentSession?.soloLayerId == node.id) add(stringResource(R.string.layers_flag_solo))
-                    }
-                if (flags.isNotEmpty()) {
-                    Text(
-                        flags.joinToString(" · "),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                val visibilityLabel = stringResource(R.string.layers_visibility)
+                Box(
+                    Modifier
+                        .combinedClickable(
+                            onClick = {
+                                onCommand(
+                                    DocumentCommandIds.LAYER_SET_HIDDEN,
+                                    mapOf("layerId" to node.id, "hidden" to !node.hidden),
+                                )
+                            },
+                            onLongClick = {
+                                if (node is RasterLayer) {
+                                    val solo = if (session.documentSession?.soloLayerId == node.id) null else node.id
+                                    onCommand(DocumentCommandIds.LAYER_SOLO, mapOf("layerId" to solo))
+                                }
+                            },
+                        ).semantics { contentDescription = visibilityLabel },
+                ) {
+                    Checkbox(checked = !node.hidden, onCheckedChange = null, modifier = Modifier.padding(8.dp), colors = checkboxColors)
                 }
-            }
-            val blendLabel = stringResource(R.string.layers_blend_and_opacity, stringResource(blendNameRes(node.blend)))
-            Box(
-                Modifier
-                    .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-                    .clickable { onBlend(node) }
-                    .semantics(mergeDescendants = true) { contentDescription = blendLabel },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(node.blend.abbreviation, style = MaterialTheme.typography.labelLarge)
-            }
-            val visibilityLabel = stringResource(R.string.layers_visibility)
-            Box(
-                Modifier
-                    .combinedClickable(
-                        onClick = { onCommand(DocumentCommandIds.LAYER_SET_HIDDEN, mapOf("layerId" to node.id, "hidden" to !node.hidden)) },
-                        onLongClick = {
-                            if (node is RasterLayer) {
-                                val solo = if (session.documentSession?.soloLayerId == node.id) null else node.id
-                                onCommand(DocumentCommandIds.LAYER_SOLO, mapOf("layerId" to solo))
-                            }
-                        },
-                    ).semantics { contentDescription = visibilityLabel },
-            ) {
-                Checkbox(checked = !node.hidden, onCheckedChange = null, modifier = Modifier.padding(8.dp))
             }
         }
         if (quickActions) {
