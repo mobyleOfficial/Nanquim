@@ -1029,8 +1029,7 @@ std::string psdBlendModeId(const std::string& key) {
   return {};
 }
 
-ImportResult importPsd(InputSource& source, const std::string& folder,
-                       const ImportLimits& limits) {
+ImportResult importPsd(InputSource& source, const std::string& folder, const ImportLimits& limits) {
   return PsdImporter(source, folder, limits).run();
 }
 

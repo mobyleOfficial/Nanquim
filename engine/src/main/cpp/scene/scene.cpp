@@ -276,7 +276,8 @@ std::optional<Scene> parseScene(std::string_view jsonText, const FileReader& rea
       const auto parsed =
           format.is_string() ? canvas::parsePixelFormat(format.get<std::string>()) : std::nullopt;
       if (!parsed) {
-        throw std::invalid_argument("pixelFormat must be rgba8_premul_srgb or rgba16f_premul_linear");
+        throw std::invalid_argument(
+            "pixelFormat must be rgba8_premul_srgb or rgba16f_premul_linear");
       }
       scene.layers.pixelFormat = *parsed;
     }
@@ -656,9 +657,9 @@ std::optional<Scene> parseScene(std::string_view jsonText, const FileReader& rea
           if (!copy.is_array() || copy.size() != 6) {
             throw std::invalid_argument("a symmetry copy is [a, b, c, d, tx, ty]");
           }
-          stroke.settings.symmetry.push_back(
-              {copy.at(0).get<double>(), copy.at(1).get<double>(), copy.at(2).get<double>(),
-               copy.at(3).get<double>(), copy.at(4).get<double>(), copy.at(5).get<double>()});
+          stroke.settings.symmetry.push_back({copy.at(0).get<double>(), copy.at(1).get<double>(),
+                                              copy.at(2).get<double>(), copy.at(3).get<double>(),
+                                              copy.at(4).get<double>(), copy.at(5).get<double>()});
         }
       }
       stroke.samples = readSamples(action, readFile);

@@ -45,7 +45,9 @@ add_library(lcms2 STATIC ${LCMS2_SOURCES})
 target_include_directories(lcms2 SYSTEM PUBLIC ${LCMS2_DIRECTORY}/include)
 target_include_directories(lcms2 PRIVATE ${LCMS2_DIRECTORY}/src)
 if(NANQUIM_FUZZ)
-  target_compile_options(lcms2 PRIVATE -fno-sanitize=function)
+  # lcms2 is vendored as is. _cmsMLUgetWide computes MemPool + 0 on an MLU with an empty pool
+  # (null + 0), which UBSan's pointer-overflow check reports although nothing is read through it.
+  target_compile_options(lcms2 PRIVATE -fno-sanitize=function,pointer-overflow)
 endif()
 include(${THIRD_PARTY_DIRECTORY}/text.cmake)
 add_library(third_party_headers INTERFACE)

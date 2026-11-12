@@ -322,8 +322,8 @@ std::map<canvas::LayerId, Image> renderSceneSurfaces(const scene::Scene& scene) 
         }
         const double sourceAlpha = fill.color[3] * amount;
         for (size_t channel = 0; channel < 3; ++channel) {
-          const double color = linear ? canvas::srgbToLinearValue(fill.color[channel])
-                                      : fill.color[channel];
+          const double color =
+              linear ? canvas::srgbToLinearValue(fill.color[channel]) : fill.color[channel];
           pixel[channel] = color * sourceAlpha + pixel[channel] * (1 - sourceAlpha);
         }
         pixel[3] = sourceAlpha + pixel[3] * (1 - sourceAlpha);
@@ -416,8 +416,7 @@ std::map<canvas::LayerId, Image> renderSceneSurfaces(const scene::Scene& scene) 
           stroke.brush.render.accumulation == stroke::Accumulation::BlendIntense &&
           paintsLayerColors;
       renderDabs(strokeBuffer, dabs, stroke.tipStyle(), stroke.brush.render.accumulation,
-                 mixesLayer ? &surface(static_cast<canvas::LayerId>(stroke.layer), false)
-                            : nullptr,
+                 mixesLayer ? &surface(static_cast<canvas::LayerId>(stroke.layer), false) : nullptr,
                  render.gammaCorrect, linear);
     }
     Image dualBuffer;
@@ -431,7 +430,8 @@ std::map<canvas::LayerId, Image> renderSceneSurfaces(const scene::Scene& scene) 
       dualBuffer = Image(scene.width, scene.height);
       renderDabs(dualBuffer, generateDabs(secondary), secondary.tipStyle(),
                  secondary.brush.render.accumulation, nullptr, false, linear);
-      dual = DualCoverage{&dualBuffer, stroke.brush.dual.blend,
+      dual = DualCoverage{&dualBuffer,
+                          stroke.brush.dual.blend,
                           {canvas::documentChannel(stroke.settings.color[0], linear),
                            canvas::documentChannel(stroke.settings.color[1], linear),
                            canvas::documentChannel(stroke.settings.color[2], linear)}};

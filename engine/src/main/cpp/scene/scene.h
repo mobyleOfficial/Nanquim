@@ -50,8 +50,8 @@ struct StrokeAction {
   [[nodiscard]] StrokeAction replaced() const;
 
   [[nodiscard]] stroke::TipStyle tipStyle() const {
-    return stroke::TipStyle{brush.shape.hardness, shapeTexture.get(), brush.shape.invert,
-                            brush.shape.filtering, &brush.grain, grainTexture.get()};
+    return stroke::TipStyle{brush.shape.hardness,  shapeTexture.get(), brush.shape.invert,
+                            brush.shape.filtering, &brush.grain,       grainTexture.get()};
   }
 };
 

@@ -34,10 +34,11 @@ struct Journal {
 };
 
 std::vector<uint8_t> journalBytes(const Journal& journal) {
-  const std::string text = Json{{"version", kJournalVersion},
-                                {"renames", journal.renames},
-                                {"removals", journal.removals}}
-                               .dump();
+  const std::string text = Json{
+      {"version", kJournalVersion},
+      {"renames", journal.renames},
+      {"removals",
+       journal.removals}}.dump();
   return {text.begin(), text.end()};
 }
 

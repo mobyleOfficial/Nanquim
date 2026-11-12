@@ -41,7 +41,8 @@ DabMixing dabMixing(PaintMixing mode, const BrushParameters& brush, double strok
     const WetMixParameters& wet = brush.wetMix;
     const double grade = lerp(1.0, std::clamp(dab.pressure, 0.0, 1.0), wet.grade);
     const double charge =
-        wet.charge <= 0 ? 0.0 : std::clamp(1.0 - dab.distance / (wet.charge * kChargePixels), 0.0, 1.0);
+        wet.charge <= 0 ? 0.0
+                        : std::clamp(1.0 - dab.distance / (wet.charge * kChargePixels), 0.0, 1.0);
     mixing.brushPaint = {dab.color[0] * charge, dab.color[1] * charge, dab.color[2] * charge,
                          charge};
     mixing.pull = std::clamp(wet.pull * grade, 0.0, 1.0);

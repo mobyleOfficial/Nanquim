@@ -251,8 +251,7 @@ void EngineContext::openDocumentFolder(int32_t widthPixels, int32_t heightPixels
                                        std::vector<canvas::SaveSurface> surfaces) {
   post([this, widthPixels, heightPixels, tree = std::move(tree), documentId = std::move(documentId),
         folder = std::move(folder), surfaces = std::move(surfaces)]() mutable {
-    openDocumentFolderNow(widthPixels, heightPixels, std::move(tree), documentId, folder,
-                          surfaces);
+    openDocumentFolderNow(widthPixels, heightPixels, std::move(tree), documentId, folder, surfaces);
   });
 }
 
@@ -447,8 +446,9 @@ void EngineContext::writeSurfaceTileRow(canvas::LayerId surface, int32_t tileRow
   auto shared = std::make_shared<const std::vector<uint8_t>>(std::move(pixels));
   post([this, surface, tileRow, shared] {
     runStrokeTask([this, surface, tileRow, shared] {
-      pendingSurfaceWrites_.push_back(
-          [this, surface, tileRow, shared] { return writeSurfaceTileRowNow(surface, tileRow, *shared); });
+      pendingSurfaceWrites_.push_back([this, surface, tileRow, shared] {
+        return writeSurfaceTileRowNow(surface, tileRow, *shared);
+      });
     });
   });
 }
@@ -492,7 +492,8 @@ bool EngineContext::writeSurfaceTileRowNow(canvas::LayerId surface, int32_t tile
     }
     const canvas::LayerTileKey key{surface, {column, tileRow}};
     if (!empty && halfFloat) {
-      const auto pixelCount = static_cast<size_t>(canvas::kTileSizePixels) * canvas::kTileSizePixels;
+      const auto pixelCount =
+          static_cast<size_t>(canvas::kTileSizePixels) * canvas::kTileSizePixels;
       if (layerSurface) {
         canvas::premultipliedSrgb8ToLinearHalf(tile.data(), halfTile.data(), pixelCount);
       } else {
@@ -634,7 +635,8 @@ void EngineContext::pollCompositePreview() {
     const PreviewReadback done = std::move(*frameReadback_);
     frameReadback_.reset();
     callbacks_->onSceneRendered(done.requestId, read ? done.width : 0, read ? done.height : 0,
-                                read ? pixels : std::vector<uint8_t>(), read ? "" : "readback failed");
+                                read ? pixels : std::vector<uint8_t>(),
+                                read ? "" : "readback failed");
   }
   if (!previewReadback_) {
     return;
@@ -781,9 +783,8 @@ bool EngineContext::sendCompositeThumbnail(int32_t requestId, int32_t maxSide) {
     return true;
   }
   ATrace_beginSection("NanquimThumbnailFilter");
-  const double scale =
-      std::min(1.0, static_cast<double>(maxSide) /
-                        std::max(document_->widthPixels, document_->heightPixels));
+  const double scale = std::min(1.0, static_cast<double>(maxSide) /
+                                         std::max(document_->widthPixels, document_->heightPixels));
   const int32_t width =
       std::max(1, static_cast<int32_t>(std::lround(document_->widthPixels * scale)));
   const int32_t height =
@@ -815,9 +816,9 @@ bool EngineContext::sendCompositeThumbnail(int32_t requestId, int32_t maxSide) {
           ++count;
         }
       }
-      uint8_t* out = &pixels[(static_cast<size_t>(y) * static_cast<size_t>(width) +
-                              static_cast<size_t>(x)) *
-                             4];
+      uint8_t* out =
+          &pixels[(static_cast<size_t>(y) * static_cast<size_t>(width) + static_cast<size_t>(x)) *
+                  4];
       const uint32_t alphaSum = sum[3];
       for (size_t channel = 0; channel < 3; ++channel) {
         out[channel] = alphaSum == 0 ? 0
@@ -997,8 +998,7 @@ void EngineContext::fillRandomTiles(canvas::LayerId layer, int32_t tileCount, ui
       }
     } else {
       for (int32_t index = 0; index < tileCount; ++index) {
-        const canvas::LayerId target =
-            layer != 0 ? layer : layerIds[layerDistribution(generator)];
+        const canvas::LayerId target = layer != 0 ? layer : layerIds[layerDistribution(generator)];
         keys.push_back(canvas::LayerTileKey{
             target,
             canvas::TileCoordinate{columnDistribution(generator), rowDistribution(generator)}});
@@ -1240,7 +1240,8 @@ void EngineContext::beginStroke(StrokeTool tool, canvas::LayerId layer, StrokeSt
           (node == nullptr || node->isGroup() || (style.maskTarget && !node->mask))) {
         return;
       }
-      if (tool == StrokeTool::Smudge && (style.maskTarget || style.selectionTarget || style.clone)) {
+      if (tool == StrokeTool::Smudge &&
+          (style.maskTarget || style.selectionTarget || style.clone)) {
         return;
       }
       stroke::StrokeSettings settings;
@@ -1283,8 +1284,8 @@ EngineContext::PaintSession& EngineContext::startPaintSession(
   strokeRenderer_->setBrush(brush, std::move(shapeTexture), std::move(grainTexture));
   const bool paintsLayerColors = tool == StrokeTool::Paint && !maskTarget && !selectionTarget;
   const stroke::PaintMixing mixing =
-      maskTarget || selectionTarget || clone ? stroke::PaintMixing::None
-      : tool == StrokeTool::Smudge           ? stroke::PaintMixing::Smudge
+      maskTarget || selectionTarget || clone              ? stroke::PaintMixing::None
+      : tool == StrokeTool::Smudge                        ? stroke::PaintMixing::Smudge
       : tool == StrokeTool::Paint && brush.wetMix.enabled ? stroke::PaintMixing::WetMix
                                                           : stroke::PaintMixing::None;
   stroke::StrokeSettings settings = strokeSettings;
@@ -1300,15 +1301,17 @@ EngineContext::PaintSession& EngineContext::startPaintSession(
       settings.sizePixels, document_ ? document_->widthPixels : 0,
       document_ ? document_->heightPixels : 0);
   if (document_ && !strokeRenderer_->beginMixing(mixing, layer, settings.opacity,
-                                                 document_->widthPixels,
-                                                 document_->heightPixels)) {
+                                                 document_->widthPixels, document_->heightPixels)) {
     NANQUIM_LOG_ERROR("Smudge: no working copy");
   }
   const bool usesDual = dual && brush.dual.enabled && mixing == stroke::PaintMixing::None &&
                         !clone && !selectionTarget;
   strokeRenderer_->setDualBrush(
       usesDual ? std::optional(canvas::StrokeRenderer::DualBrush{
-                     dual->parameters, dual->shapeTexture, dual->grainTexture, brush.dual.blend,
+                     dual->parameters,
+                     dual->shapeTexture,
+                     dual->grainTexture,
+                     brush.dual.blend,
                      {static_cast<float>(settings.color[0]), static_cast<float>(settings.color[1]),
                       static_cast<float>(settings.color[2])}})
                : std::nullopt);
@@ -1342,13 +1345,21 @@ EngineContext::PaintSession& EngineContext::startPaintSession(
     commit.selectionTarget = true;
     commit.maskLuminance = commit.erase ? 0.0F : 1.0F;
   }
-  const bool usesParticles = brush.particles.active() && mixing == stroke::PaintMixing::None &&
-                             !clone && !selectionTarget;
+  const bool usesParticles =
+      brush.particles.active() && mixing == stroke::PaintMixing::None && !clone && !selectionTarget;
   strokeRenderer_->setParticles(usesParticles, brush.particles.useShape);
   const stroke::ParticleParameters particleParameters = brush.particles;
-  PaintSession& session = paintSession_.emplace(PaintSession{
-      tool, layer, commit, commit.opacity, stroke::DabGenerator(std::move(brush), settings), {},
-      std::nullopt, std::nullopt, {}, false});
+  PaintSession& session =
+      paintSession_.emplace(PaintSession{tool,
+                                         layer,
+                                         commit,
+                                         commit.opacity,
+                                         stroke::DabGenerator(std::move(brush), settings),
+                                         {},
+                                         std::nullopt,
+                                         std::nullopt,
+                                         {},
+                                         false});
   if (usesDual) {
     session.dualGenerator.emplace(dual->parameters, stroke::dualStrokeSettings(settings));
   }
@@ -1457,8 +1468,7 @@ void EngineContext::restartPaintSession(PaintSession& session) {
   clearProvisionalStroke();
   markStrokeTilesChanged(session.touchedTiles);
   if (document_) {
-    strokeRenderer_->restartStroke(session.layer, document_->widthPixels,
-                                   document_->heightPixels);
+    strokeRenderer_->restartStroke(session.layer, document_->widthPixels, document_->heightPixels);
   }
   session.generator = session.generator.replacement();
   if (session.dualGenerator) {
@@ -1515,9 +1525,9 @@ bool EngineContext::particlesStillFlying(PaintSession& session) {
   }
   const double lastInput = static_cast<double>(session.latestInputNanos) / 1e6;
   const double end = lastInput + stroke::ParticleSystem::kMaximumTailMilliseconds;
-  const double elapsed = std::chrono::duration<double, std::milli>(
-                             std::chrono::steady_clock::now() - session.liftTime)
-                             .count();
+  const double elapsed =
+      std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - session.liftTime)
+          .count();
   advanceParticles(session, std::min(end, lastInput + elapsed));
   if (session.particles->active(end)) {
     frameRequested_ = true;
@@ -2214,8 +2224,7 @@ void EngineContext::requestThumbnails(int32_t requestId, std::vector<canvas::Lay
   });
 }
 
-void EngineContext::sampleColor(int32_t requestId, double canvasX, double canvasY,
-                                int32_t size) {
+void EngineContext::sampleColor(int32_t requestId, double canvasX, double canvasY, int32_t size) {
   post([this, requestId, canvasX, canvasY, size] {
     if (!document_ || !compositor_->isConfigured()) {
       callbacks_->onSceneRendered(requestId, 0, 0, {}, "no document");
@@ -2556,7 +2565,9 @@ void EngineContext::registerFont(std::string fontId, std::string path, std::vect
 }
 
 void EngineContext::prefetchSurfaces(std::vector<canvas::LayerId> surfaces) {
-  post([this, surfaces = std::move(surfaces)]() mutable { prefetchSurfaces_ = std::move(surfaces); });
+  post([this, surfaces = std::move(surfaces)]() mutable {
+    prefetchSurfaces_ = std::move(surfaces);
+  });
 }
 
 void EngineContext::prefetchTiles() {
@@ -3155,11 +3166,13 @@ bool EngineContext::stepOperation(DocumentOperation& operation,
     std::vector<canvas::TileCoordinate> positions;
     switch (operation.kind) {
       case Kind::Fill:
-        canvasTiles.forEach([&](canvas::TileCoordinate coordinate) { positions.push_back(coordinate); });
+        canvasTiles.forEach(
+            [&](canvas::TileCoordinate coordinate) { positions.push_back(coordinate); });
         break;
       case Kind::Invert:
         if (operation.mask || operation.selection) {
-          canvasTiles.forEach([&](canvas::TileCoordinate coordinate) { positions.push_back(coordinate); });
+          canvasTiles.forEach(
+              [&](canvas::TileCoordinate coordinate) { positions.push_back(coordinate); });
         } else {
           positions = tileStore_->tilesOf(operation.surface);
         }
@@ -4219,7 +4232,7 @@ void EngineContext::renderFrame() {
     if (pendingFills_.empty()) {
       const bool adjusting = adjustmentSession_ && adjustmentSession_->shown;
       int32_t previewLevel = levels.nearest || levels.coarseLevel == 0 ? 0
-                             : adjusting ? levels.coarseLevel
+                             : adjusting                               ? levels.coarseLevel
                                          : std::max(levels.fineLevel, 1);
       int32_t coarsestLevel = levels.coarseLevel;
       constexpr int32_t kZoomedInAdjustmentLevel = 2;

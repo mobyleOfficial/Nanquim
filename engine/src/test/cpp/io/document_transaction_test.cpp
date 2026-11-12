@@ -66,9 +66,9 @@ TEST(DocumentTransaction, CommitReplacesFilesAndRemovesTheRest) {
   writeOldState(folder);
   ASSERT_TRUE(writeNewState(folder, -1));
   const FolderContents expected{
-      {"manifest.json", "manifest v2"},           {"thumbnail.png", "thumbnail v2"},
-      {"layers/a/index.json", "index a v2"},      {"layers/a/tiles/0_0.lz4", "new 0_0"},
-      {"layers/a/tiles/2_3.lz4", "new 2_3"},      {"layers/b/tiles/0_0.lz4", "b 0_0"}};
+      {"manifest.json", "manifest v2"},      {"thumbnail.png", "thumbnail v2"},
+      {"layers/a/index.json", "index a v2"}, {"layers/a/tiles/0_0.lz4", "new 0_0"},
+      {"layers/a/tiles/2_3.lz4", "new 2_3"}, {"layers/b/tiles/0_0.lz4", "b 0_0"}};
   EXPECT_EQ(contentsOf(folder), expected);
   EXPECT_FALSE(fs::exists(folder / "layers/gone"));
 }
@@ -121,8 +121,8 @@ TEST(DocumentTransaction, UncommittedTransactionLeavesNoFiles) {
 TEST(DocumentTransaction, RejectsUnsafePaths) {
   const fs::path folder = freshFolder("unsafe");
   DocumentTransaction transaction(folder.u8string());
-  for (const char* path : {"", "/etc/x", "../x", "a/../b", "a//b", "a/./b", "a\\b", "C:/x",
-                           "save.journal", "x.tmp"}) {
+  for (const char* path :
+       {"", "/etc/x", "../x", "a/../b", "a//b", "a/./b", "a\\b", "C:/x", "save.journal", "x.tmp"}) {
     EXPECT_FALSE(transaction.stageFile(path, bytesOf("x"))) << path;
   }
   EXPECT_TRUE(isSafeRelativePath("layers/6f1c/tiles/0_0.lz4"));
@@ -133,9 +133,8 @@ TEST(DocumentTransaction, RecoveryRejectsAnUnreadableJournal) {
   ASSERT_TRUE(writeFileDurably((folder / kSaveJournalName).u8string(), bytesOf("{not json")));
   std::string error;
   EXPECT_FALSE(recoverDocumentFolder(folder.u8string(), error));
-  ASSERT_TRUE(writeFileDurably(
-      (folder / kSaveJournalName).u8string(),
-      bytesOf(R"({"version":1,"renames":["../outside"],"removals":[]})")));
+  ASSERT_TRUE(writeFileDurably((folder / kSaveJournalName).u8string(),
+                               bytesOf(R"({"version":1,"renames":["../outside"],"removals":[]})")));
   EXPECT_FALSE(recoverDocumentFolder(folder.u8string(), error));
 }
 

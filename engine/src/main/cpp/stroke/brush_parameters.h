@@ -166,8 +166,9 @@ struct ColorDynamicsParameters {
   [[nodiscard]] bool changesHsb() const {
     return hueJitter != 0 || saturationJitter != 0 || brightnessJitter != 0 ||
            darknessJitter != 0 || strokeHueJitter != 0 || strokeSaturationJitter != 0 ||
-           strokeBrightnessJitter != 0 || strokeDarknessJitter != 0 || pressureHue != 0 || pressureSaturation != 0 ||
-           pressureBrightness != 0 || tiltHue != 0 || tiltSaturation != 0 || tiltBrightness != 0;
+           strokeBrightnessJitter != 0 || strokeDarknessJitter != 0 || pressureHue != 0 ||
+           pressureSaturation != 0 || pressureBrightness != 0 || tiltHue != 0 ||
+           tiltSaturation != 0 || tiltBrightness != 0;
   }
 };
 

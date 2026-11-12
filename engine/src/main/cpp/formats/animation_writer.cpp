@@ -162,8 +162,13 @@ class GifWriter final : public AnimationWriter {
     out_->u8(0);
     out_->u8(0);
     if (options.plays != 1) {
-      out_->bytes("\x21\xFF\x0B" "NETSCAPE2.0" "\x03\x01", 16);
-      littleEndian16(options.plays == 0 ? 0 : static_cast<uint32_t>(std::min(options.plays - 1, 65535)));
+      out_->bytes(
+          "\x21\xFF\x0B"
+          "NETSCAPE2.0"
+          "\x03\x01",
+          16);
+      littleEndian16(
+          options.plays == 0 ? 0 : static_cast<uint32_t>(std::min(options.plays - 1, 65535)));
       out_->u8(0);
     }
   }
@@ -172,7 +177,8 @@ class GifWriter final : public AnimationWriter {
     if (!error_.empty()) {
       return false;
     }
-    const auto pixelCount = static_cast<size_t>(options_.width) * static_cast<size_t>(options_.height);
+    const auto pixelCount =
+        static_cast<size_t>(options_.width) * static_cast<size_t>(options_.height);
     bool transparent = false;
     for (size_t pixel = 0; pixel < pixelCount && !transparent; ++pixel) {
       transparent = rgba[pixel * 4 + 3] < 128;
@@ -192,7 +198,8 @@ class GifWriter final : public AnimationWriter {
 
     elapsedMilliseconds_ += std::max(durationMilliseconds, 0);
     const int64_t end = (elapsedMilliseconds_ + 5) / 10;
-    const auto delay = static_cast<uint32_t>(std::clamp<int64_t>(end - shownCentiseconds_, 0, 65535));
+    const auto delay =
+        static_cast<uint32_t>(std::clamp<int64_t>(end - shownCentiseconds_, 0, 65535));
     shownCentiseconds_ = end;
     out_->u8(0x21);
     out_->u8(0xF9);
@@ -237,7 +244,9 @@ class GifWriter final : public AnimationWriter {
                                     static_cast<float>(pixel[2])};
         if (dither == Dither::Ordered) {
           const float offset =
-              (static_cast<float>(kBayer[static_cast<size_t>((y & 7) * 8) + (x & 7)]) + 0.5F) / 64.0F - 0.5F;
+              (static_cast<float>(kBayer[static_cast<size_t>((y & 7) * 8) + (x & 7)]) + 0.5F) /
+                  64.0F -
+              0.5F;
           for (float& channel : wanted) {
             channel += offset * kOrderedSpread;
           }
@@ -253,7 +262,8 @@ class GifWriter final : public AnimationWriter {
         if (dither == Dither::FloydSteinberg) {
           const Rgb8& chosen = palette[index];
           for (size_t channel = 0; channel < 3; ++channel) {
-            const float error = std::clamp(wanted[channel], 0.0F, 255.0F) - static_cast<float>(chosen[channel]);
+            const float error =
+                std::clamp(wanted[channel], 0.0F, 255.0F) - static_cast<float>(chosen[channel]);
             errors[(x + 2) * 3 + channel] += error * 7.0F / 16.0F;
             nextErrors[x * 3 + channel] += error * 3.0F / 16.0F;
             nextErrors[(x + 1) * 3 + channel] += error * 5.0F / 16.0F;
@@ -363,13 +373,15 @@ class ApngWriter final : public AnimationWriter {
     png::writeChunk(*out_, "IEND", nullptr, 0);
     std::array<uint8_t, 12> typeAndData{'a', 'c', 'T', 'L'};
     for (size_t index = 0; index < 4; ++index) {
-      typeAndData[4 + index] = static_cast<uint8_t>(static_cast<uint32_t>(frames_) >> (24U - 8U * index));
-      typeAndData[8 + index] =
-          static_cast<uint8_t>(static_cast<uint32_t>(std::max(options_.plays, 0)) >> (24U - 8U * index));
+      typeAndData[4 + index] =
+          static_cast<uint8_t>(static_cast<uint32_t>(frames_) >> (24U - 8U * index));
+      typeAndData[8 + index] = static_cast<uint8_t>(
+          static_cast<uint32_t>(std::max(options_.plays, 0)) >> (24U - 8U * index));
     }
     out_->patch32(animationControlOffset_ + 8, static_cast<uint32_t>(frames_));
-    out_->patch32(animationControlOffset_ + 16,
-                  static_cast<uint32_t>(mz_crc32(MZ_CRC32_INIT, typeAndData.data(), typeAndData.size())));
+    out_->patch32(
+        animationControlOffset_ + 16,
+        static_cast<uint32_t>(mz_crc32(MZ_CRC32_INIT, typeAndData.data(), typeAndData.size())));
     if (!out_->close() && error_.empty()) {
       error_ = "writeFailed";
     }

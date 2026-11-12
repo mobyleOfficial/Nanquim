@@ -23,8 +23,8 @@ inline constexpr int32_t kSheetSize = 2048;
 
 std::vector<SheetRegion> sheetRegions(double scale = 1);
 
-scene::Scene testSheetScene(const stroke::LoadedBrush& brush, double scale = 1, double sizePixels = 0,
-                            double opacity = 0);
+scene::Scene testSheetScene(const stroke::LoadedBrush& brush, double scale = 1,
+                            double sizePixels = 0, double opacity = 0);
 
 double defaultBrushSize(const stroke::BrushParameters& brush);
 double defaultBrushOpacity(const stroke::BrushParameters& brush);

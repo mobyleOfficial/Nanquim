@@ -24,7 +24,8 @@ constexpr int64_t kMaximumIndexFileBytes = int64_t{16} * 1024 * 1024;
 constexpr int32_t kIndexVersion = 1;
 constexpr const char* kTileExtension = ".lz4";
 
-static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__, "Half-float tiles are stored as in memory");
+static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
+              "Half-float tiles are stored as in memory");
 
 constexpr uint16_t kHalfOne = 0x3C00;
 
@@ -284,7 +285,8 @@ TileReadResult readDocumentTile(const std::string& surfaceFolder, canvas::TileCo
     return TileReadResult::Corrupt;
   }
   if (!decodeDocumentTile(*encoded, format, fileTile.data())) {
-    if (format != DocumentTileFormat::Rgba8 || engineFormat != canvas::PixelFormat::Rgba8PremulSrgb) {
+    if (format != DocumentTileFormat::Rgba8 ||
+        engineFormat != canvas::PixelFormat::Rgba8PremulSrgb) {
       return TileReadResult::Corrupt;
     }
     std::vector<uint8_t> halves(documentTileBytes(DocumentTileFormat::Rgba16f));
