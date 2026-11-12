@@ -17,10 +17,16 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.R
+import com.mobyle.nanquim.feedback.FeedbackChannel
+import com.mobyle.nanquim.feedback.FeedbackKind
 import com.mobyle.nanquim.ui.common.ScreenHeader
 
 data class SupportLink(
@@ -39,8 +45,11 @@ fun parseSupportLinks(items: List<String>): List<SupportLink> =
 fun SupportScreen(
     links: List<SupportLink>,
     onOpenLink: (Int) -> Unit,
+    onShareApp: () -> Unit,
+    onReport: (FeedbackChannel) -> Unit,
     onBack: () -> Unit,
 ) {
+    var reporting by remember { mutableStateOf(false) }
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.windowInsetsPadding(WindowInsets.safeDrawing)) {
             ScreenHeader(title = stringResource(R.string.support_title), onBack = onBack)
@@ -64,9 +73,16 @@ fun SupportScreen(
                 }
                 HorizontalDivider()
                 Text(stringResource(R.string.support_other_title), style = MaterialTheme.typography.titleMedium)
+                OutlinedButton(
+                    onClick = onShareApp,
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text(stringResource(R.string.settings_share_app)) }
+                OutlinedButton(
+                    onClick = { reporting = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text(stringResource(R.string.settings_report_bug)) }
                 listOf(
                     R.string.support_other_share,
-                    R.string.support_other_report,
                     R.string.support_other_translate,
                     R.string.support_other_brushes,
                 ).forEach {
@@ -74,5 +90,15 @@ fun SupportScreen(
                 }
             }
         }
+    }
+    if (reporting) {
+        FeedbackChannelDialog(
+            kind = FeedbackKind.Bug,
+            onChoose = { channel ->
+                reporting = false
+                onReport(channel)
+            },
+            onDismiss = { reporting = false },
+        )
     }
 }

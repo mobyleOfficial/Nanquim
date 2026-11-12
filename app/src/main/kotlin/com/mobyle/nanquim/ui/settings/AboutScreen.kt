@@ -25,6 +25,7 @@ import com.mobyle.nanquim.R
 import com.mobyle.nanquim.ui.common.ScreenHeader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonObject
 
 data class CreditEntry(
     val section: String,
@@ -73,6 +74,7 @@ fun parseCredits(markdown: String): List<CreditEntry> {
 @Composable
 fun AboutScreen(
     assets: AssetManager,
+    onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,
 ) {
     val credits by produceState(emptyList<CreditEntry>()) {
@@ -95,8 +97,10 @@ fun AboutScreen(
                     Text(
                         stringResource(R.string.about_license),
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 12.dp),
+                        modifier = Modifier.padding(bottom = 4.dp),
                     )
+                    LegalLinks(onCommand)
+                    HorizontalDivider()
                 }
                 items(credits) { entry ->
                     Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {

@@ -97,6 +97,11 @@
       "scope": "app",
       "source": "Crash reports, Kotlin and native; pulls play-services-basement (Android SDK License)"
     },
+    "com.google.android.play:review-ktx": {
+      "license": "Android-SDK-License",
+      "scope": "app",
+      "source": "Google Play In-App Review API (Play Core, closed); pulls com.google.android.play:review"
+    },
     "com.google.firebase:firebase-analytics": {
       "license": "Android-SDK-License",
       "scope": "app",

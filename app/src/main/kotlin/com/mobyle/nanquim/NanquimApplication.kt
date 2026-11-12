@@ -27,9 +27,11 @@ import com.mobyle.nanquim.color.ColorProfileLibrary
 import com.mobyle.nanquim.color.PaletteLibrary
 import com.mobyle.nanquim.color.builtInPalettes
 import com.mobyle.nanquim.command.CommandDispatcher
+import com.mobyle.nanquim.command.FeedbackTexts
 import com.mobyle.nanquim.command.NanquimAppState
 import com.mobyle.nanquim.command.ShareSheet
 import com.mobyle.nanquim.command.createAppCommandRegistry
+import com.mobyle.nanquim.command.registerFeedbackCommands
 import com.mobyle.nanquim.command.registerHelpCommands
 import com.mobyle.nanquim.diagnostics.DiagnosticsCollector
 import com.mobyle.nanquim.diagnostics.DiagnosticsExporter
@@ -44,6 +46,11 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.EngineConfig
 import com.mobyle.nanquim.engine.Renderer
+import com.mobyle.nanquim.feedback.AppInfo
+import com.mobyle.nanquim.feedback.AppLinks
+import com.mobyle.nanquim.feedback.FeedbackActions
+import com.mobyle.nanquim.feedback.FeedbackKind
+import com.mobyle.nanquim.feedback.ReviewPrompt
 import com.mobyle.nanquim.gallery.ArtworkTransfer
 import com.mobyle.nanquim.gallery.Gallery
 import com.mobyle.nanquim.gallery.GalleryDatabase
@@ -81,6 +88,7 @@ class NanquimApplication : Application() {
         Telemetry.create(
             this,
             analyticsEnabled = BuildConfig.BUILD_TYPE != "benchmark",
+            userAllows = appSettings.usageStatistics,
         )
     }
 
@@ -282,6 +290,19 @@ class NanquimApplication : Application() {
 
     val appSettings: AppSettings by lazy { AppSettings(getSharedPreferences(AppSettings.PREFERENCES_NAME, MODE_PRIVATE)) }
 
+    val reviewPrompt: ReviewPrompt by lazy { ReviewPrompt(getSharedPreferences(ReviewPrompt.PREFERENCES_NAME, MODE_PRIVATE)) }
+
+    val feedbackActions: FeedbackActions by lazy { FeedbackActions(this) }
+
+    /** Version, device and renderer for bug reports, without the engine: a report must work even when the engine does not start. */
+    fun appInfo(): AppInfo =
+        AppInfo(
+            version = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+            device = "${Build.MANUFACTURER} ${Build.MODEL}",
+            android = "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
+            renderer = (appSettings.activeRenderer ?: appSettings.renderer).let(AppSettings::rendererId),
+        )
+
     val storageCleaner: StorageCleaner by lazy { StorageCleaner(artworkStorage.root, cacheDir) }
 
     var incomingFile: Uri? by mutableStateOf(null)
@@ -357,8 +378,45 @@ class NanquimApplication : Application() {
             installSamples = sampleArtworks::install,
             supportLinks = ::supportLinks,
         )
+        registerFeedbackCommands(
+            registry = registry,
+            actions = feedbackActions,
+            appSettings = appSettings,
+            appInfo = ::appInfo,
+            texts =
+                FeedbackTexts(
+                    shareApp = { getString(R.string.share_app_text, AppLinks.PLAY_STORE_WEB) },
+                    emailSubject = { kind ->
+                        getString(
+                            if (kind ==
+                                FeedbackKind.Bug
+                            ) {
+                                R.string.feedback_email_subject_bug
+                            } else {
+                                R.string.feedback_email_subject_feature
+                            },
+                        )
+                    },
+                    emailBody = { kind, info ->
+                        getString(
+                            if (kind ==
+                                FeedbackKind.Bug
+                            ) {
+                                R.string.feedback_email_body_bug
+                            } else {
+                                R.string.feedback_email_body_feature
+                            },
+                            info.summary(),
+                        )
+                    },
+                ),
+            onUsageStatisticsChanged = telemetry::setCollectionEnabled,
+        )
         registry.onExecuted = { commandId, arguments, result ->
-            if (result is CommandResult.Success) macros.record(commandId, arguments)
+            if (result is CommandResult.Success) {
+                macros.record(commandId, arguments)
+                if (commandId in REVIEW_MOMENTS) reviewPrompt.artworkExported()
+            }
         }
         CommandDispatcher(
             registry = registry,
@@ -429,5 +487,13 @@ class NanquimApplication : Application() {
         const val COLOR_SAVE_INTERVAL_MILLIS = 500L
         const val MEMORY_SAMPLE_INTERVAL_MILLISECONDS = 2_000L
         const val QUICK_MENU_PREFERENCES = "quick-menu"
+
+        /** Commands after which the person has just finished something they liked: a good moment to ask for a review. */
+        val REVIEW_MOMENTS =
+            setOf(
+                com.mobyle.nanquim.command.TransferCommandIds.SHARE,
+                com.mobyle.nanquim.command.TransferCommandIds.EXPORT_IMAGE,
+                com.mobyle.nanquim.command.TimelapseCommandIds.EXPORT,
+            )
     }
 }

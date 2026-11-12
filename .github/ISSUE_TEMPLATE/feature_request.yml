@@ -1,0 +1,29 @@
+name: Suggest a feature
+description: An idea that would make Nanquim better for you.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! Please search the existing issues first; if someone already suggested it, add a 👍 there.
+        Suggestions here are public: do not include personal information.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What would it help you do?
+      description: The drawing or workflow you have in mind. Other apps that do it well are useful examples too.
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      placeholder: "0.3.0 (3)"
+    validations:
+      required: false

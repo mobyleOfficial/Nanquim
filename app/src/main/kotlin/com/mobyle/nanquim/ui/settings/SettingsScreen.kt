@@ -225,6 +225,8 @@ fun SettingsScreen(
                     }
                 }
                 HorizontalDivider()
+                FeedbackSection(appSettings, onCommand)
+                HorizontalDivider()
                 TextButton(
                     onClick = { onCommand(AppCommandIds.SUPPORT_OPEN, JsonObject(emptyMap())) },
                 ) { Text(stringResource(R.string.settings_support)) }

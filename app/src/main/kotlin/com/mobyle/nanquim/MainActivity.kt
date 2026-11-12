@@ -58,6 +58,7 @@ import com.mobyle.nanquim.command.AppCommandIds
 import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.command.CanvasCommandIds
 import com.mobyle.nanquim.command.DocumentCommandIds
+import com.mobyle.nanquim.command.FeedbackCommandIds
 import com.mobyle.nanquim.command.GalleryCommandIds
 import com.mobyle.nanquim.command.HelpCommandIds
 import com.mobyle.nanquim.command.PaletteCommandIds
@@ -67,8 +68,11 @@ import com.mobyle.nanquim.command.TransferCommandIds
 import com.mobyle.nanquim.command.VideoCommandIds
 import com.mobyle.nanquim.display.ProjectedCanvas
 import com.mobyle.nanquim.document.animation.playedFrames
+import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.engine.EngineEvent
+import com.mobyle.nanquim.feedback.FeedbackKind
+import com.mobyle.nanquim.feedback.requestInAppReview
 import com.mobyle.nanquim.formats.NanquimFileType
 import com.mobyle.nanquim.gallery.ExportOptions
 import com.mobyle.nanquim.gallery.GalleryError
@@ -175,6 +179,19 @@ class MainActivity : ComponentActivity() {
                     controller.hide(WindowInsetsCompat.Type.systemBars())
                 } else {
                     controller.show(WindowInsetsCompat.Type.systemBars())
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                snapshotFlow {
+                    application.reviewPrompt.pending && application.navigator.current == AppDestination.Gallery &&
+                        application.help.automatic
+                }.collect { ready ->
+                    if (ready) {
+                        application.reviewPrompt.asked()
+                        requestInAppReview(this@MainActivity)
+                    }
                 }
             }
         }
@@ -324,6 +341,13 @@ private fun NanquimApp(application: NanquimApplication) {
     val dispatcher = application.commandDispatcher
     val engine = application.engine
     val session = application.canvasSession
+    val feedbackCommand: (String, JsonObject) -> Unit = { commandId, arguments ->
+        dispatcher.dispatch(commandId, arguments) { result ->
+            if (result is CommandResult.Failure && result.code == CommandErrorCode.HandlerFailed) {
+                Toast.makeText(context, R.string.feedback_open_failed, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     LaunchedEffect(engine) {
         engine.events.collect { event ->
@@ -528,7 +552,7 @@ private fun NanquimApp(application: NanquimApplication) {
                     inputSettings = application.inputSettings,
                     appSettings = application.appSettings,
                     storage = application.storageCleaner,
-                    onCommand = { commandId, arguments -> dispatcher.dispatch(commandId, arguments) },
+                    onCommand = feedbackCommand,
                     onBack = navigator::back,
                     onOpenDiagnostics = { dispatcher.dispatch(AppCommandIds.DIAGNOSTICS_OPEN) },
                 )
@@ -573,12 +597,22 @@ private fun NanquimApp(application: NanquimApplication) {
                     onCommand = { commandId, arguments -> dispatcher.dispatch(commandId, arguments) },
                     onBack = navigator::back,
                 )
-            AppDestination.About -> AboutScreen(assets = context.assets, onBack = navigator::back)
+            AppDestination.About -> AboutScreen(assets = context.assets, onCommand = feedbackCommand, onBack = navigator::back)
             AppDestination.Support ->
                 SupportScreen(
                     links = remember { application.supportLinks() },
                     onOpenLink = { index ->
                         dispatcher.dispatch(HelpCommandIds.SUPPORT_OPEN_LINK, buildJsonObject { put("index", index) })
+                    },
+                    onShareApp = { feedbackCommand(FeedbackCommandIds.SHARE_APP, buildJsonObject {}) },
+                    onReport = { channel ->
+                        feedbackCommand(
+                            FeedbackCommandIds.REPORT,
+                            buildJsonObject {
+                                put("kind", FeedbackKind.Bug.id)
+                                put("channel", channel.id)
+                            },
+                        )
                     },
                     onBack = navigator::back,
                 )
