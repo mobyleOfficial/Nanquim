@@ -1651,4 +1651,15 @@
     <string name="settings_confirm_exit">Ask before leaving with Back</string>
     <string name="command_settings_confirm_exit">Ask before leaving with Back</string>
     <string name="settings_ad_choices">Ad choices</string>
+    <string name="welcome_close">Close</string>
+    <string name="welcome_quick_shape_title">QuickShape</string>
+    <string name="welcome_quick_shape_body">Draw a line, a circle or a shape and keep the pen still at the end: it turns into a clean shape you can still adjust.</string>
+    <string name="welcome_animation_title">Animation and timelapse</string>
+    <string name="welcome_animation_body">Turn on animation in Actions to draw frame by frame with onion skin. Nanquim also records a timelapse while you paint.</string>
+    <string name="welcome_share_title">Share your art</string>
+    <string name="welcome_share_body">Share from the canvas or the gallery as PNG, JPEG, PSD, PDF, GIF or video. Your artworks stay on your device and save on their own.</string>
+    <string name="tour_tools">The bar at the top: back to the gallery, Actions, then brush, smudge, eraser, layers and color.</string>
+    <string name="tour_sliders">At the side: brush size and opacity, then undo and redo.</string>
+    <string name="tour_actions">Actions has the other tools (selection, transform, adjustments, text…), animation, timelapse, sharing and Settings.</string>
+    <string name="tour_progress">%1$d of %2$d</string>
 </resources>

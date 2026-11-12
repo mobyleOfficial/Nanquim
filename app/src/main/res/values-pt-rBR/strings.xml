@@ -1652,4 +1652,15 @@
     <string name="settings_confirm_exit">Perguntar antes de sair com o botão Voltar</string>
     <string name="command_settings_confirm_exit">Perguntar antes de sair com o botão Voltar</string>
     <string name="settings_ad_choices">Opções de anúncios</string>
+    <string name="welcome_close">Fechar</string>
+    <string name="welcome_quick_shape_title">QuickShape</string>
+    <string name="welcome_quick_shape_body">Desenhe uma linha, um círculo ou uma forma e segure a caneta parada no fim: o traço vira uma forma limpa que ainda dá para ajustar.</string>
+    <string name="welcome_animation_title">Animação e timelapse</string>
+    <string name="welcome_animation_body">Ative a animação em Ações para desenhar quadro a quadro com papel vegetal. O Nanquim também grava um timelapse enquanto você pinta.</string>
+    <string name="welcome_share_title">Compartilhe sua arte</string>
+    <string name="welcome_share_body">Compartilhe pela tela de desenho ou pela galeria em PNG, JPEG, PSD, PDF, GIF ou vídeo. Suas artes ficam no seu aparelho e são salvas sozinhas.</string>
+    <string name="tour_tools">A barra de cima: voltar à galeria, Ações e depois pincel, esfumar, borracha, camadas e cor.</string>
+    <string name="tour_sliders">Na lateral: tamanho e opacidade do pincel, depois desfazer e refazer.</string>
+    <string name="tour_actions">Em Ações ficam as outras ferramentas (seleção, transformar, ajustes, texto…), animação, timelapse, compartilhar e Configurações.</string>
+    <string name="tour_progress">%1$d de %2$d</string>
 </resources>

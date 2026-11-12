@@ -106,6 +106,18 @@ class Telemetry private constructor(
         crashlytics?.setCustomKey(KEY_MEMORY_BUDGET_MB, bytes / BYTES_PER_MEGABYTE)
     }
 
+    fun welcomeFinished(
+        completed: Boolean,
+        card: Int,
+    ) {
+        analytics?.logEvent(
+            if (completed) EVENT_WELCOME_COMPLETED else EVENT_WELCOME_SKIPPED,
+            Bundle().apply {
+                putLong(PARAM_CARD, card.toLong())
+            },
+        )
+    }
+
     fun engineFailed(error: EngineEvent.Error) {
         crashlytics?.recordException(EngineFailure("${error.code}: ${error.message}"))
         analytics?.logEvent(EVENT_ENGINE_FAILURE, Bundle().apply { putString(PARAM_REASON, error.code.name) })
@@ -155,6 +167,9 @@ class Telemetry private constructor(
         const val EVENT_ARTWORK_CLOSE = "artwork_close"
         const val EVENT_ARTWORK_BACKGROUND_SAVE = "artwork_background_save"
         const val EVENT_ENGINE_FAILURE = "engine_failure"
+        const val EVENT_WELCOME_COMPLETED = "welcome_completed"
+        const val EVENT_WELCOME_SKIPPED = "welcome_skipped"
+        const val PARAM_CARD = "card"
         const val PARAM_DURATION = "duration_ms"
         const val PARAM_ACTIVITY_DURATION = "activity_duration_ms"
         const val PARAM_READ_DURATION = "read_ms"

@@ -62,7 +62,7 @@ fun registerHelpCommands(
         CommandResult.Success()
     }
     registry.register(spec(HelpCommandIds.WELCOME_FINISH, R.string.command_help_welcome_finish)) { _, _ ->
-        help.finishWelcome()
+        help.finishWelcome(completed = false)
         CommandResult.Success()
     }
     val tipTools = Help.TIPS.map { it.name }
@@ -128,6 +128,7 @@ fun Help.stateJson() =
         put("welcomeVisible", JsonPrimitive(welcomeVisible))
         put("welcomeCard", JsonPrimitive(welcomeCard))
         put("welcomeSeen", JsonPrimitive(welcomeSeen))
+        put("tourStep", tourStep?.let(::JsonPrimitive) ?: kotlinx.serialization.json.JsonNull)
         put("tip", tip?.name?.let(::JsonPrimitive) ?: kotlinx.serialization.json.JsonNull)
         put("automatic", JsonPrimitive(automatic))
     }

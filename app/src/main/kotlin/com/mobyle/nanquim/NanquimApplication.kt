@@ -291,7 +291,11 @@ class NanquimApplication : Application() {
         }
     }
 
-    val help: Help by lazy { Help(getSharedPreferences(Help.PREFERENCES_NAME, MODE_PRIVATE)) }
+    val help: Help by lazy {
+        Help(getSharedPreferences(Help.PREFERENCES_NAME, MODE_PRIVATE)).also { help ->
+            help.onWelcomeFinished = { completed, card -> telemetry.welcomeFinished(completed, card) }
+        }
+    }
 
     val appSettings: AppSettings by lazy { AppSettings(getSharedPreferences(AppSettings.PREFERENCES_NAME, MODE_PRIVATE)) }
 

@@ -99,6 +99,7 @@ import com.mobyle.nanquim.ui.gallery.GalleryScreen
 import com.mobyle.nanquim.ui.gallery.IncomingFileDialog
 import com.mobyle.nanquim.ui.gallery.NewCanvasScreen
 import com.mobyle.nanquim.ui.gallery.TransferReportDialog
+import com.mobyle.nanquim.ui.help.CanvasTourCard
 import com.mobyle.nanquim.ui.help.ToolTipCard
 import com.mobyle.nanquim.ui.help.WelcomeOverlay
 import com.mobyle.nanquim.ui.settings.AboutScreen
@@ -743,8 +744,19 @@ private fun NanquimApp(application: NanquimApplication) {
             ToolTipCard(tip, onDismiss = { dispatcher.dispatch(HelpCommandIds.TIP_DISMISS) })
         }
     }
+    LaunchedEffect(navigator.current, help.welcomeVisible, session.documentShown) {
+        if (navigator.current == AppDestination.Canvas && session.documentShown) help.canvasShown()
+    }
+    val tourStep = help.tourStep
+    if (tourStep != null && navigator.current == AppDestination.Canvas) {
+        CanvasTourCard(tourStep, onNext = help::nextTourStep, onSkip = help::finishTour)
+    }
     if (help.welcomeVisible) {
-        WelcomeOverlay(help)
+        // From the gallery the last card opens a new canvas; when replayed from Settings it just closes.
+        WelcomeOverlay(
+            help,
+            onStartDrawing = if (navigator.current == AppDestination.Gallery) ({ navigator.open(AppDestination.NewCanvas) }) else null,
+        )
         BackHandler { dispatcher.dispatch(HelpCommandIds.WELCOME_FINISH) }
     }
 }

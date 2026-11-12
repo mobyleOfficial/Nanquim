@@ -58,6 +58,46 @@ class HelpTest {
         assertEquals(CanvasTool.Smudge, help.tip)
     }
 
+    @Test
+    fun theCanvasTourRunsOnceAfterTheIntroduction() {
+        val help = Help(preferences)
+        help.showWelcomeIfFirstLaunch()
+        help.canvasShown()
+        assertNull(help.tourStep)
+        help.finishWelcome(completed = true)
+        help.canvasShown()
+        assertEquals(0, help.tourStep)
+        help.toolSelected(CanvasTool.Eraser)
+        assertNull(help.tip)
+        repeat(Help.TOUR_STEPS) { help.nextTourStep() }
+        assertNull(help.tourStep)
+        val nextLaunch = Help(preferences)
+        nextLaunch.canvasShown()
+        assertNull(nextLaunch.tourStep)
+    }
+
+    @Test
+    fun replayingTheIntroductionAlsoReplaysTheTour() {
+        val help = Help(preferences)
+        help.canvasShown()
+        help.finishTour()
+        help.showWelcome()
+        help.finishWelcome()
+        help.canvasShown()
+        assertEquals(0, help.tourStep)
+    }
+
+    @Test
+    fun finishingTheIntroductionReportsHowItEnded() {
+        val reports = mutableListOf<Pair<Boolean, Int>>()
+        val help = Help(preferences).apply { onWelcomeFinished = { completed, card -> reports += completed to card } }
+        help.showWelcome()
+        help.welcomeCard = 2
+        help.finishWelcome(completed = false)
+        help.finishWelcome(completed = false)
+        assertEquals(listOf(false to 2), reports)
+    }
+
     private class MemoryPreferences : SharedPreferences {
         val values = mutableMapOf<String, Any?>()
 
