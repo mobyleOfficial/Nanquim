@@ -1645,4 +1645,10 @@
     <string name="command_settings_terms">Abrir os termos de uso</string>
     <string name="command_settings_feedback_report">Relatar um problema ou sugerir um recurso</string>
     <string name="command_settings_usage_statistics">Compartilhar estatísticas de uso e relatórios de falhas</string>
+    <string name="exit_dialog_title">Sair do Nanquim?</string>
+    <string name="exit_dialog_body">Suas artes estão salvas.</string>
+    <string name="exit_dialog_dont_ask">Não perguntar de novo</string>
+    <string name="exit_dialog_exit">Sair</string>
+    <string name="settings_confirm_exit">Perguntar antes de sair com o botão Voltar</string>
+    <string name="command_settings_confirm_exit">Perguntar antes de sair com o botão Voltar</string>
 </resources>

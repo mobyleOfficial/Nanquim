@@ -1644,4 +1644,10 @@
     <string name="command_settings_terms">Open the terms of use</string>
     <string name="command_settings_feedback_report">Report a problem or suggest a feature</string>
     <string name="command_settings_usage_statistics">Share usage statistics and crash reports</string>
+    <string name="exit_dialog_title">Leave Nanquim?</string>
+    <string name="exit_dialog_body">Your artworks are saved.</string>
+    <string name="exit_dialog_dont_ask">Don’t ask again</string>
+    <string name="exit_dialog_exit">Leave</string>
+    <string name="settings_confirm_exit">Ask before leaving with Back</string>
+    <string name="command_settings_confirm_exit">Ask before leaving with Back</string>
 </resources>

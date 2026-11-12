@@ -36,6 +36,9 @@ class CanvasViewportController(
 
     var rotationGestureEnabled: Boolean = true
 
+    /** A camera to use instead of fitting once both the view and the canvas have a size (see [restoreCamera]). */
+    private var pendingCamera: CameraState? = null
+
     private val frameCallback =
         Choreographer.FrameCallback { frameTimeNanos -> onAnimationFrame(frameTimeNanos) }
 
@@ -56,6 +59,13 @@ class CanvasViewportController(
         canvasWidth = widthPx.toDouble()
         canvasHeight = heightPx.toDouble()
         cameraBeforeQuickFit = null
+        pendingCamera = null
+        fitIfPossible(animate = false)
+    }
+
+    /** Shows the canvas as it was when the app was closed, now or as soon as the view is laid out. Call after the canvas is set. */
+    fun restoreCamera(saved: CameraState) {
+        pendingCamera = saved.withClampedZoom()
         fitIfPossible(animate = false)
     }
 
@@ -184,6 +194,11 @@ class CanvasViewportController(
 
     private fun fitIfPossible(animate: Boolean) {
         if (viewWidth <= 0 || viewHeight <= 0 || canvasWidth <= 0 || canvasHeight <= 0) return
+        pendingCamera?.let { saved ->
+            pendingCamera = null
+            setCamera(saved, animate = false)
+            return
+        }
         val flipped = camera?.flippedHorizontally ?: false
         setCamera(CameraState.fit(canvasWidth, canvasHeight, viewWidth, viewHeight, flipped), animate)
     }

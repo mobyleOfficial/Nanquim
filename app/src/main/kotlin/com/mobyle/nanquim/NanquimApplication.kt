@@ -22,6 +22,7 @@ import com.mobyle.nanquim.brush.library.BrushLibraryDatabase
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.canvas.MemoryBudgetPolicy
 import com.mobyle.nanquim.canvas.ResourceLayerNames
+import com.mobyle.nanquim.canvas.ResumeState
 import com.mobyle.nanquim.canvas.adjust.GradientLibrary
 import com.mobyle.nanquim.color.ColorProfileLibrary
 import com.mobyle.nanquim.color.PaletteLibrary
@@ -93,6 +94,9 @@ class NanquimApplication : Application() {
     }
 
     var appStartReported = false
+
+    /** Set by the first activity of the process once it has opened or restored what the launch asked for. */
+    var launchHandled = false
 
     override fun onCreate() {
         super.onCreate()
@@ -289,6 +293,8 @@ class NanquimApplication : Application() {
     val help: Help by lazy { Help(getSharedPreferences(Help.PREFERENCES_NAME, MODE_PRIVATE)) }
 
     val appSettings: AppSettings by lazy { AppSettings(getSharedPreferences(AppSettings.PREFERENCES_NAME, MODE_PRIVATE)) }
+
+    val resumeState: ResumeState by lazy { ResumeState(getSharedPreferences(ResumeState.PREFERENCES_NAME, MODE_PRIVATE)) }
 
     val reviewPrompt: ReviewPrompt by lazy { ReviewPrompt(getSharedPreferences(ReviewPrompt.PREFERENCES_NAME, MODE_PRIVATE)) }
 

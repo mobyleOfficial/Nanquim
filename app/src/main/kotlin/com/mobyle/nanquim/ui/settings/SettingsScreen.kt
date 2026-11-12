@@ -187,6 +187,22 @@ fun SettingsScreen(
                     Switch(checked = appSettings.projectedCanvas, onCheckedChange = null)
                 }
                 Text(stringResource(R.string.settings_projected_canvas_hint), style = MaterialTheme.typography.bodySmall)
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .toggleable(
+                            value = appSettings.confirmExit,
+                            role = Role.Switch,
+                            onValueChange = {
+                                onCommand(AppCommandIds.SETTINGS_CONFIRM_EXIT, JsonObject(mapOf("enabled" to JsonPrimitive(it))))
+                            },
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(stringResource(R.string.settings_confirm_exit), modifier = Modifier.weight(1f))
+                    Switch(checked = appSettings.confirmExit, onCheckedChange = null)
+                }
                 HorizontalDivider()
                 Text(stringResource(R.string.settings_storage_title), style = MaterialTheme.typography.titleMedium)
                 usage?.let { current ->

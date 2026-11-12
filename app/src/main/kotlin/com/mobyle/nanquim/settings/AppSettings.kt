@@ -73,6 +73,14 @@ class AppSettings(
         preferences.edit { putBoolean(KEY_USAGE_STATISTICS, enabled) }
     }
 
+    var confirmExit: Boolean by mutableStateOf(preferences.getBoolean(KEY_CONFIRM_EXIT, true))
+        private set
+
+    fun changeConfirmExit(enabled: Boolean) {
+        confirmExit = enabled
+        preferences.edit { putBoolean(KEY_CONFIRM_EXIT, enabled) }
+    }
+
     fun changeRenderer(renderer: Renderer) {
         this.renderer = renderer
         preferences.edit { putString(KEY_RENDERER, rendererId(renderer)) }
@@ -86,6 +94,7 @@ class AppSettings(
         private const val KEY_RENDERER = "renderer"
         private const val KEY_RECORD_TIMELAPSE = "recordTimelapse"
         private const val KEY_USAGE_STATISTICS = "usageStatistics"
+        private const val KEY_CONFIRM_EXIT = "confirmExit"
 
         fun rendererId(renderer: Renderer): String =
             when (renderer) {

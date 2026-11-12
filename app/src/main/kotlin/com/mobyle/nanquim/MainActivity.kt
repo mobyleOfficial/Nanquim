@@ -1,5 +1,6 @@
 package com.mobyle.nanquim
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Process
@@ -85,6 +86,7 @@ import com.mobyle.nanquim.settings.ThemeMode
 import com.mobyle.nanquim.ui.brush.BrushEditorScreen
 import com.mobyle.nanquim.ui.canvas.CanvasScreen
 import com.mobyle.nanquim.ui.canvas.canvasSurroundColor
+import com.mobyle.nanquim.ui.common.ExitDialog
 import com.mobyle.nanquim.ui.common.ProvideWindowLayout
 import com.mobyle.nanquim.ui.diagnostics.DiagnosticsScreen
 import com.mobyle.nanquim.ui.diagnostics.LatencyTestScreen
@@ -142,18 +144,26 @@ class MainActivity : ComponentActivity() {
                 ProvideWindowLayout { NanquimApp(application) }
             }
         }
-        if (savedInstanceState == null && !openTestDocumentFromIntent(application, intent)) {
+        // Once per process, not once per fresh activity: after the system ends the process in the background, the activity
+        // comes back with a saved state but everything else starts from scratch, and the open artwork must come back too.
+        val processStart = !application.launchHandled
+        application.launchHandled = true
+        if (processStart && !openTestDocumentFromIntent(application, intent)) {
+            val savedScreens = savedInstanceState?.getStringArrayList(STATE_SCREENS)
             lifecycleScope.launch {
                 val (screenWidth, screenHeight) = displayResolution()
                 application.gallery.seedPresets(screenWidth, screenHeight)
                 application.gallery.sync()
                 if (application.help.automatic) application.sampleArtworks.installOnce()
-                val requested = takeArtworkToOpen(intent)
+                val requested = if (savedInstanceState == null) takeArtworkToOpen(intent) else null
                 if (requested != null) {
                     application.gallery.openFromOutside(requested)
-                } else if (application.canvasSession.documentSession == null) {
-                    application.gallery.restoreLastOpen()
+                } else if (application.canvasSession.documentSession == null && application.gallery.restoreLastOpen()) {
+                    application.canvasSession.artwork
+                        ?.id
+                        ?.let { application.resumeState.restore(application.canvasSession, it) }
                 }
+                savedScreens?.let { application.navigator.restore(it, artworkOpen = application.canvasSession.documentSession != null) }
             }
         }
         val windowCallback = window.callback
@@ -287,6 +297,11 @@ class MainActivity : ComponentActivity() {
             ).also { it.start() }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putStringArrayList(STATE_SCREENS, ArrayList((application as NanquimApplication).navigator.snapshot()))
+    }
+
     override fun onStop() {
         projectedCanvas?.stop()
         projectedCanvas = null
@@ -294,6 +309,7 @@ class MainActivity : ComponentActivity() {
         val application = application as NanquimApplication
         val session = application.canvasSession
         val state = session.artwork?.let { session.document }
+        application.resumeState.save(session)
         val startedAt = SystemClock.elapsedRealtime()
         session.persistence.saveNow(withThumbnail = true) { saved ->
             if (state != null) application.telemetry.artworkSavedInBackground(state, SystemClock.elapsedRealtime() - startedAt, saved)
@@ -330,6 +346,7 @@ class MainActivity : ComponentActivity() {
 
         private const val EXTRA_CONTROL_TOKEN = "com.mobyle.nanquim.extra.CONTROL_TOKEN"
         private const val EXTRA_TEST_FILL = "com.mobyle.nanquim.extra.TEST_FILL"
+        private const val STATE_SCREENS = "screens"
     }
 }
 
@@ -480,6 +497,26 @@ private fun NanquimApp(application: NanquimApplication) {
         TransferReportDialog(report = report, onDismiss = { application.transfer.report = null })
     }
     val panelOpen = brushUi.libraryTool != null || session.layersPanelVisible || session.colorPanelVisible
+    var confirmingExit by remember { mutableStateOf(false) }
+    val gallery = application.gallery
+    val atGallery = navigator.current == AppDestination.Gallery && !navigator.canGoBack
+    BackHandler(enabled = atGallery && (gallery.selecting || gallery.openStackId != null || application.appSettings.confirmExit)) {
+        when {
+            gallery.selecting -> gallery.changeSelecting(false)
+            gallery.openStackId != null -> gallery.openStackId = null
+            else -> confirmingExit = true
+        }
+    }
+    if (confirmingExit) {
+        ExitDialog(
+            onExit = { dontAskAgain ->
+                confirmingExit = false
+                if (dontAskAgain) dispatcher.dispatch(AppCommandIds.SETTINGS_CONFIRM_EXIT, buildJsonObject { put("enabled", false) })
+                (context as? Activity)?.finish()
+            },
+            onDismiss = { confirmingExit = false },
+        )
+    }
     BackHandler(enabled = navigator.canGoBack || session.debugPanelVisible || panelOpen) {
         when {
             navigator.current == AppDestination.BrushEditor -> dispatcher.dispatch(BrushCommandIds.EDITOR_CANCEL)

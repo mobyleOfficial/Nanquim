@@ -62,6 +62,7 @@ object AppCommandIds {
     const val ABOUT_OPEN = "settings.about.open"
     const val SUPPORT_OPEN = "settings.support.open"
     const val SETTINGS_PROJECTED_CANVAS = "settings.projectedCanvas.set"
+    const val SETTINGS_CONFIRM_EXIT = "settings.confirmExit.set"
 }
 
 class NanquimAppState(
@@ -210,6 +211,19 @@ fun createAppCommandRegistry(
         ),
     ) { _, arguments ->
         appSettings.changeProjectedCanvas(arguments.getValue("enabled").jsonPrimitive.boolean)
+        CommandResult.Success()
+    }
+
+    registry.register(
+        CommandSpec(
+            id = AppCommandIds.SETTINGS_CONFIRM_EXIT,
+            titleRes = R.string.command_settings_confirm_exit,
+            category = CommandCategory.Settings,
+            parameters = listOf(ParameterSpec("enabled", ParameterType.Boolean)),
+            undoable = false,
+        ),
+    ) { _, arguments ->
+        appSettings.changeConfirmExit(arguments.getValue("enabled").jsonPrimitive.boolean)
         CommandResult.Success()
     }
 
