@@ -2,6 +2,7 @@ package com.mobyle.nanquim
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Process
 import android.os.SystemClock
@@ -12,6 +13,7 @@ import android.view.Menu
 import android.view.Window
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -34,6 +36,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -142,6 +145,13 @@ class MainActivity : ComponentActivity() {
                     ThemeMode.Light -> false
                     ThemeMode.Dark -> true
                 }
+            // The default edge-to-edge style follows the system's dark mode, so a Light app on a dark
+            // system kept white status bar icons on a light background. Follow the app's theme instead.
+            DisposableEffect(darkTheme) {
+                val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkTheme }
+                enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+                onDispose {}
+            }
             NanquimTheme(darkTheme = darkTheme) {
                 ProvideWindowLayout { NanquimApp(application) }
             }
