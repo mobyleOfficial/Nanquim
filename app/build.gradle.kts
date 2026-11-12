@@ -62,8 +62,9 @@ android {
             libs.versions.targetSdk
                 .get()
                 .toInt()
-        versionCode = 1
-        versionName = "0.2.0"
+        // versionCode = major * 10000 + minor * 100 + patch, so every release sorts after the last.
+        versionCode = 10000
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

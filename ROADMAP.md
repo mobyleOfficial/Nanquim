@@ -137,16 +137,18 @@ Sobre e feedback
 
 ## Ordem e checklist
 
-| # | Item do feedback | Entrega | Status |
-|---|---|---|---|
-| 3 | Política de privacidade e termos | 1 | Páginas escritas · falta publicar o site |
-| 4 | Acesso em Configurações | 1 | A fazer |
-| 5 | Avaliar o app | 1 | A fazer |
-| 6 | Compartilhar o app | 1 | A fazer |
-| 2 | Relatar erro / sugerir (GitHub) | 1 | A fazer |
-| 7 | Confirmar saída no voltar | 2 | A fazer |
-| 8 | Preservar estado | 2 | Parcial (arte reabre; falta visão/ferramenta/tela) |
-| 9 | Anúncios só na Galeria | 3 | A fazer · exige mudar a ficha "sem anúncios" |
-| 1 | Onboarding | 4 | Parcial (5 cartões + dicas existem) |
+| # | Item do feedback | Entrega | Branch | Status |
+|---|---|---|---|---|
+| 3 | Política de privacidade e termos | 1 | `feat/settings-feedback` | Feito · falta publicar o site |
+| 4 | Acesso em Configurações | 1 | `feat/settings-feedback` | Feito |
+| 5 | Avaliar o app | 1 | `feat/settings-feedback` | Feito |
+| 6 | Compartilhar o app | 1 | `feat/settings-feedback` | Feito |
+| 2 | Relatar erro / sugerir (GitHub) | 1 | `feat/settings-feedback` | Feito |
+| 7 | Confirmar saída no voltar | 2 | `feat/exit-and-state` | Feito |
+| 8 | Preservar estado | 2 | `feat/exit-and-state` | Feito |
+| 9 | Anúncios só na Galeria | 3 | `feat/gallery-ads` | Feito · faltam os IDs do AdMob (`ads.properties`), o `app-ads.txt` e a ficha da Play |
+| 1 | Onboarding | 4 | `feat/onboarding` | Feito |
+
+Versão **1.0.0** (`versionCode` 10000) em `chore/version-1.0.0`.
 
 Strings novas sempre em `values/strings.xml` **e** `values-pt-rBR/strings.xml`.
