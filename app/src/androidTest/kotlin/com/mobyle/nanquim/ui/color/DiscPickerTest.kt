@@ -17,14 +17,14 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.pinch
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.mobyle.nanquim.document.color.ColorDisc
+import com.mobyle.nanquim.document.color.ColorValue
+import com.mobyle.nanquim.document.color.DiscZoom
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.mobyle.nanquim.document.color.ColorDisc
-import com.mobyle.nanquim.document.color.ColorValue
-import com.mobyle.nanquim.document.color.DiscZoom
 import kotlin.math.abs
 import kotlin.math.roundToInt
 

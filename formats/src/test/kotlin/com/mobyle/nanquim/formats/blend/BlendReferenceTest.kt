@@ -1,27 +1,34 @@
 package com.mobyle.nanquim.formats.blend
 
+import com.mobyle.nanquim.document.layer.BlendMode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.double
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.double
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.document.layer.BlendMode
 import java.io.File
 import kotlin.math.abs
 
 class BlendReferenceTest {
-    private fun JsonArray.toRgba() = Rgba(this[0].jsonPrimitive.double, this[1].jsonPrimitive.double, this[2].jsonPrimitive.double, this[3].jsonPrimitive.double)
+    private fun JsonArray.toRgba() =
+        Rgba(this[0].jsonPrimitive.double, this[1].jsonPrimitive.double, this[2].jsonPrimitive.double, this[3].jsonPrimitive.double)
 
     private fun assertClose(
         expected: Rgba,
         actual: Rgba,
         context: String,
     ) {
-        val pairs = listOf(expected.red to actual.red, expected.green to actual.green, expected.blue to actual.blue, expected.alpha to actual.alpha)
+        val pairs =
+            listOf(
+                expected.red to actual.red,
+                expected.green to actual.green,
+                expected.blue to actual.blue,
+                expected.alpha to actual.alpha,
+            )
         pairs.forEach { (want, got) -> assertTrue(abs(want - got) < TOLERANCE, "$context: expected $expected, got $actual") }
     }
 
@@ -43,7 +50,11 @@ class BlendReferenceTest {
             }
             val mode = BlendMode.fromId(modeId) ?: error("unknown mode $modeId")
             assertClose(expected, BlendReference.composite(mode, backdrop, source), context)
-            assertClose(entry.getValue("clipped").jsonArray.toRgba(), BlendReference.clipComposite(mode, backdrop, source), "clipped $context")
+            assertClose(
+                entry.getValue("clipped").jsonArray.toRgba(),
+                BlendReference.clipComposite(mode, backdrop, source),
+                "clipped $context",
+            )
         }
     }
 

@@ -12,8 +12,18 @@ plugins {
 
 val firebaseConfigured = file("google-services.json").exists()
 if (firebaseConfigured) {
-    apply(plugin = libs.plugins.google.services.get().pluginId)
-    apply(plugin = libs.plugins.firebase.crashlytics.get().pluginId)
+    apply(
+        plugin =
+            libs.plugins.google.services
+                .get()
+                .pluginId,
+    )
+    apply(
+        plugin =
+            libs.plugins.firebase.crashlytics
+                .get()
+                .pluginId,
+    )
 }
 
 val keystoreProperties =

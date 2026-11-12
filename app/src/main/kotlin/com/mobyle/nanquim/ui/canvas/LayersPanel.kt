@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.ui.canvas
 
-import androidx.compose.foundation.layout.sizeIn
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -16,11 +15,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -59,7 +59,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.ui.common.onSecondaryClick
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.command.DocumentCommandIds
 import com.mobyle.nanquim.command.TextCommandIds
@@ -69,6 +68,7 @@ import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.LayerGroup
 import com.mobyle.nanquim.document.layer.LayerNode
 import com.mobyle.nanquim.document.layer.RasterLayer
+import com.mobyle.nanquim.ui.common.onSecondaryClick
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -103,6 +103,7 @@ fun LayersPanel(
 ) {
     val state = session.document ?: return
     val document = session.documentSession ?: return
+
     @Suppress("UNUSED_VARIABLE")
     val version = session.documentVersion
     val rows = rowsOf(state)
@@ -113,9 +114,15 @@ fun LayersPanel(
             Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.layers_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                 if (document.selectedIds.size > 1) {
-                    TextButton(onClick = { onCommand(DocumentCommandIds.LAYER_GROUP, emptyMap()) }) { Text(stringResource(R.string.layers_group)) }
-                    TextButton(onClick = { onCommand(DocumentCommandIds.LAYER_MERGE, emptyMap()) }) { Text(stringResource(R.string.layers_merge)) }
-                    TextButton(onClick = { onCommand(DocumentCommandIds.LAYER_DELETE, emptyMap()) }) { Text(stringResource(R.string.layers_delete)) }
+                    TextButton(
+                        onClick = { onCommand(DocumentCommandIds.LAYER_GROUP, emptyMap()) },
+                    ) { Text(stringResource(R.string.layers_group)) }
+                    TextButton(
+                        onClick = { onCommand(DocumentCommandIds.LAYER_MERGE, emptyMap()) },
+                    ) { Text(stringResource(R.string.layers_merge)) }
+                    TextButton(
+                        onClick = { onCommand(DocumentCommandIds.LAYER_DELETE, emptyMap()) },
+                    ) { Text(stringResource(R.string.layers_delete)) }
                 }
                 val addLabel = stringResource(R.string.command_layer_new)
                 TextButton(
@@ -193,7 +200,11 @@ private fun LayerRowView(
                         onHorizontalDrag = { _, amount -> travel += amount },
                         onDragEnd = {
                             when {
-                                travel > SWIPE_THRESHOLD_PX -> onCommand(DocumentCommandIds.LAYER_TOGGLE_SELECTED, mapOf("layerId" to node.id))
+                                travel > SWIPE_THRESHOLD_PX ->
+                                    onCommand(
+                                        DocumentCommandIds.LAYER_TOGGLE_SELECTED,
+                                        mapOf("layerId" to node.id),
+                                    )
                                 travel < -SWIPE_THRESHOLD_PX -> quickActions = true
                             }
                         },
@@ -232,8 +243,15 @@ private fun LayerRowView(
                     if (node.collapsed) "▸" else "▾",
                     modifier =
                         Modifier
-                            .clickable { onCommand(DocumentCommandIds.LAYER_SET_COLLAPSED, mapOf("layerId" to node.id, "collapsed" to !node.collapsed)) }
-                            .padding(6.dp)
+                            .clickable {
+                                onCommand(
+                                    DocumentCommandIds.LAYER_SET_COLLAPSED,
+                                    mapOf(
+                                        "layerId" to node.id,
+                                        "collapsed" to !node.collapsed,
+                                    ),
+                                )
+                            }.padding(6.dp)
                             .semantics { contentDescription = label },
                 )
             } else {
@@ -247,7 +265,13 @@ private fun LayerRowView(
                         .clickable { onCommand(DocumentCommandIds.LAYER_SELECT, mapOf("layerId" to node.id, "mask" to true)) }
                         .semantics { contentDescription = maskLabel },
                 ) {
-                    Thumbnail(session, layerMask.id, mask = true, highlighted = active && document.maskSelected, disabled = !layerMask.enabled)
+                    Thumbnail(
+                        session,
+                        layerMask.id,
+                        mask = true,
+                        highlighted = active && document.maskSelected,
+                        disabled = !layerMask.enabled,
+                    )
                 }
             }
             Column(Modifier.weight(1f)) {
@@ -262,7 +286,11 @@ private fun LayerRowView(
                         if (session.documentSession?.soloLayerId == node.id) add(stringResource(R.string.layers_flag_solo))
                     }
                 if (flags.isNotEmpty()) {
-                    Text(flags.joinToString(" · "), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        flags.joinToString(" · "),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
             val blendLabel = stringResource(R.string.layers_blend_and_opacity, stringResource(blendNameRes(node.blend)))
@@ -341,26 +369,60 @@ private fun LayerRowView(
                     if (node.video != null) item(R.string.layers_rasterize_video, command = VideoCommandIds.RASTERIZE, arguments = id)()
                     item(R.string.layers_fill, command = DocumentCommandIds.LAYER_FILL, arguments = id)()
                     item(R.string.layers_clear, command = DocumentCommandIds.LAYER_CLEAR, arguments = id)()
-                    item(R.string.layers_alpha_lock, node.alphaLock, DocumentCommandIds.LAYER_ALPHA_LOCK, id + ("enabled" to !node.alphaLock))()
-                    item(R.string.layers_drawing_assist, node.assisted, DocumentCommandIds.LAYER_SET_ASSISTED, id + ("enabled" to !node.assisted))()
+                    item(
+                        R.string.layers_alpha_lock,
+                        node.alphaLock,
+                        DocumentCommandIds.LAYER_ALPHA_LOCK,
+                        id + ("enabled" to !node.alphaLock),
+                    )()
+                    item(
+                        R.string.layers_drawing_assist,
+                        node.assisted,
+                        DocumentCommandIds.LAYER_SET_ASSISTED,
+                        id + ("enabled" to !node.assisted),
+                    )()
                     val mask = node.mask
                     if (mask == null) {
                         item(R.string.layers_mask_add, command = DocumentCommandIds.LAYER_MASK_ADD, arguments = id)()
                     } else {
-                        item(R.string.layers_mask_enabled, mask.enabled, DocumentCommandIds.LAYER_MASK_SET_ENABLED, id + ("enabled" to !mask.enabled))()
-                        item(R.string.layers_mask_inverted, mask.inverted, DocumentCommandIds.LAYER_MASK_SET_INVERTED, id + ("inverted" to !mask.inverted))()
+                        item(
+                            R.string.layers_mask_enabled,
+                            mask.enabled,
+                            DocumentCommandIds.LAYER_MASK_SET_ENABLED,
+                            id + ("enabled" to !mask.enabled),
+                        )()
+                        item(
+                            R.string.layers_mask_inverted,
+                            mask.inverted,
+                            DocumentCommandIds.LAYER_MASK_SET_INVERTED,
+                            id + ("inverted" to !mask.inverted),
+                        )()
                         item(R.string.layers_mask_apply, command = DocumentCommandIds.LAYER_MASK_APPLY, arguments = id)()
                         item(R.string.layers_mask_delete, command = DocumentCommandIds.LAYER_MASK_DELETE, arguments = id)()
                     }
                     item(R.string.layers_clipping, node.clipping, DocumentCommandIds.LAYER_CLIPPING, id + ("enabled" to !node.clipping))()
                     item(R.string.layers_invert, command = DocumentCommandIds.LAYER_INVERT, arguments = id)()
-                    item(R.string.layers_reference, node.isReference, DocumentCommandIds.LAYER_SET_REFERENCE, id + ("enabled" to !node.isReference))()
-                    item(R.string.layers_private, node.isPrivate, DocumentCommandIds.LAYER_SET_PRIVATE, id + ("enabled" to !node.isPrivate))()
+                    item(
+                        R.string.layers_reference,
+                        node.isReference,
+                        DocumentCommandIds.LAYER_SET_REFERENCE,
+                        id + ("enabled" to !node.isReference),
+                    )()
+                    item(
+                        R.string.layers_private,
+                        node.isPrivate,
+                        DocumentCommandIds.LAYER_SET_PRIVATE,
+                        id + ("enabled" to !node.isPrivate),
+                    )()
                     item(R.string.layers_merge_down, command = DocumentCommandIds.LAYER_MERGE_DOWN, arguments = id)()
                     item(R.string.layers_combine_down, command = DocumentCommandIds.LAYER_COMBINE_DOWN, arguments = id)()
                 }
                 is LayerGroup -> {
-                    item(R.string.layers_flatten_group, command = DocumentCommandIds.LAYER_FLATTEN, arguments = mapOf("groupId" to node.id))()
+                    item(
+                        R.string.layers_flatten_group,
+                        command = DocumentCommandIds.LAYER_FLATTEN,
+                        arguments = mapOf("groupId" to node.id),
+                    )()
                     item(R.string.layers_ungroup, command = DocumentCommandIds.LAYER_UNGROUP, arguments = id)()
                 }
             }
@@ -420,7 +482,13 @@ private fun Thumbnail(
     ) {
         if (!mask) Checkerboard()
         image?.let {
-            Image(it, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(THUMBNAIL_SIZE), alpha = if (disabled) 0.4f else 1f)
+            Image(
+                it,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(THUMBNAIL_SIZE),
+                alpha = if (disabled) 0.4f else 1f,
+            )
         }
     }
 }
@@ -431,7 +499,17 @@ private fun Checkerboard() {
         repeat(CHECKER_CELLS) { row ->
             Row {
                 repeat(CHECKER_CELLS) { column ->
-                    Box(Modifier.size(THUMBNAIL_SIZE / CHECKER_CELLS).background(if ((row + column) % 2 == 0) CHECKER_LIGHT else CHECKER_DARK))
+                    Box(
+                        Modifier.size(THUMBNAIL_SIZE / CHECKER_CELLS).background(
+                            if ((row + column) % 2 ==
+                                0
+                            ) {
+                                CHECKER_LIGHT
+                            } else {
+                                CHECKER_DARK
+                            },
+                        ),
+                    )
                 }
             }
         }
@@ -469,7 +547,12 @@ private fun BackgroundRow(
             onCheckedChange = { visible ->
                 onCommand(
                     DocumentCommandIds.CANVAS_SET_BACKGROUND,
-                    mapOf("red" to background.color.red, "green" to background.color.green, "blue" to background.color.blue, "hidden" to !visible),
+                    mapOf(
+                        "red" to background.color.red,
+                        "green" to background.color.green,
+                        "blue" to background.color.blue,
+                        "hidden" to !visible,
+                    ),
                 )
             },
             modifier = Modifier.semantics { contentDescription = visibilityLabel },
@@ -534,8 +617,15 @@ private fun BlendDialog(
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
-                                    .clickable { onCommand(DocumentCommandIds.LAYER_SET_BLEND, mapOf("layerId" to node.id, "blend" to mode.id)) }
-                                    .padding(vertical = 10.dp),
+                                    .clickable {
+                                        onCommand(
+                                            DocumentCommandIds.LAYER_SET_BLEND,
+                                            mapOf(
+                                                "layerId" to node.id,
+                                                "blend" to mode.id,
+                                            ),
+                                        )
+                                    }.padding(vertical = 10.dp),
                         )
                     }
                 }

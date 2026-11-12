@@ -1,14 +1,14 @@
 package com.mobyle.nanquim.formats.interchange
 
+import com.mobyle.nanquim.document.layer.RgbaColor
+import com.mobyle.nanquim.formats.palette.Palette
+import com.mobyle.nanquim.formats.palette.PaletteSwatch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
-import com.mobyle.nanquim.document.layer.RgbaColor
-import com.mobyle.nanquim.formats.palette.Palette
-import com.mobyle.nanquim.formats.palette.PaletteSwatch
 import kotlin.math.floor
 
 object ProcreateSwatches {

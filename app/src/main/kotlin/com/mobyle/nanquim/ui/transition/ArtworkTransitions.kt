@@ -47,6 +47,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.mobyle.nanquim.R
+import com.mobyle.nanquim.canvas.CanvasSession
+import com.mobyle.nanquim.engine.Point
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
@@ -54,9 +57,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import com.mobyle.nanquim.R
-import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.engine.Point
 import kotlin.math.min
 import kotlin.math.roundToInt
 

@@ -74,7 +74,9 @@ class AnimationPlayback(
             return false
         }
         if (startNanos == 0L) startNanos = frameTimeNanos
-        val elapsedFrames = (((frameTimeNanos - startNanos) * state.animation.framesPerSecond + NANOS_PER_SECOND / 2) / NANOS_PER_SECOND).toInt()
+        val elapsedFrames =
+            (((frameTimeNanos - startNanos) * state.animation.framesPerSecond + NANOS_PER_SECOND / 2) / NANOS_PER_SECOND)
+                .toInt()
         if (state.animation.playback == PlaybackMode.OneShot && elapsedFrames >= sequence.size) {
             stop()
             return false

@@ -1,13 +1,5 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.intOrNull
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.document.animation.OnionBlend
@@ -23,6 +15,14 @@ import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.document.layer.RgbaColor
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
 
 object AnimationCommandIds {
     const val SET_ENABLED = "animation.setEnabled"
@@ -49,7 +49,14 @@ fun registerAnimationCommands(
         parameters: List<ParameterSpec> = emptyList(),
         handler: suspend (JsonObject) -> CommandResult,
     ) = registry.register(
-        CommandSpec(id = id, titleRes = titleRes, category = CommandCategory.Animation, parameters = parameters, undoable = true, availability = document),
+        CommandSpec(
+            id = id,
+            titleRes = titleRes,
+            category = CommandCategory.Animation,
+            parameters = parameters,
+            undoable = true,
+            availability = document,
+        ),
     ) { _, arguments -> handler(arguments) }
 
     fun optional(
@@ -66,7 +73,11 @@ fun registerAnimationCommands(
         return if (values.size >= 3) RgbaColor(values[0], values[1], values[2], values.getOrElse(3) { 1f }) else null
     }
 
-    register(AnimationCommandIds.SET_ENABLED, R.string.command_animation_set_enabled, listOf(ParameterSpec("enabled", ParameterType.Boolean))) {
+    register(
+        AnimationCommandIds.SET_ENABLED,
+        R.string.command_animation_set_enabled,
+        listOf(ParameterSpec("enabled", ParameterType.Boolean)),
+    ) {
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No document")
         session.setAnimation(session.state.animation.copy(enabled = it.flag("enabled") == true))
         CommandResult.Success()
@@ -91,9 +102,17 @@ fun registerAnimationCommands(
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No document")
         val current = session.state.animation
         val playbackId = (arguments["playback"] as? JsonPrimitive)?.contentOrNull
-        val playback = playbackId?.let { PlaybackMode.fromId(it) ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "playback is loop, pingPong or oneShot") }
+        val playback =
+            playbackId?.let {
+                PlaybackMode.fromId(it)
+                    ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "playback is loop, pingPong or oneShot")
+            }
         val blendId = (arguments["onionBlend"] as? JsonPrimitive)?.contentOrNull
-        val blend = blendId?.let { OnionBlend.fromId(it) ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "onionBlend is colorize or normal") }
+        val blend =
+            blendId?.let {
+                OnionBlend.fromId(it)
+                    ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "onionBlend is colorize or normal")
+            }
         val onion = current.onionSkin
         session.setAnimation(
             current.copy(
@@ -118,29 +137,50 @@ fun registerAnimationCommands(
     register(
         AnimationCommandIds.SET_HOLD,
         R.string.command_animation_set_hold,
-        listOf(ParameterSpec("layerId", ParameterType.Integer), ParameterSpec("holdFrames", ParameterType.Integer), ParameterSpec("final", ParameterType.Boolean, JsonPrimitive(true))),
+        listOf(
+            ParameterSpec("layerId", ParameterType.Integer),
+            ParameterSpec("holdFrames", ParameterType.Integer),
+            ParameterSpec("final", ParameterType.Boolean, JsonPrimitive(true)),
+        ),
     ) { arguments ->
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No document")
         val id = (arguments["layerId"] as? JsonPrimitive)?.intOrNull ?: 0
-        if (session.state.frames.none { it.id == id }) return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Layer $id is not a frame")
+        if (session.state.frames.none {
+                it.id == id
+            }
+        ) {
+            return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Layer $id is not a frame")
+        }
         val hold = ((arguments["holdFrames"] as? JsonPrimitive)?.intOrNull ?: 0).coerceAtLeast(0)
         val animation = session.state.animation
         session.setAnimation(animation.copy(holdFrames = animation.holdFrames + (id to hold)), final = arguments.flag("final") != false)
         CommandResult.Success()
     }
-    register(AnimationCommandIds.GO_TO_FRAME, R.string.command_animation_go_to_frame, listOf(ParameterSpec("index", ParameterType.Integer))) { arguments ->
+    register(
+        AnimationCommandIds.GO_TO_FRAME,
+        R.string.command_animation_go_to_frame,
+        listOf(ParameterSpec("index", ParameterType.Integer)),
+    ) { arguments ->
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No document")
-        val frame = session.state.frames.getOrNull((arguments["index"] as? JsonPrimitive)?.intOrNull ?: -1)
-            ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "No such frame")
+        val frame =
+            session.state.frames.getOrNull((arguments["index"] as? JsonPrimitive)?.intOrNull ?: -1)
+                ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "No such frame")
         session.select(frame.id)
         CommandResult.Success()
     }
+
     fun registerPlayback(
         id: String,
         titleRes: Int,
         action: () -> Unit,
-    ) = registry.register(CommandSpec(id = id, titleRes = titleRes, category = CommandCategory.Animation, undoable = false, availability = document)) { _, _ ->
-        if (canvas.documentSession?.state?.animation?.enabled != true) {
+    ) = registry.register(
+        CommandSpec(id = id, titleRes = titleRes, category = CommandCategory.Animation, undoable = false, availability = document),
+    ) { _, _ ->
+        if (canvas.documentSession
+                ?.state
+                ?.animation
+                ?.enabled != true
+        ) {
             CommandResult.Failure(CommandErrorCode.Unavailable, "Animation is off")
         } else {
             action()

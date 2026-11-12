@@ -83,7 +83,9 @@ class DocumentArchiveTest {
                             zip.write(1)
                         }
                     }.toByteArray()
-            assertThrows(IOException::class.java, { DocumentArchive.extract(ByteArrayInputStream(bytes), File(temporary, "unsafe${name.hashCode()}")) }, name)
+            assertThrows(IOException::class.java, {
+                DocumentArchive.extract(ByteArrayInputStream(bytes), File(temporary, "unsafe${name.hashCode()}"))
+            }, name)
         }
         assertFalse(File(temporary.parentFile, "escape.txt").exists())
         val noManifest =

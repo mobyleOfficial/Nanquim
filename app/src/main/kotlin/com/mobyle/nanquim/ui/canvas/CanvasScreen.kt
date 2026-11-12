@@ -1,11 +1,5 @@
 package com.mobyle.nanquim.ui.canvas
 
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.unit.Density
-import androidx.compose.runtime.CompositionLocalProvider
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -36,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -47,6 +42,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -69,8 +65,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -90,16 +90,16 @@ import com.mobyle.nanquim.command.SliderNames
 import com.mobyle.nanquim.command.ToolCommandIds
 import com.mobyle.nanquim.document.DocumentPersistence
 import com.mobyle.nanquim.document.SaveStatus
+import com.mobyle.nanquim.engine.Engine
+import com.mobyle.nanquim.engine.EngineEvent
+import com.mobyle.nanquim.engine.GpuInfo
+import com.mobyle.nanquim.engine.ViewportStyle
 import com.mobyle.nanquim.macro.Macros
 import com.mobyle.nanquim.settings.QuickMenuSettings
 import com.mobyle.nanquim.ui.brush.BrushLibraryPanel
 import com.mobyle.nanquim.ui.color.ColorPanel
 import com.mobyle.nanquim.ui.common.LocalWindowLayout
 import com.mobyle.nanquim.ui.theme.LocalDarkTheme
-import com.mobyle.nanquim.engine.Engine
-import com.mobyle.nanquim.engine.EngineEvent
-import com.mobyle.nanquim.engine.GpuInfo
-import com.mobyle.nanquim.engine.ViewportStyle
 
 @Composable
 fun CanvasScreen(

@@ -1,5 +1,6 @@
 package com.mobyle.nanquim.document.layer
 
+import com.mobyle.nanquim.document.animation.FrameAppearance
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -9,7 +10,6 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
-import com.mobyle.nanquim.document.animation.FrameAppearance
 
 fun DocumentState.toEngineLayerTree(
     soloLayerId: Int? = null,

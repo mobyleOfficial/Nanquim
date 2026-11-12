@@ -5,6 +5,9 @@ import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.mobyle.nanquim.canvas.input.TouchEvent
+import com.mobyle.nanquim.canvas.input.TouchSession
+import com.mobyle.nanquim.canvas.input.TouchSessionSet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +16,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
-import com.mobyle.nanquim.canvas.input.TouchEvent
-import com.mobyle.nanquim.canvas.input.TouchSession
-import com.mobyle.nanquim.canvas.input.TouchSessionSet
 import java.io.File
 import java.io.IOException
 

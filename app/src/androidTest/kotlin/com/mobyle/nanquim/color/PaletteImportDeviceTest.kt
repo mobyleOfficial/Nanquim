@@ -1,15 +1,15 @@
 package com.mobyle.nanquim.color
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
-import org.junit.runner.RunWith
 import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.formats.palette.Palette
 import com.mobyle.nanquim.formats.palette.PaletteFormatException
 import com.mobyle.nanquim.formats.palette.PaletteInterchange
 import com.mobyle.nanquim.formats.palette.PaletteSwatch
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 

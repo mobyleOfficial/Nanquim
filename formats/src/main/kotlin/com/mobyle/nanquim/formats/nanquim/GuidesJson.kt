@@ -1,11 +1,5 @@
 package com.mobyle.nanquim.formats.nanquim
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.doubleOrNull
 import com.mobyle.nanquim.document.guide.GridGuide
 import com.mobyle.nanquim.document.guide.GuideSettings
 import com.mobyle.nanquim.document.guide.GuideType
@@ -13,6 +7,12 @@ import com.mobyle.nanquim.document.guide.PerspectiveGuide
 import com.mobyle.nanquim.document.guide.SymmetryGuide
 import com.mobyle.nanquim.document.guide.SymmetryKind
 import com.mobyle.nanquim.document.guide.VanishingPoint
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.doubleOrNull
 
 internal object GuidesJson {
     fun read(

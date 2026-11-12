@@ -1,11 +1,11 @@
 package com.mobyle.nanquim.ui.color
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import com.mobyle.nanquim.document.color.ColorDisc
 import com.mobyle.nanquim.document.color.ColorValue
 import com.mobyle.nanquim.document.color.DiscPoint
 import com.mobyle.nanquim.document.color.DiscZoom
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import kotlin.math.roundToInt
 
 class ColorDiscPixelsTest {

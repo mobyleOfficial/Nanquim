@@ -1,8 +1,6 @@
 package com.mobyle.nanquim.gallery
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import android.graphics.Bitmap
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.document.animation.AnimationExportPlan
 import com.mobyle.nanquim.document.animation.PlaybackMode
@@ -11,10 +9,12 @@ import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.engine.AnimationFileWriter
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.InterchangeFiles
-import android.graphics.Bitmap
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
-import java.nio.ByteBuffer
 import java.io.OutputStream
+import java.nio.ByteBuffer
 import java.util.zip.CRC32
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -70,7 +70,16 @@ class AnimationExport(
         if (!state.animation.enabled) throw GalleryException(GalleryError.WriteFailed, "Animation is off")
         val plan = state.animationExportPlan(settings.firstFrame, settings.lastFrame, settings.framesPerSecond)
         if (plan.slots.isEmpty()) throw GalleryException(GalleryError.WriteFailed, "No frames")
-        val divisor = (100 / settings.scalePercent.coerceIn(25, 100)).let { if (it >= 4) 4 else if (it >= 2) 2 else 1 }
+        val divisor =
+            (100 / settings.scalePercent.coerceIn(25, 100)).let {
+                if (it >= 4) {
+                    4
+                } else if (it >= 2) {
+                    2
+                } else {
+                    1
+                }
+            }
         var width = state.widthPx / divisor
         var height = state.heightPx / divisor
         val video = format == AnimationFormat.Mp4 || format == AnimationFormat.WebM
@@ -146,7 +155,14 @@ class AnimationExport(
             var startMicroseconds = 0L
             frames.forEachMerged { pixels, durationMilliseconds ->
                 val start = startMicroseconds
-                val sized = if (width == frames.width && height == frames.height) pixels else withContext(Dispatchers.Default) { resized(pixels, frames.width, frames.height, width, height) }
+                val sized =
+                    if (width == frames.width &&
+                        height == frames.height
+                    ) {
+                        pixels
+                    } else {
+                        withContext(Dispatchers.Default) { resized(pixels, frames.width, frames.height, width, height) }
+                    }
                 withContext(Dispatchers.IO) { encoder.addFrame(sized, start) }
                 startMicroseconds += durationMilliseconds * 1000L
             }
@@ -165,7 +181,13 @@ class AnimationExport(
         val zip = ZipOutputStream(output)
         val png = File(cacheDirectory, "animation-frame-${System.nanoTime()}.png")
         try {
-            val digits = maxOf(4, plan.slots.size.toString().length)
+            val digits =
+                maxOf(
+                    4,
+                    plan.slots.size
+                        .toString()
+                        .length,
+                )
             var slot = 0
             frames.forEachMerged { pixels, durationMilliseconds ->
                 val bytes =

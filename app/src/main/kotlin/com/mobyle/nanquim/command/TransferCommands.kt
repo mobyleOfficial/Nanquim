@@ -1,19 +1,5 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.int
-
-import kotlinx.serialization.json.addJsonArray
-
-import com.mobyle.nanquim.gallery.AnimationDecoder
-
-import com.mobyle.nanquim.BuildConfig
-
-import com.mobyle.nanquim.engine.AnimationFileWriter
-
-import com.mobyle.nanquim.gallery.AnimationExportSettings
-
-import com.mobyle.nanquim.gallery.AnimationFormat
-
 import android.content.ClipData
 import android.content.ContentResolver
 import android.content.Context
@@ -21,29 +7,11 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.addJsonObject
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
+import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.BrushUiState
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.document.ImageFormat
-import com.mobyle.nanquim.gallery.ArtworkTransfer
-import com.mobyle.nanquim.gallery.Gallery
-import com.mobyle.nanquim.gallery.ExportOptions
-import com.mobyle.nanquim.gallery.GalleryException
-import com.mobyle.nanquim.gallery.ImportTarget
-import com.mobyle.nanquim.gallery.InterchangeFormat
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandRegistry
@@ -51,7 +19,32 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.engine.AnimationFileWriter
 import com.mobyle.nanquim.formats.interchange.ImportWarning
+import com.mobyle.nanquim.gallery.AnimationDecoder
+import com.mobyle.nanquim.gallery.AnimationExportSettings
+import com.mobyle.nanquim.gallery.AnimationFormat
+import com.mobyle.nanquim.gallery.ArtworkTransfer
+import com.mobyle.nanquim.gallery.ExportOptions
+import com.mobyle.nanquim.gallery.Gallery
+import com.mobyle.nanquim.gallery.GalleryException
+import com.mobyle.nanquim.gallery.ImportTarget
+import com.mobyle.nanquim.gallery.InterchangeFormat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.addJsonArray
+import kotlinx.serialization.json.addJsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import java.io.File
 import java.io.IOException
 
@@ -82,7 +75,9 @@ class ShareSheet(
                 clipData = ClipData.newRawUri(null, uris.first()).also { clip -> uris.drop(1).forEach { clip.addItem(ClipData.Item(it)) } }
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-        context.startActivity(Intent.createChooser(intent, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION))
+        context.startActivity(
+            Intent.createChooser(intent, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION),
+        )
     }
 }
 
@@ -116,8 +111,9 @@ private fun JsonObject.exportOptions(): ExportOptions {
                 scalePercent = optionalInt("scale")?.takeIf { it in AnimationExportSettings.SCALES } ?: 100,
                 plays = optionalInt("plays"),
                 includeBackground = optionalString("includeBackground") != "false",
-                dither = AnimationFileWriter.Dither.entries.firstOrNull { it.name.equals(optionalString("dither"), ignoreCase = true) }
-                    ?: AnimationFileWriter.Dither.FloydSteinberg,
+                dither =
+                    AnimationFileWriter.Dither.entries.firstOrNull { it.name.equals(optionalString("dither"), ignoreCase = true) }
+                        ?: AnimationFileWriter.Dither.FloydSteinberg,
                 hevc = optionalString("hevc") == "true",
             ),
     )
@@ -184,7 +180,10 @@ fun registerTransferCommands(
             val segment = (arguments["timelapseSegment"] as? JsonPrimitive)?.intOrNull
             val folder =
                 if (segment != null) {
-                    File(canvasSession.artwork?.folder ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No artwork"), "timelapse")
+                    File(
+                        canvasSession.artwork?.folder ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No artwork"),
+                        "timelapse",
+                    )
                 } else {
                     File(cacheDirectory, ArtworkTransfer.EXPORT_FOLDER)
                 }
@@ -195,13 +194,21 @@ fun registerTransferCommands(
             }
             val frames = (arguments["frames"] as? JsonArray)?.map { it.jsonPrimitive.int } ?: listOf(0)
             val points =
-                (arguments["points"] as? JsonArray)?.map { point -> (point as JsonArray).let { it[0].jsonPrimitive.int to it[1].jsonPrimitive.int } }
+                (arguments["points"] as? JsonArray)?.map { point ->
+                    (point as JsonArray).let {
+                        it[0].jsonPrimitive.int to
+                            it[1].jsonPrimitive.int
+                    }
+                }
                     ?: emptyList()
             val decoded =
                 try {
                     withContext(Dispatchers.IO) { AnimationDecoder.decode(file, frames, points) }
                 } catch (exception: Exception) {
-                    return@register CommandResult.Failure(CommandErrorCode.HandlerFailed, exception.stackTraceToString().take(MAXIMUM_TRACE_CHARACTERS))
+                    return@register CommandResult.Failure(
+                        CommandErrorCode.HandlerFailed,
+                        exception.stackTraceToString().take(MAXIMUM_TRACE_CHARACTERS),
+                    )
                 }
             CommandResult.Success(
                 buildJsonObject {
@@ -212,7 +219,9 @@ fun registerTransferCommands(
                     put("frames", decoded.frames)
                     put("durationMilliseconds", decoded.durationMilliseconds)
                     putJsonArray("colors") {
-                        decoded.colors.forEach { frame -> addJsonArray { frame.forEach { color -> addJsonArray { color.forEach { add(JsonPrimitive(it)) } } } } }
+                        decoded.colors.forEach { frame ->
+                            addJsonArray { frame.forEach { color -> addJsonArray { color.forEach { add(JsonPrimitive(it)) } } } }
+                        }
                     }
                 },
             )
@@ -225,11 +234,23 @@ fun registerTransferCommands(
         CommandCategory.Gallery,
         listOf(
             ParameterSpec("uri", ParameterType.String),
-            ParameterSpec("target", ParameterType.Enumeration, JsonPrimitive(ImportTarget.NewArtwork.id), allowedValues = ImportTarget.entries.map { it.id }),
+            ParameterSpec(
+                "target",
+                ParameterType.Enumeration,
+                JsonPrimitive(
+                    ImportTarget.NewArtwork.id,
+                ),
+                allowedValues =
+                    ImportTarget.entries.map {
+                        it.id
+                    },
+            ),
             ParameterSpec("private", ParameterType.Boolean, JsonPrimitive(false)),
         ),
     ) { arguments ->
-        val uri = arguments.contentUri("uri") ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
+        val uri =
+            arguments.contentUri("uri")
+                ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         if (transfer.isBrushFile(uri)) return@register importBrushFile(brushUi, contentResolver, uri, onBrushImportReport)
         if (transfer.isDocumentPackage(uri)) {
             val id = gallery.whileBusy { transfer.importDocument(uri) }
@@ -271,9 +292,15 @@ fun registerTransferCommands(
         CommandCategory.Export,
         listOf(ParameterSpec("uri", ParameterType.String), ParameterSpec("id", ParameterType.String, JsonNull)) + exportParameters,
     ) { arguments ->
-        val uri = arguments.contentUri("uri") ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
-        val id = arguments.optionalString("id") ?: canvasSession.artwork?.id ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "No artwork")
-        val output = withContext(Dispatchers.IO) { contentResolver.openOutputStream(uri, "wt") } ?: return@register CommandResult.Failure(CommandErrorCode.HandlerFailed, "Cannot write $uri")
+        val uri =
+            arguments.contentUri("uri")
+                ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
+        val id =
+            arguments.optionalString("id") ?: canvasSession.artwork?.id
+                ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "No artwork")
+        val output =
+            withContext(Dispatchers.IO) { contentResolver.openOutputStream(uri, "wt") }
+                ?: return@register CommandResult.Failure(CommandErrorCode.HandlerFailed, "Cannot write $uri")
         output.use { transfer.export(id, arguments.exportOptions(), it) }
         CommandResult.Success()
     }
@@ -284,9 +311,15 @@ fun registerTransferCommands(
         CommandCategory.Export,
         listOf(ParameterSpec("uri", ParameterType.String), ParameterSpec("id", ParameterType.String, JsonNull)),
     ) { arguments ->
-        val uri = arguments.contentUri("uri") ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
-        val id = arguments.optionalString("id") ?: canvasSession.artwork?.id ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "No artwork")
-        val output = withContext(Dispatchers.IO) { contentResolver.openOutputStream(uri, "wt") } ?: return@register CommandResult.Failure(CommandErrorCode.HandlerFailed, "Cannot write $uri")
+        val uri =
+            arguments.contentUri("uri")
+                ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
+        val id =
+            arguments.optionalString("id") ?: canvasSession.artwork?.id
+                ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "No artwork")
+        val output =
+            withContext(Dispatchers.IO) { contentResolver.openOutputStream(uri, "wt") }
+                ?: return@register CommandResult.Failure(CommandErrorCode.HandlerFailed, "Cannot write $uri")
         output.use { transfer.export(id, ExportOptions(imageFormat = null), it) }
         CommandResult.Success()
     }

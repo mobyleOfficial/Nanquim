@@ -1,12 +1,12 @@
 package com.mobyle.nanquim.help
 
 import android.content.SharedPreferences
+import com.mobyle.nanquim.canvas.input.CanvasTool
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.canvas.input.CanvasTool
 
 class HelpTest {
     private val preferences = MemoryPreferences()

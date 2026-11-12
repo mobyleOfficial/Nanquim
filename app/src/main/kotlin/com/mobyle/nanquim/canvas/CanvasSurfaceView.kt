@@ -29,11 +29,10 @@ import com.mobyle.nanquim.canvas.selection.SelectionEditor
 import com.mobyle.nanquim.canvas.selection.SelectionMode
 import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.command.CanvasCommandIds
-import com.mobyle.nanquim.command.QuickMenuCommandIds
 import com.mobyle.nanquim.command.DocumentCommandIds
 import com.mobyle.nanquim.command.GuideCommandIds
+import com.mobyle.nanquim.command.QuickMenuCommandIds
 import com.mobyle.nanquim.command.ToolCommandIds
-import com.mobyle.nanquim.ui.canvas.EngineSurfaceView
 import com.mobyle.nanquim.document.guide.GuideType
 import com.mobyle.nanquim.document.guide.PerspectiveGuide
 import com.mobyle.nanquim.document.layer.LayerOperationException
@@ -41,6 +40,7 @@ import com.mobyle.nanquim.document.layer.RasterLayer
 import com.mobyle.nanquim.engine.AdjustmentFilter
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.Point
+import com.mobyle.nanquim.ui.canvas.EngineSurfaceView
 import kotlin.math.atan2
 import kotlin.math.hypot
 import kotlin.math.pow
@@ -61,6 +61,7 @@ class CanvasSurfaceView(
     init {
         session.onSnapped = { snapFeedback() }
     }
+
     private val stroke =
         StrokeInput(
             engine,

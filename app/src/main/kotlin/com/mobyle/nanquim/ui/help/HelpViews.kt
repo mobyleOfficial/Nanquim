@@ -47,11 +47,11 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.input.CanvasTool
 import com.mobyle.nanquim.help.Help
 import com.mobyle.nanquim.help.WelcomeCard
+import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin

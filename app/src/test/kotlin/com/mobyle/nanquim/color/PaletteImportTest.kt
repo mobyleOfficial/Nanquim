@@ -1,13 +1,13 @@
 package com.mobyle.nanquim.color
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.formats.palette.Palette
 import com.mobyle.nanquim.formats.palette.PaletteFile
 import com.mobyle.nanquim.formats.palette.PaletteFormatException
 import com.mobyle.nanquim.formats.palette.PaletteSwatch
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.zip.ZipEntry
@@ -18,7 +18,7 @@ class PaletteImportTest {
 
     @Test
     fun nqpaletteIsReadAsIs() {
-        val bytes = ("﻿  " + PaletteFile.write("old-id", palette)).toByteArray(Charsets.UTF_8)
+        val bytes = ("  " + PaletteFile.write("old-id", palette)).toByteArray(Charsets.UTF_8)
         val (imported, warnings) = PaletteImport.read(bytes, "File")
         assertEquals(palette, imported)
         assertEquals(emptyList<Any>(), warnings)

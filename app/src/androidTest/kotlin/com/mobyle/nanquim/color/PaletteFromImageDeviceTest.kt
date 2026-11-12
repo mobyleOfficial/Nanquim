@@ -3,12 +3,12 @@ package com.mobyle.nanquim.color
 import android.graphics.BitmapFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.document.color.PaletteExtractor
 import org.json.JSONArray
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.mobyle.nanquim.document.color.PaletteExtractor
 
 @RunWith(AndroidJUnit4::class)
 class PaletteFromImageDeviceTest {

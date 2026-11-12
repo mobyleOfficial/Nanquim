@@ -37,7 +37,12 @@ class PerspectiveSymmetryGeometryTest {
         assertEquals(250.0, horizon.y1, 1e-9)
         val rays = lines.filter { !it.emphasized && distanceToLine(it, 500.0, 250.0) < 1e-6 }
         assertEquals(14, rays.size)
-        val vertical = lines.filter { abs(it.x0 - it.x1) < 1e-9 }.map { Math.round(it.x0 * 1e6) / 1e6 }.distinct().sorted()
+        val vertical =
+            lines
+                .filter { abs(it.x0 - it.x1) < 1e-9 }
+                .map { Math.round(it.x0 * 1e6) / 1e6 }
+                .distinct()
+                .sorted()
         assertEquals((0..10).map { it * 100.0 }, vertical)
     }
 

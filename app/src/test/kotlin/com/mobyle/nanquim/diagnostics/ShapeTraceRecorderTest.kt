@@ -1,5 +1,6 @@
 package com.mobyle.nanquim.diagnostics
 
+import com.mobyle.nanquim.document.shape.ShapeTraceSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
-import com.mobyle.nanquim.document.shape.ShapeTraceSet
 import java.io.File
 
 class ShapeTraceRecorderTest {

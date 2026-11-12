@@ -33,12 +33,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.command.CanvasInfoCommandIds
 import com.mobyle.nanquim.formats.nanquim.ArtistInfo
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
 import java.text.DateFormat
 import java.util.Date
 import java.util.Locale

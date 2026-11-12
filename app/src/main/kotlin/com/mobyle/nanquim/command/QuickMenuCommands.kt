@@ -1,19 +1,8 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.int
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.canvas.QuickMenuAnchor
-import com.mobyle.nanquim.settings.QuickMenuPreset
-import com.mobyle.nanquim.settings.QuickMenuSettings
-import com.mobyle.nanquim.settings.QuickMenuSlot
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandContext
 import com.mobyle.nanquim.document.command.CommandErrorCode
@@ -22,6 +11,17 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.settings.QuickMenuPreset
+import com.mobyle.nanquim.settings.QuickMenuSettings
+import com.mobyle.nanquim.settings.QuickMenuSlot
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.int
 
 object QuickMenuCommandIds {
     const val SHOW = "quickMenu.show"

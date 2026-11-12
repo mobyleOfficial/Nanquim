@@ -1,13 +1,13 @@
 package com.mobyle.nanquim.ui.color
 
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -36,13 +36,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.color.CmykConversion
 import com.mobyle.nanquim.document.color.CmykInks
 import com.mobyle.nanquim.document.color.ColorComponent
-import com.mobyle.nanquim.document.color.InkChannel
 import com.mobyle.nanquim.document.color.ColorValue
+import com.mobyle.nanquim.document.color.InkChannel
+import kotlinx.coroutines.launch
 
 @Composable
 fun ValuePicker(

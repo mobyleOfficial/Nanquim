@@ -1,19 +1,9 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.double
-import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.put
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.canvas.ShapeSnapResult
 import com.mobyle.nanquim.canvas.input.PalmSupport
-import com.mobyle.nanquim.settings.InputSettings
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -26,6 +16,16 @@ import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.document.shape.RecognizedShape
 import com.mobyle.nanquim.document.shape.ShapeHandle
 import com.mobyle.nanquim.engine.Point
+import com.mobyle.nanquim.settings.InputSettings
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.put
 
 private val requiresDocument: (AppState) -> Availability = { state ->
     if (state.hasOpenDocument) Availability.Enabled else Availability.Disabled("No open document")

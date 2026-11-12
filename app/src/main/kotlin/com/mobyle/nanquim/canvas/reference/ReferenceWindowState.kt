@@ -11,10 +11,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.graphics.get
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import com.mobyle.nanquim.canvas.SrgbColor
 import com.mobyle.nanquim.document.OpenArtwork
 import com.mobyle.nanquim.document.RgbaImages
@@ -22,6 +18,10 @@ import com.mobyle.nanquim.document.reference.ReferenceMode
 import com.mobyle.nanquim.document.reference.ReferenceSettings
 import com.mobyle.nanquim.document.reference.ReferenceView
 import com.mobyle.nanquim.engine.Engine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 

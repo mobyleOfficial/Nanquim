@@ -10,20 +10,6 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.color.ColorProfileLibrary
-import com.mobyle.nanquim.color.PaletteLibrary
-import com.mobyle.nanquim.color.builtInPalettes
-import com.mobyle.nanquim.text.FontLibrary
-import com.mobyle.nanquim.document.color.ColorState
-import com.mobyle.nanquim.canvas.adjust.GradientLibrary
 import com.mobyle.nanquim.automation.CanvasAutomationHost
 import com.mobyle.nanquim.automation.ControlChannel
 import com.mobyle.nanquim.brush.ActiveBrushes
@@ -36,41 +22,55 @@ import com.mobyle.nanquim.brush.library.BrushLibraryDatabase
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.canvas.MemoryBudgetPolicy
 import com.mobyle.nanquim.canvas.ResourceLayerNames
+import com.mobyle.nanquim.canvas.adjust.GradientLibrary
+import com.mobyle.nanquim.color.ColorProfileLibrary
+import com.mobyle.nanquim.color.PaletteLibrary
+import com.mobyle.nanquim.color.builtInPalettes
 import com.mobyle.nanquim.command.CommandDispatcher
 import com.mobyle.nanquim.command.NanquimAppState
 import com.mobyle.nanquim.command.ShareSheet
 import com.mobyle.nanquim.command.createAppCommandRegistry
 import com.mobyle.nanquim.command.registerHelpCommands
-import com.mobyle.nanquim.help.Help
 import com.mobyle.nanquim.diagnostics.DiagnosticsCollector
 import com.mobyle.nanquim.diagnostics.DiagnosticsExporter
 import com.mobyle.nanquim.diagnostics.ShapeTraceRecorder
-import com.mobyle.nanquim.diagnostics.TouchSessionRecorder
 import com.mobyle.nanquim.diagnostics.StylusObservationRecorder
+import com.mobyle.nanquim.diagnostics.TouchSessionRecorder
 import com.mobyle.nanquim.document.ArtworkStorage
 import com.mobyle.nanquim.document.DocumentPersistence
+import com.mobyle.nanquim.document.color.ColorState
+import com.mobyle.nanquim.document.command.CommandContext
+import com.mobyle.nanquim.document.command.CommandResult
+import com.mobyle.nanquim.engine.Engine
+import com.mobyle.nanquim.engine.EngineConfig
+import com.mobyle.nanquim.engine.Renderer
 import com.mobyle.nanquim.gallery.ArtworkTransfer
 import com.mobyle.nanquim.gallery.Gallery
 import com.mobyle.nanquim.gallery.GalleryDatabase
 import com.mobyle.nanquim.gallery.GalleryDocumentsProvider
 import com.mobyle.nanquim.gallery.GalleryNames
 import com.mobyle.nanquim.gallery.SampleArtworks
-import com.mobyle.nanquim.ui.settings.SupportLink
-import com.mobyle.nanquim.ui.settings.parseSupportLinks
-import com.mobyle.nanquim.navigation.AppNavigator
+import com.mobyle.nanquim.help.Help
 import com.mobyle.nanquim.keyboard.KeyboardShortcutSettings
 import com.mobyle.nanquim.macro.Macros
+import com.mobyle.nanquim.navigation.AppNavigator
 import com.mobyle.nanquim.settings.AppSettings
 import com.mobyle.nanquim.settings.InputSettings
 import com.mobyle.nanquim.settings.QuickMenuSettings
 import com.mobyle.nanquim.settings.StorageCleaner
 import com.mobyle.nanquim.telemetry.Telemetry
+import com.mobyle.nanquim.text.FontLibrary
+import com.mobyle.nanquim.ui.settings.SupportLink
+import com.mobyle.nanquim.ui.settings.parseSupportLinks
 import com.mobyle.nanquim.widget.WidgetUpdates
-import com.mobyle.nanquim.document.command.CommandContext
-import com.mobyle.nanquim.document.command.CommandResult
-import com.mobyle.nanquim.engine.Engine
-import com.mobyle.nanquim.engine.EngineConfig
-import com.mobyle.nanquim.engine.Renderer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Locale
 
@@ -345,7 +345,13 @@ class NanquimApplication : Application() {
             manualUrl = { getString(R.string.help_manual_url) },
             openUrl = { url ->
                 runCatching {
-                    startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                    startActivity(
+                        android.content
+                            .Intent(
+                                android.content.Intent.ACTION_VIEW,
+                                Uri.parse(url),
+                            ).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
                 }.isSuccess
             },
             installSamples = sampleArtworks::install,

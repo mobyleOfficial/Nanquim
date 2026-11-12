@@ -1,10 +1,5 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.contentOrNull
 import android.content.ContentResolver
 import androidx.core.net.toUri
 import androidx.work.ExistingWorkPolicy
@@ -13,17 +8,8 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.gallery.ArtworkTransfer
-import com.mobyle.nanquim.gallery.TimelapseExportWorker
-import com.mobyle.nanquim.gallery.TimelapseLength
-import java.io.File
 import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.settings.AppSettings
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -35,6 +21,20 @@ import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.formats.nanquim.TimelapseResolution
 import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
+import com.mobyle.nanquim.gallery.ArtworkTransfer
+import com.mobyle.nanquim.gallery.TimelapseExportWorker
+import com.mobyle.nanquim.gallery.TimelapseLength
+import com.mobyle.nanquim.settings.AppSettings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import java.io.File
 
 object TimelapseCommandIds {
     const val SET_ENABLED = "timelapse.setEnabled"
@@ -86,7 +86,12 @@ fun registerTimelapseCommands(
             category = CommandCategory.Canvas,
             parameters =
                 listOf(
-                    ParameterSpec("resolution", ParameterType.Enumeration, JsonNull, allowedValues = TimelapseResolution.entries.map { it.id }),
+                    ParameterSpec(
+                        "resolution",
+                        ParameterType.Enumeration,
+                        JsonNull,
+                        allowedValues = TimelapseResolution.entries.map { it.id },
+                    ),
                     ParameterSpec("hevc", ParameterType.Boolean, JsonNull),
                 ),
             undoable = false,
@@ -131,7 +136,17 @@ fun registerTimelapseCommands(
             category = CommandCategory.Export,
             parameters =
                 listOf(
-                    ParameterSpec("length", ParameterType.Enumeration, JsonPrimitive(TimelapseLength.Full.id), allowedValues = TimelapseLength.entries.map { it.id }),
+                    ParameterSpec(
+                        "length",
+                        ParameterType.Enumeration,
+                        JsonPrimitive(
+                            TimelapseLength.Full.id,
+                        ),
+                        allowedValues =
+                            TimelapseLength.entries.map {
+                                it.id
+                            },
+                    ),
                     ParameterSpec("cards", ParameterType.Boolean, JsonPrimitive(false)),
                     ParameterSpec("author", ParameterType.String, JsonNull),
                     ParameterSpec("uri", ParameterType.String, JsonNull),
@@ -145,7 +160,11 @@ fun registerTimelapseCommands(
         canvas.timelapse.flush()
         val segments = canvas.timelapse.segmentsOf(open.folder)
         if (segments.isEmpty()) return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No timelapse recorded")
-        val name = open.info.name.replace(Regex("[\\\\/:*?\"<>|\\p{Cntrl}]"), "_").trim().ifEmpty { "timelapse" }
+        val name =
+            open.info.name
+                .replace(Regex("[\\\\/:*?\"<>|\\p{Cntrl}]"), "_")
+                .trim()
+                .ifEmpty { "timelapse" }
         val folder = File(cacheDirectory, ArtworkTransfer.EXPORT_FOLDER).apply { mkdirs() }
         val output = File(folder, "$name-timelapse.mp4")
         val cards =
@@ -161,17 +180,26 @@ fun registerTimelapseCommands(
                     workDataOf(
                         TimelapseExportWorker.KEY_SEGMENTS to segments.map { it.path }.toTypedArray(),
                         TimelapseExportWorker.KEY_OUTPUT to output.path,
-                        TimelapseExportWorker.KEY_LENGTH to ((arguments["length"] as? JsonPrimitive)?.contentOrNull ?: TimelapseLength.Full.id),
+                        TimelapseExportWorker.KEY_LENGTH to
+                            ((arguments["length"] as? JsonPrimitive)?.contentOrNull ?: TimelapseLength.Full.id),
                         TimelapseExportWorker.KEY_CARD_LINES to cards.toTypedArray(),
                     ),
                 ).setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
         manager.enqueueUniqueWork(EXPORT_WORK, ExistingWorkPolicy.REPLACE, request)
         val finished = manager.getWorkInfoByIdFlow(request.id).filterNotNull().first { it.state.isFinished }
-        if (finished.state != WorkInfo.State.SUCCEEDED) return@register CommandResult.Failure(CommandErrorCode.HandlerFailed, "Timelapse export failed")
+        if (finished.state !=
+            WorkInfo.State.SUCCEEDED
+        ) {
+            return@register CommandResult.Failure(CommandErrorCode.HandlerFailed, "Timelapse export failed")
+        }
         val uri = (arguments["uri"] as? JsonPrimitive)?.contentOrNull?.toUri()
         if (uri != null) {
-            if (uri.scheme != ContentResolver.SCHEME_CONTENT) return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
+            if (uri.scheme !=
+                ContentResolver.SCHEME_CONTENT
+            ) {
+                return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
+            }
             withContext(Dispatchers.IO) {
                 contentResolver.openOutputStream(uri, "wt")?.use { stream -> output.inputStream().use { it.copyTo(stream) } }
             }

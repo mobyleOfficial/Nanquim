@@ -21,8 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.ui.canvas.EngineSurfaceView
 import com.mobyle.nanquim.engine.Engine
+import com.mobyle.nanquim.ui.canvas.EngineSurfaceView
 
 @Composable
 fun LatencyTestScreen(

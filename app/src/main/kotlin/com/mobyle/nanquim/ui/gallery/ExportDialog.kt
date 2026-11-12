@@ -26,12 +26,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.ImageFormat
+import com.mobyle.nanquim.document.animation.AnimationSettings
+import com.mobyle.nanquim.engine.AnimationFileWriter
 import com.mobyle.nanquim.gallery.AnimationExportSettings
 import com.mobyle.nanquim.gallery.AnimationFormat
 import com.mobyle.nanquim.gallery.ExportOptions
 import com.mobyle.nanquim.gallery.InterchangeFormat
-import com.mobyle.nanquim.document.animation.AnimationSettings
-import com.mobyle.nanquim.engine.AnimationFileWriter
 import kotlin.math.roundToInt
 
 private const val PDF_JPEG_QUALITY = 90
@@ -80,7 +80,9 @@ fun ExportDialog(
     var cmykProfileId by remember { mutableStateOf(if (documentCmyk != null) null else ExportOptions.RGB_COLOR) }
     val frameCount = maxOf(animation?.frames ?: 1, 1)
     var frameRange by remember { mutableStateOf(1f..frameCount.toFloat()) }
-    var framesPerSecond by remember { mutableFloatStateOf((animation?.framesPerSecond ?: AnimationSettings.DEFAULT_FRAMES_PER_SECOND).toFloat()) }
+    var framesPerSecond by remember {
+        mutableFloatStateOf((animation?.framesPerSecond ?: AnimationSettings.DEFAULT_FRAMES_PER_SECOND).toFloat())
+    }
     var scalePercent by remember { mutableIntStateOf(100) }
     var includeBackground by remember { mutableStateOf(true) }
     var playOnce by remember { mutableStateOf(false) }
@@ -254,7 +256,9 @@ private fun AnimationOptions(
     Text(stringResource(R.string.export_animation_scale))
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         AnimationExportSettings.SCALES.forEach { scale ->
-            FilterChip(selected = scalePercent == scale, onClick = { onScale(scale) }, label = { Text(stringResource(R.string.export_animation_percent, scale)) })
+            FilterChip(selected = scalePercent == scale, onClick = {
+                onScale(scale)
+            }, label = { Text(stringResource(R.string.export_animation_percent, scale)) })
         }
     }
     val video = format == AnimationFormat.Mp4 || format == AnimationFormat.WebM

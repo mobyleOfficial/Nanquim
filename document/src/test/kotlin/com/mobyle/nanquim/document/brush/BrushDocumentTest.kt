@@ -48,7 +48,10 @@ class BrushDocumentTest {
         assertEquals(0.2, reparsed.number("path.spacing"))
         assertEquals(40.0, reparsed.number("taper.stylus.end"))
         assertEquals(true, reparsed.boolean("path.somethingNew"))
-        assertEquals(JsonPrimitive(3), (reparsed["futureField"] as JsonObject)["kept"]?.let { (it as kotlinx.serialization.json.JsonArray)[2] })
+        assertEquals(
+            JsonPrimitive(3),
+            (reparsed["futureField"] as JsonObject)["kept"]?.let { (it as kotlinx.serialization.json.JsonArray)[2] },
+        )
         assertNull(reparsed.shapeTexture)
         assertTrue(reparsed.has("shape.texture"))
     }

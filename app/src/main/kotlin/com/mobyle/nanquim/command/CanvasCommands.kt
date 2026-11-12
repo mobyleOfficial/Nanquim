@@ -1,15 +1,5 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.boolean
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.double
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.long
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.library.BrushTool
 import com.mobyle.nanquim.canvas.CanvasSession
@@ -24,6 +14,16 @@ import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.engine.Point
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import kotlin.math.PI
 
 object CanvasCommandIds {

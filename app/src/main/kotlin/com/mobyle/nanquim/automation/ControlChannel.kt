@@ -5,6 +5,11 @@ import android.net.LocalServerSocket
 import android.net.LocalSocket
 import android.util.Base64
 import android.util.Log
+import com.mobyle.nanquim.document.command.Availability
+import com.mobyle.nanquim.document.command.CommandContext
+import com.mobyle.nanquim.document.command.CommandRegistry
+import com.mobyle.nanquim.document.command.CommandResult
+import com.mobyle.nanquim.document.command.CommandSpec
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,11 +32,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
-import com.mobyle.nanquim.document.command.Availability
-import com.mobyle.nanquim.document.command.CommandContext
-import com.mobyle.nanquim.document.command.CommandRegistry
-import com.mobyle.nanquim.document.command.CommandResult
-import com.mobyle.nanquim.document.command.CommandSpec
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -174,7 +174,9 @@ class ControlChannel(
     }
 
     private suspend fun screenshot(id: JsonElement): JsonObject {
-        val (width, height, pixels) = withContext(Dispatchers.Main) { host.composite() } ?: return error(id, COMMAND_FAILED, "No open document")
+        val (width, height, pixels) =
+            withContext(Dispatchers.Main) { host.composite() }
+                ?: return error(id, COMMAND_FAILED, "No open document")
         val colors = IntArray(width * height)
         for (index in colors.indices) {
             val offset = index * 4
@@ -183,7 +185,11 @@ class ControlChannel(
                 ((pixels[offset + 1].toInt() and 0xFF) shl 8) or (pixels[offset + 2].toInt() and 0xFF)
         }
         val bitmap = Bitmap.createBitmap(colors, width, height, Bitmap.Config.ARGB_8888)
-        val png = java.io.ByteArrayOutputStream().also { bitmap.compress(Bitmap.CompressFormat.PNG, PNG_QUALITY, it) }.toByteArray()
+        val png =
+            java.io
+                .ByteArrayOutputStream()
+                .also { bitmap.compress(Bitmap.CompressFormat.PNG, PNG_QUALITY, it) }
+                .toByteArray()
         bitmap.recycle()
         return result(
             id,

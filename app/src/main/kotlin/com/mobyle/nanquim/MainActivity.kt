@@ -25,6 +25,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,35 +42,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.command.AppCommandIds
 import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.command.CanvasCommandIds
 import com.mobyle.nanquim.command.DocumentCommandIds
 import com.mobyle.nanquim.command.GalleryCommandIds
+import com.mobyle.nanquim.command.HelpCommandIds
 import com.mobyle.nanquim.command.PaletteCommandIds
+import com.mobyle.nanquim.command.TimelapseCommandIds
 import com.mobyle.nanquim.command.ToolCommandIds
 import com.mobyle.nanquim.command.TransferCommandIds
 import com.mobyle.nanquim.command.VideoCommandIds
 import com.mobyle.nanquim.display.ProjectedCanvas
+import com.mobyle.nanquim.document.animation.playedFrames
+import com.mobyle.nanquim.document.command.CommandResult
+import com.mobyle.nanquim.engine.EngineEvent
+import com.mobyle.nanquim.formats.NanquimFileType
 import com.mobyle.nanquim.gallery.ExportOptions
 import com.mobyle.nanquim.gallery.GalleryError
 import com.mobyle.nanquim.gallery.ImportTarget
@@ -82,24 +87,13 @@ import com.mobyle.nanquim.ui.diagnostics.LatencyTestScreen
 import com.mobyle.nanquim.ui.diagnostics.ShapeTraceScreen
 import com.mobyle.nanquim.ui.diagnostics.TouchSessionScreen
 import com.mobyle.nanquim.ui.gallery.ExportAnimation
-import com.mobyle.nanquim.ui.help.ToolTipCard
-import com.mobyle.nanquim.ui.help.WelcomeOverlay
-import com.mobyle.nanquim.command.HelpCommandIds
-import com.mobyle.nanquim.command.TimelapseCommandIds
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.ui.gallery.ExportDialog
 import com.mobyle.nanquim.ui.gallery.GalleryScreen
 import com.mobyle.nanquim.ui.gallery.IncomingFileDialog
 import com.mobyle.nanquim.ui.gallery.NewCanvasScreen
 import com.mobyle.nanquim.ui.gallery.TransferReportDialog
+import com.mobyle.nanquim.ui.help.ToolTipCard
+import com.mobyle.nanquim.ui.help.WelcomeOverlay
 import com.mobyle.nanquim.ui.settings.AboutScreen
 import com.mobyle.nanquim.ui.settings.GestureSettingsScreen
 import com.mobyle.nanquim.ui.settings.KeyboardShortcutsScreen
@@ -108,14 +102,20 @@ import com.mobyle.nanquim.ui.settings.SupportScreen
 import com.mobyle.nanquim.ui.theme.LocalDarkTheme
 import com.mobyle.nanquim.ui.theme.NanquimTheme
 import com.mobyle.nanquim.ui.transition.ArtworkCloseOverlay
-import com.mobyle.nanquim.ui.transition.BlockingLoadingIndicator
 import com.mobyle.nanquim.ui.transition.ArtworkClosingCover
 import com.mobyle.nanquim.ui.transition.ArtworkLoadingIndicator
 import com.mobyle.nanquim.ui.transition.ArtworkOpenOverlay
-import com.mobyle.nanquim.document.animation.playedFrames
-import com.mobyle.nanquim.document.command.CommandResult
-import com.mobyle.nanquim.engine.EngineEvent
-import com.mobyle.nanquim.formats.NanquimFileType
+import com.mobyle.nanquim.ui.transition.BlockingLoadingIndicator
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -397,7 +397,15 @@ private fun NanquimApp(application: NanquimApplication) {
             application.colorProfileLibrary.entries
                 .filter { it.info.colorSpace == com.mobyle.nanquim.engine.ProfileColorSpace.Cmyk && it.info.convertsTo }
                 .map { it.id to it.name }
-        val animationState = session.document?.takeIf { it.animation.enabled && (ids.isEmpty() || ids == listOfNotNull(session.artwork?.id)) }
+        val animationState =
+            session.document?.takeIf {
+                it.animation.enabled && (
+                    ids.isEmpty() || ids ==
+                        listOfNotNull(
+                            session.artwork?.id,
+                        )
+                )
+            }
         ExportDialog(
             artworkCount = count,
             cmykProfiles = cmykProfiles,
@@ -508,7 +516,10 @@ private fun NanquimApp(application: NanquimApplication) {
                     onAddImage = { importLauncher.launch(arrayOf("image/*", "video/*")) },
                     onCommand = { commandId, arguments ->
                         dispatcher.dispatch(commandId, arguments.toJsonObject()) { result ->
-                            timelapseNotice(commandId, result)?.let { Toast.makeText(context, resources.getString(it), Toast.LENGTH_LONG).show() }
+                            timelapseNotice(
+                                commandId,
+                                result,
+                            )?.let { Toast.makeText(context, resources.getString(it), Toast.LENGTH_LONG).show() }
                         }
                     },
                 )
@@ -566,7 +577,9 @@ private fun NanquimApp(application: NanquimApplication) {
             AppDestination.Support ->
                 SupportScreen(
                     links = remember { application.supportLinks() },
-                    onOpenLink = { index -> dispatcher.dispatch(HelpCommandIds.SUPPORT_OPEN_LINK, buildJsonObject { put("index", index) }) },
+                    onOpenLink = { index ->
+                        dispatcher.dispatch(HelpCommandIds.SUPPORT_OPEN_LINK, buildJsonObject { put("index", index) })
+                    },
                     onBack = navigator::back,
                 )
             AppDestination.LatencyTest -> LatencyTestScreen(engine = engine, onBack = navigator::back)

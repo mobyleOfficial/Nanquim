@@ -1,5 +1,6 @@
 package com.mobyle.nanquim.ui.settings
 
+import android.text.format.Formatter
 import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,35 +22,37 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.command.AppCommandIds
+import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.command.GestureCommandIds
+import com.mobyle.nanquim.command.HelpCommandIds
 import com.mobyle.nanquim.command.KeyboardCommandIds
 import com.mobyle.nanquim.command.QuickShapeCommandIds
 import com.mobyle.nanquim.settings.AppSettings
@@ -57,16 +60,13 @@ import com.mobyle.nanquim.settings.InputSettings
 import com.mobyle.nanquim.settings.StorageCleaner
 import com.mobyle.nanquim.settings.StorageUsage
 import com.mobyle.nanquim.settings.ThemeMode
-import android.text.format.Formatter
-import androidx.compose.material3.FilterChip
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.ui.platform.LocalContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.command.HelpCommandIds
 import com.mobyle.nanquim.ui.common.CurveEditor
 import com.mobyle.nanquim.ui.common.ScreenHeader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -190,8 +190,19 @@ fun SettingsScreen(
                 HorizontalDivider()
                 Text(stringResource(R.string.settings_storage_title), style = MaterialTheme.typography.titleMedium)
                 usage?.let { current ->
-                    Text(stringResource(R.string.settings_storage_artworks, current.artworkCount, Formatter.formatShortFileSize(LocalContext.current, current.artworkBytes)))
-                    Text(stringResource(R.string.settings_storage_cache, Formatter.formatShortFileSize(LocalContext.current, current.cacheBytes)))
+                    Text(
+                        stringResource(
+                            R.string.settings_storage_artworks,
+                            current.artworkCount,
+                            Formatter.formatShortFileSize(LocalContext.current, current.artworkBytes),
+                        ),
+                    )
+                    Text(
+                        stringResource(
+                            R.string.settings_storage_cache,
+                            Formatter.formatShortFileSize(LocalContext.current, current.cacheBytes),
+                        ),
+                    )
                 }
                 TextButton(onClick = {
                     onCommand(AppCommandIds.SETTINGS_CLEAR_CACHE, JsonObject(emptyMap()))
@@ -214,8 +225,12 @@ fun SettingsScreen(
                     }
                 }
                 HorizontalDivider()
-                TextButton(onClick = { onCommand(AppCommandIds.SUPPORT_OPEN, JsonObject(emptyMap())) }) { Text(stringResource(R.string.settings_support)) }
-                TextButton(onClick = { onCommand(AppCommandIds.ABOUT_OPEN, JsonObject(emptyMap())) }) { Text(stringResource(R.string.settings_about)) }
+                TextButton(
+                    onClick = { onCommand(AppCommandIds.SUPPORT_OPEN, JsonObject(emptyMap())) },
+                ) { Text(stringResource(R.string.settings_support)) }
+                TextButton(
+                    onClick = { onCommand(AppCommandIds.ABOUT_OPEN, JsonObject(emptyMap())) },
+                ) { Text(stringResource(R.string.settings_about)) }
                 Box(Modifier.height(8.dp))
             }
             HorizontalDivider()

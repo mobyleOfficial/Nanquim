@@ -9,17 +9,17 @@ import android.os.SystemClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.engine.Engine
+import com.mobyle.nanquim.formats.nanquim.TimelapseResolution
+import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
+import com.mobyle.nanquim.gallery.VideoFileEncoder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.gallery.VideoFileEncoder
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.engine.Engine
-import com.mobyle.nanquim.formats.nanquim.TimelapseResolution
-import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
 import java.io.File
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
@@ -108,7 +108,12 @@ class TimelapseRecorder(
         }
         lastRequestMillis = SystemClock.uptimeMillis()
         val (videoWidth, videoHeight) = videoSize(settings, state.widthPx, state.heightPx) ?: return
-        val excluded = state.rasterLayers().filter { it.isPrivate }.map { it.id }.toIntArray()
+        val excluded =
+            state
+                .rasterLayers()
+                .filter { it.isPrivate }
+                .map { it.id }
+                .toIntArray()
         busy = true
         val fit = min(videoWidth.toDouble() / state.widthPx, videoHeight.toDouble() / state.heightPx)
         val fittedSide = ceil(maxOf(state.widthPx, state.heightPx) * fit)
@@ -119,10 +124,11 @@ class TimelapseRecorder(
             }
             scope.launch {
                 try {
-                    framesRecorded = withContext(encoding) {
-                        encode(folder, settings, state, videoWidth, videoHeight, render.pixels, render.width, render.height)
-                        segment?.frames ?: 0
-                    }
+                    framesRecorded =
+                        withContext(encoding) {
+                            encode(folder, settings, state, videoWidth, videoHeight, render.pixels, render.width, render.height)
+                            segment?.frames ?: 0
+                        }
                 } finally {
                     busy = false
                 }
@@ -141,7 +147,12 @@ class TimelapseRecorder(
         height: Int,
     ) {
         var current = segment
-        if (current != null && (current.canvasWidth != state.widthPx || current.canvasHeight != state.heightPx || current.width != videoWidth || current.height != videoHeight)) {
+        if (current != null &&
+            (
+                current.canvasWidth != state.widthPx || current.canvasHeight != state.heightPx || current.width != videoWidth ||
+                    current.height != videoHeight
+            )
+        ) {
             finishSegmentNow(current)
             current = null
         }
@@ -149,7 +160,14 @@ class TimelapseRecorder(
             val directory = File(folder, TimelapseSettings.FOLDER).apply { mkdirs() }
             val next = (segmentsOf(folder).lastOrNull()?.let { SEGMENT.find(it.name)!!.groupValues[1].toInt() } ?: 0) + 1
             val file = File(directory, "segment-$next.mp4")
-            val mime = if (settings.hevc && VideoFileEncoder.supports(VideoFileEncoder.HEVC, videoWidth, videoHeight, FRAMES_PER_SECOND)) VideoFileEncoder.HEVC else VideoFileEncoder.AVC
+            val mime =
+                if (settings.hevc &&
+                    VideoFileEncoder.supports(VideoFileEncoder.HEVC, videoWidth, videoHeight, FRAMES_PER_SECOND)
+                ) {
+                    VideoFileEncoder.HEVC
+                } else {
+                    VideoFileEncoder.AVC
+                }
             val encoder = VideoFileEncoder.create(file.path, mime, videoWidth, videoHeight, FRAMES_PER_SECOND, webm = false) ?: return
             current = Segment(file, encoder, videoWidth, videoHeight, state.widthPx, state.heightPx)
             segment = current
@@ -162,7 +180,14 @@ class TimelapseRecorder(
         val scale = min(videoWidth.toFloat() / width, videoHeight.toFloat() / height)
         val left = (videoWidth - width * scale) / 2
         val top = (videoHeight - height * scale) / 2
-        canvas.drawBitmap(source, Matrix().apply { setScale(scale, scale); postTranslate(left, top) }, Paint(Paint.FILTER_BITMAP_FLAG))
+        canvas.drawBitmap(
+            source,
+            Matrix().apply {
+                setScale(scale, scale)
+                postTranslate(left, top)
+            },
+            Paint(Paint.FILTER_BITMAP_FLAG),
+        )
         val pixels = ByteBuffer.allocate(videoWidth * videoHeight * 4)
         frame.copyPixelsToBuffer(pixels)
         source.recycle()
@@ -196,8 +221,19 @@ class TimelapseRecorder(
     ): Pair<Int, Int>? {
         val landscape = canvasWidth >= canvasHeight
         return when (val resolution = settings.resolution) {
-            TimelapseResolution.Canvas -> VideoFileEncoder.largestSize(if (settings.hevc) VideoFileEncoder.HEVC else VideoFileEncoder.AVC, canvasWidth - canvasWidth % 2, canvasHeight - canvasHeight % 2)
-            else -> if (landscape) resolution.longSidePixels to resolution.shortSidePixels else resolution.shortSidePixels to resolution.longSidePixels
+            TimelapseResolution.Canvas ->
+                VideoFileEncoder.largestSize(
+                    if (settings.hevc) VideoFileEncoder.HEVC else VideoFileEncoder.AVC,
+                    canvasWidth - canvasWidth % 2,
+                    canvasHeight - canvasHeight % 2,
+                )
+            else ->
+                if (landscape) {
+                    resolution.longSidePixels to resolution.shortSidePixels
+                } else {
+                    resolution.shortSidePixels to
+                        resolution.longSidePixels
+                }
         }
     }
 

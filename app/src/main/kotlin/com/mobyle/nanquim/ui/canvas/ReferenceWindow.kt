@@ -49,13 +49,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.command.ReferenceCommandIds
 import com.mobyle.nanquim.document.reference.ReferenceGeometry
 import com.mobyle.nanquim.document.reference.ReferenceMode
 import com.mobyle.nanquim.document.reference.ReferenceSettings
+import kotlinx.coroutines.delay
 import kotlin.math.max
 import kotlin.math.roundToInt
 

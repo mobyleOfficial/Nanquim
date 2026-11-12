@@ -100,8 +100,7 @@ object BrushPackageIo {
         previous.deleteRecursively()
     }
 
-    fun writeBrushArchive(brushPackage: BrushPackage): ByteArray =
-        zip(packageEntries(brushPackage, prefix = ""))
+    fun writeBrushArchive(brushPackage: BrushPackage): ByteArray = zip(packageEntries(brushPackage, prefix = ""))
 
     fun readBrushArchive(bytes: ByteArray): BrushPackage = packageFrom(unzip(bytes), prefix = "")
 
@@ -153,7 +152,9 @@ object BrushPackageIo {
         prefix: String,
     ): List<Pair<String, ByteArray>> =
         listOf(prefix + BrushPackage.BRUSH_JSON to brushPackage.document.toJsonText().toByteArray()) +
-            brushPackage.files.entries.sortedBy { it.key }.map { (name, bytes) -> prefix + name to bytes }
+            brushPackage.files.entries
+                .sortedBy { it.key }
+                .map { (name, bytes) -> prefix + name to bytes }
 
     private fun packageFrom(
         entries: Map<String, ByteArray>,

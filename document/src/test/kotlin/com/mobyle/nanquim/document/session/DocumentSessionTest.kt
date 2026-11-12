@@ -1,5 +1,18 @@
 package com.mobyle.nanquim.document.session
 
+import com.mobyle.nanquim.document.history.HistoryLabel
+import com.mobyle.nanquim.document.layer.BlendMode
+import com.mobyle.nanquim.document.layer.CanvasOperation
+import com.mobyle.nanquim.document.layer.ContentLayerPixelsException
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.LayerGroup
+import com.mobyle.nanquim.document.layer.LayerOperationException
+import com.mobyle.nanquim.document.layer.RasterLayer
+import com.mobyle.nanquim.document.layer.RgbaColor
+import com.mobyle.nanquim.document.layer.TextLayerContent
+import com.mobyle.nanquim.document.layer.VideoLayerContent
+import com.mobyle.nanquim.document.layer.addRasterLayer
+import com.mobyle.nanquim.document.layer.nodeBelow
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -9,19 +22,6 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import com.mobyle.nanquim.document.history.HistoryLabel
-import com.mobyle.nanquim.document.layer.BlendMode
-import com.mobyle.nanquim.document.layer.CanvasOperation
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.LayerGroup
-import com.mobyle.nanquim.document.layer.LayerOperationException
-import com.mobyle.nanquim.document.layer.RasterLayer
-import com.mobyle.nanquim.document.layer.RgbaColor
-import com.mobyle.nanquim.document.layer.TextLayerContent
-import com.mobyle.nanquim.document.layer.VideoLayerContent
-import com.mobyle.nanquim.document.layer.ContentLayerPixelsException
-import com.mobyle.nanquim.document.layer.addRasterLayer
-import com.mobyle.nanquim.document.layer.nodeBelow
 import kotlin.random.Random
 
 private class FakeEngine : DocumentEngine {
@@ -294,10 +294,20 @@ class DocumentSessionTest {
         session.setOpacity(id, 0.5f)
         assertEquals(1, engine.textLayers.size)
         session.setTextContent(id, textContent("Hello there"))
-        assertTrue(engine.textLayers.last().second.contains("Hello there"))
+        assertTrue(
+            engine.textLayers
+                .last()
+                .second
+                .contains("Hello there"),
+        )
         session.undo()
         session.undo()
-        assertTrue(engine.textLayers.last().second.contains("\"Hello\""))
+        assertTrue(
+            engine.textLayers
+                .last()
+                .second
+                .contains("\"Hello\""),
+        )
         assertEquals(3, engine.textLayers.size)
         session.rasterizeText(id)
         assertEquals(null, session.state.raster(id)!!.text)
@@ -340,10 +350,22 @@ class DocumentSessionTest {
         val steps = session.history.undoCount
         session.setVideoTime(id, 500_000, final = false)
         session.setVideoTime(id, 9_000_000, final = true)
-        assertEquals(2_000_000, session.state.raster(id)!!.video!!.timeMicroseconds)
+        assertEquals(
+            2_000_000,
+            session.state
+                .raster(id)!!
+                .video!!
+                .timeMicroseconds,
+        )
         assertEquals(steps + 1, session.history.undoCount)
         session.undo()
-        assertEquals(0, session.state.raster(id)!!.video!!.timeMicroseconds)
+        assertEquals(
+            0,
+            session.state
+                .raster(id)!!
+                .video!!
+                .timeMicroseconds,
+        )
         session.rasterizeVideo(id)
         assertEquals(null, session.state.raster(id)!!.video)
         session.beginStroke()

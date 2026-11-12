@@ -1,5 +1,9 @@
 package com.mobyle.nanquim.document.animation
 
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.addRasterLayer
+import com.mobyle.nanquim.document.layer.groupLayers
+import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -10,10 +14,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.addRasterLayer
-import com.mobyle.nanquim.document.layer.groupLayers
-import com.mobyle.nanquim.document.layer.toEngineLayerTree
 
 class AnimationViewTest {
     private fun document(frames: Int): DocumentState {
@@ -48,7 +48,10 @@ class AnimationViewTest {
 
     @Test
     fun normalOnionBlendHasNoTint() {
-        val state = document(3).let { it.withAnimation(it.animation.copy(enabled = true, onionSkin = OnionSkin(blend = OnionBlend.Normal))) }
+        val state =
+            document(
+                3,
+            ).let { it.withAnimation(it.animation.copy(enabled = true, onionSkin = OnionSkin(blend = OnionBlend.Normal))) }
         val appearance = state.animationAppearance(state.layers[1].id)!!
         assertNull(appearance.getValue(state.layers[0].id).tint)
         assertFalse(appearance.getValue(state.layers[0].id).hidden)
@@ -63,6 +66,7 @@ class AnimationViewTest {
         val group = state.layers[2]
         val tree = state.toEngineLayerTree(frames = state.animationAppearance(ids[1]))
         val layers = tree["layers"] as JsonArray
+
         fun node(index: Int) = layers[index] as JsonObject
         assertEquals(0.25f, (node(0)["opacity"] as JsonPrimitive).float, 1e-6f)
         assertEquals(4, (node(0)["tint"] as JsonArray).size)
@@ -72,6 +76,12 @@ class AnimationViewTest {
         assertEquals(null, node(2)["tint"])
         val children = node(2)["children"] as JsonArray
         assertTrue(children.all { (it as JsonObject)["tint"] is JsonArray })
-        assertTrue(state.toEngineLayerTree().toString().contains("tint").not())
+        assertTrue(
+            state
+                .toEngineLayerTree()
+                .toString()
+                .contains("tint")
+                .not(),
+        )
     }
 }

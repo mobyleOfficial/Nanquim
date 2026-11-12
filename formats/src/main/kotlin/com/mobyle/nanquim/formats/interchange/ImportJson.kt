@@ -1,5 +1,14 @@
 package com.mobyle.nanquim.formats.interchange
 
+import com.mobyle.nanquim.document.layer.Background
+import com.mobyle.nanquim.document.layer.BlendMode
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.LayerGroup
+import com.mobyle.nanquim.document.layer.LayerMask
+import com.mobyle.nanquim.document.layer.LayerNode
+import com.mobyle.nanquim.document.layer.RasterLayer
+import com.mobyle.nanquim.document.layer.RgbaColor
+import com.mobyle.nanquim.formats.nanquim.LayerUuids
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
@@ -14,15 +23,6 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
-import com.mobyle.nanquim.document.layer.Background
-import com.mobyle.nanquim.document.layer.BlendMode
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.LayerGroup
-import com.mobyle.nanquim.document.layer.LayerMask
-import com.mobyle.nanquim.document.layer.LayerNode
-import com.mobyle.nanquim.document.layer.RasterLayer
-import com.mobyle.nanquim.document.layer.RgbaColor
-import com.mobyle.nanquim.formats.nanquim.LayerUuids
 
 data class ImportWarning(
     val code: String,
