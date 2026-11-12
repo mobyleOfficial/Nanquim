@@ -207,14 +207,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        application.startControlChannel(intent?.getStringExtra(EXTRA_CONTROL_TOKEN))
+        // Before the wait below: lifecycleScope starts it immediately, so the cards must already count as shown.
+        if (savedInstanceState == null) application.help.showWelcomeIfFirstLaunch()
+        if (savedInstanceState == null) incomingFileOf(intent)?.let { application.incomingFile = it }
         lifecycleScope.launch {
             // Consent and ads wait for the introduction to end and the gallery to show, so nothing interrupts a first launch.
             snapshotFlow { !application.help.welcomeVisible && application.navigator.current == AppDestination.Gallery }.first { it }
             if (application.help.automatic) application.galleryAds.start(this@MainActivity)
         }
-        application.startControlChannel(intent?.getStringExtra(EXTRA_CONTROL_TOKEN))
-        if (savedInstanceState == null) application.help.showWelcomeIfFirstLaunch()
-        if (savedInstanceState == null) incomingFileOf(intent)?.let { application.incomingFile = it }
     }
 
     private fun measureAppStart(
@@ -562,7 +563,7 @@ private fun NanquimApp(application: NanquimApplication) {
                     onShare = { ids -> exportIds = ids },
                     onOpenSettings = { dispatcher.dispatch(AppCommandIds.SETTINGS_OPEN) },
                     banner =
-                        application.galleryAds.takeIf { it.enabled && it.ready }?.let { ads ->
+                        application.galleryAds.takeIf { it.enabled && it.ready && !application.help.welcomeVisible }?.let { ads ->
                             { modifier -> GalleryBanner(ads.bannerUnitId, modifier) }
                         },
                 )
