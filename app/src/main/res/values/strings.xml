@@ -1604,7 +1604,7 @@
     <string name="command_gallery_samples_install">Add the sample artworks</string>
     <string name="support_title">Support the project</string>
     <string name="settings_support">Support the project</string>
-    <string name="support_intro">Nanquim is free and open source, with no paid features and no ads. It is made by people who give their time; donations pay for devices to test on and for the project’s costs.</string>
+    <string name="support_intro">Nanquim is free and open source, with no paid features; the only ad is a small banner in the gallery, never while you draw. It is made by people who give their time; donations pay for devices to test on and for the project’s costs.</string>
     <string name="support_donate_title">Donate</string>
     <string name="support_no_links">The project has no donation page yet. Thank you for wanting to help!</string>
     <string name="support_other_title">Other ways to help</string>
@@ -1650,4 +1650,5 @@
     <string name="exit_dialog_exit">Leave</string>
     <string name="settings_confirm_exit">Ask before leaving with Back</string>
     <string name="command_settings_confirm_exit">Ask before leaving with Back</string>
+    <string name="settings_ad_choices">Ad choices</string>
 </resources>

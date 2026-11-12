@@ -83,6 +83,7 @@ fun GalleryScreen(
     onPhoto: () -> Unit,
     onShare: (List<String>) -> Unit,
     onOpenSettings: () -> Unit,
+    banner: (@Composable (Modifier) -> Unit)? = null,
 ) {
     val allItems by gallery.items.collectAsState()
     val items = gallery.visibleItems(allItems)
@@ -115,7 +116,7 @@ fun GalleryScreen(
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(CELL_MINIMUM_WIDTH),
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                    modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
@@ -129,6 +130,8 @@ fun GalleryScreen(
                         )
                     }
                 }
+                // Out of the way of the feature: only under a filled grid, never while selecting or previewing.
+                if (banner != null && !gallery.selecting && gallery.previewId == null) banner(Modifier.padding(top = 8.dp))
             }
         }
         gallery.previewId?.let { previewId ->

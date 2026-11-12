@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.mobyle.nanquim.ads.GalleryAds
 import com.mobyle.nanquim.automation.CanvasAutomationHost
 import com.mobyle.nanquim.automation.ControlChannel
 import com.mobyle.nanquim.brush.ActiveBrushes
@@ -295,6 +296,8 @@ class NanquimApplication : Application() {
     val appSettings: AppSettings by lazy { AppSettings(getSharedPreferences(AppSettings.PREFERENCES_NAME, MODE_PRIVATE)) }
 
     val resumeState: ResumeState by lazy { ResumeState(getSharedPreferences(ResumeState.PREFERENCES_NAME, MODE_PRIVATE)) }
+
+    val galleryAds: GalleryAds by lazy { GalleryAds(this) }
 
     val reviewPrompt: ReviewPrompt by lazy { ReviewPrompt(getSharedPreferences(ReviewPrompt.PREFERENCES_NAME, MODE_PRIVATE)) }
 

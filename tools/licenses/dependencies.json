@@ -97,6 +97,16 @@
       "scope": "app",
       "source": "Crash reports, Kotlin and native; pulls play-services-basement (Android SDK License)"
     },
+    "com.google.android.gms:play-services-ads": {
+      "license": "Android-SDK-License",
+      "scope": "app",
+      "source": "Google Mobile Ads SDK (AdMob, closed): the gallery banner only"
+    },
+    "com.google.android.ump:user-messaging-platform": {
+      "license": "Android-SDK-License",
+      "scope": "app",
+      "source": "Google User Messaging Platform (closed): ad consent in the EEA and the UK"
+    },
     "com.google.android.play:review-ktx": {
       "license": "Android-SDK-License",
       "scope": "app",

@@ -94,6 +94,7 @@ import com.mobyle.nanquim.ui.diagnostics.ShapeTraceScreen
 import com.mobyle.nanquim.ui.diagnostics.TouchSessionScreen
 import com.mobyle.nanquim.ui.gallery.ExportAnimation
 import com.mobyle.nanquim.ui.gallery.ExportDialog
+import com.mobyle.nanquim.ui.gallery.GalleryBanner
 import com.mobyle.nanquim.ui.gallery.GalleryScreen
 import com.mobyle.nanquim.ui.gallery.IncomingFileDialog
 import com.mobyle.nanquim.ui.gallery.NewCanvasScreen
@@ -204,6 +205,11 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+        lifecycleScope.launch {
+            // Consent and ads wait for the introduction to end and the gallery to show, so nothing interrupts a first launch.
+            snapshotFlow { !application.help.welcomeVisible && application.navigator.current == AppDestination.Gallery }.first { it }
+            if (application.help.automatic) application.galleryAds.start(this@MainActivity)
         }
         application.startControlChannel(intent?.getStringExtra(EXTRA_CONTROL_TOKEN))
         if (savedInstanceState == null) application.help.showWelcomeIfFirstLaunch()
@@ -554,6 +560,10 @@ private fun NanquimApp(application: NanquimApplication) {
                     onPhoto = { photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                     onShare = { ids -> exportIds = ids },
                     onOpenSettings = { dispatcher.dispatch(AppCommandIds.SETTINGS_OPEN) },
+                    banner =
+                        application.galleryAds.takeIf { it.enabled && it.ready }?.let { ads ->
+                            { modifier -> GalleryBanner(ads.bannerUnitId, modifier) }
+                        },
                 )
             AppDestination.NewCanvas ->
                 NewCanvasScreen(
@@ -592,6 +602,12 @@ private fun NanquimApp(application: NanquimApplication) {
                     onCommand = feedbackCommand,
                     onBack = navigator::back,
                     onOpenDiagnostics = { dispatcher.dispatch(AppCommandIds.DIAGNOSTICS_OPEN) },
+                    onOpenAdChoices =
+                        if (application.galleryAds.privacyOptionsRequired) {
+                            { (context as? Activity)?.let(application.galleryAds::showPrivacyOptions) }
+                        } else {
+                            null
+                        },
                 )
             AppDestination.Diagnostics ->
                 DiagnosticsScreen(

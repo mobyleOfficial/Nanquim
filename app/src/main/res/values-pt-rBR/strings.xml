@@ -1606,7 +1606,7 @@
     <string name="command_gallery_samples_install">Adicionar as obras de exemplo</string>
     <string name="support_title">Apoie o projeto</string>
     <string name="settings_support">Apoie o projeto</string>
-    <string name="support_intro">O Nanquim é livre e de código aberto, sem recursos pagos e sem anúncios. É feito por pessoas que doam seu tempo; as doações pagam aparelhos para testes e os custos do projeto.</string>
+    <string name="support_intro">O Nanquim é livre e de código aberto, sem recursos pagos; o único anúncio é um pequeno banner na galeria, nunca enquanto você desenha. É feito por pessoas que doam seu tempo; as doações pagam aparelhos para testes e os custos do projeto.</string>
     <string name="support_donate_title">Doar</string>
     <string name="support_no_links">O projeto ainda não tem página de doação. Obrigado por querer ajudar!</string>
     <string name="support_other_title">Outras formas de ajudar</string>
@@ -1651,4 +1651,5 @@
     <string name="exit_dialog_exit">Sair</string>
     <string name="settings_confirm_exit">Perguntar antes de sair com o botão Voltar</string>
     <string name="command_settings_confirm_exit">Perguntar antes de sair com o botão Voltar</string>
+    <string name="settings_ad_choices">Opções de anúncios</string>
 </resources>

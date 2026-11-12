@@ -78,6 +78,7 @@ fun SettingsScreen(
     onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,
     onOpenDiagnostics: () -> Unit,
+    onOpenAdChoices: (() -> Unit)? = null,
 ) {
     var storageRefresh by remember { mutableIntStateOf(0) }
     val usage by produceState<StorageUsage?>(null, storageRefresh) { value = withContext(Dispatchers.IO) { storage.usage() } }
@@ -241,7 +242,7 @@ fun SettingsScreen(
                     }
                 }
                 HorizontalDivider()
-                FeedbackSection(appSettings, onCommand)
+                FeedbackSection(appSettings, onCommand, onOpenAdChoices)
                 HorizontalDivider()
                 TextButton(
                     onClick = { onCommand(AppCommandIds.SUPPORT_OPEN, JsonObject(emptyMap())) },

@@ -23,6 +23,7 @@ Machine-readable list: `tools/licenses/dependencies.json`.
 | AndroidX Room 2.8 | Brush library and gallery databases | Apache-2.0 | app |
 | Firebase Crashlytics (with native crashes) | Crash reports | Apache-2.0 | app |
 | Firebase Analytics (Google Play services measurement) | Usage analytics | Android Software Development Kit License (closed) | app |
+| Google Mobile Ads SDK (AdMob) and User Messaging Platform | The gallery banner and its consent form | Android Software Development Kit License (closed) | app |
 | Google Play In-App Review API (Play Core review, review-ktx) | Asks for a Play review after a few artworks were shared | Android Software Development Kit License (closed) | app |
 | Google services and Crashlytics Gradle plugins | Firebase configuration, native symbol upload | Apache-2.0 | build |
 | Kotlin Symbol Processing (KSP) | Runs the Room compiler | Apache-2.0 | build |

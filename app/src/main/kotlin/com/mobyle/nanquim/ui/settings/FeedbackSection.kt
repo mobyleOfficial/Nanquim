@@ -34,6 +34,7 @@ import kotlinx.serialization.json.JsonPrimitive
 fun FeedbackSection(
     appSettings: AppSettings,
     onCommand: (String, JsonObject) -> Unit,
+    onOpenAdChoices: (() -> Unit)? = null,
 ) {
     var reporting by remember { mutableStateOf<FeedbackKind?>(null) }
     val none = JsonObject(emptyMap())
@@ -59,6 +60,8 @@ fun FeedbackSection(
         Switch(checked = appSettings.usageStatistics, onCheckedChange = null)
     }
     Text(stringResource(R.string.settings_usage_statistics_hint), style = MaterialTheme.typography.bodySmall)
+    // Only where the consent form applies (EEA, UK…): elsewhere Android's own ad settings are the place.
+    onOpenAdChoices?.let { open -> TextButton(onClick = open) { Text(stringResource(R.string.settings_ad_choices)) } }
     LegalLinks(onCommand)
 
     reporting?.let { kind ->

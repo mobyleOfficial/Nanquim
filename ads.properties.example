@@ -1,0 +1,4 @@
+# Copy to ads.properties (ignored by git) to show real ads in release builds.
+# Both IDs come from the AdMob console. Without this file, release builds show no ads; debug builds use Google's test ads.
+admobAppId=ca-app-pub-0000000000000000~0000000000
+galleryBannerId=ca-app-pub-0000000000000000/0000000000
