@@ -26,7 +26,7 @@ constexpr const char* kWorkingCopyPipeline = "workingCopy";
 constexpr const char* kMixSamplePipeline = "mixSample";
 constexpr const char* kMixApplyPipeline = "mixApply";
 constexpr const char* kGlazePipeline = "strokeGlaze";
-constexpr size_t kMixingStateBytes = 3 * 4 * sizeof(float) + 4 * sizeof(int32_t);
+constexpr size_t kMixingStateBytes = sizeof(float) * 3 * 4 + 4 * sizeof(int32_t);
 constexpr uint32_t kWorkingCopyImageBinding = 0;
 constexpr uint32_t kMixingStateBinding = 1;
 constexpr uint32_t kGlazeResultBinding = 0;
@@ -40,7 +40,7 @@ constexpr const char* kActiveStrokePipeline = "activeLayerStroke";
 constexpr int32_t kPollsBeforeReduction = 8;
 
 constexpr uint32_t kDabAttributes = 5;
-constexpr size_t kFloatsPerDab = kDabAttributes * 4;
+constexpr size_t kFloatsPerDab = size_t{kDabAttributes} * 4;
 constexpr size_t kInstanceStride = kFloatsPerDab * sizeof(float);
 constexpr uint32_t kShapeBinding = 1;
 constexpr uint32_t kGrainBinding = 2;

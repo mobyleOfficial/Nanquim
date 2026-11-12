@@ -5,6 +5,7 @@
 #include "canvas/color_conversion.h"
 #include "canvas/flood_fill.h"
 #include "core/log.h"
+#include "core/required.h"
 #include "engine_context.h"
 #include "engine_programs.h"
 
@@ -83,8 +84,8 @@ void EngineContext::endFill(bool commit, int64_t historyEntry) {
 }
 
 bool EngineContext::readSurfacePixels(canvas::LayerId surface, std::vector<uint8_t>& pixels) {
-  const int32_t width = document_->widthPixels;
-  const int32_t height = document_->heightPixels;
+  const int32_t width = core::required(document_).widthPixels;
+  const int32_t height = core::required(document_).heightPixels;
   const std::vector<canvas::TileCoordinate> tiles = tileStore_->tilesOf(surface);
   bool resident = true;
   for (const canvas::TileCoordinate coordinate : tiles) {
@@ -226,7 +227,7 @@ void EngineContext::processFill() {
 }
 
 bool EngineContext::fillTilesResident(const std::vector<canvas::TileCoordinate>& positions) {
-  const FillRequest& request = fillSession_->request;
+  const FillRequest& request = core::required(fillSession_).request;
   bool resident = true;
   for (const canvas::TileCoordinate coordinate : positions) {
     for (const canvas::LayerId surface : {request.surface, kFillOriginalSurface}) {
@@ -244,7 +245,7 @@ bool EngineContext::fillTilesResident(const std::vector<canvas::TileCoordinate>&
 }
 
 bool EngineContext::applyFillPreview(const canvas::TileCoverageMap& coverage) {
-  FillSession& session = *fillSession_;
+  FillSession& session = core::required(fillSession_);
   std::vector<canvas::TileCoordinate> positions;
   if (session.applied) {
     for (const auto& [coordinate, tile] : *session.applied) {
@@ -271,7 +272,7 @@ bool EngineContext::applyFillPreview(const canvas::TileCoverageMap& coverage) {
 }
 
 void EngineContext::restoreFillOriginal(canvas::TileCoordinate coordinate) {
-  FillSession& session = *fillSession_;
+  FillSession& session = core::required(fillSession_);
   const canvas::LayerTileKey target{session.request.surface, coordinate};
   const auto original = session.originals.find(coordinate);
   if (original == session.originals.end()) {
@@ -297,7 +298,7 @@ void EngineContext::copySurfaceTile(const canvas::LayerTileKey& from,
 
 void EngineContext::applyFillTile(canvas::TileCoordinate coordinate,
                                   const canvas::TileCoverage& coverage, int64_t historyEntry) {
-  const FillRequest& request = fillSession_->request;
+  const FillRequest& request = core::required(fillSession_).request;
   const canvas::LayerTileKey key{request.surface, coordinate};
   std::optional<canvas::AtlasSlot> selectionSlot;
   if (request.selection && request.target != FillRequest::Target::Selection) {
@@ -371,7 +372,7 @@ void EngineContext::applyFillTile(canvas::TileCoordinate coordinate,
 }
 
 bool EngineContext::finishFill(bool commit) {
-  FillSession& session = *fillSession_;
+  FillSession& session = core::required(fillSession_);
   std::vector<canvas::TileCoordinate> touched;
   touched.reserve(session.originals.size());
   for (const auto& [coordinate, had] : session.originals) {
@@ -404,8 +405,8 @@ bool EngineContext::finishFill(bool commit) {
     waitForGpu();
     NANQUIM_LOG_INFO(
         "Fill %dx%d: read %.1f ms, region %.1f ms, %zu tiles, shown %.1f ms after the start",
-        document_->widthPixels, document_->heightPixels, session.readMilliseconds,
-        session.regionMilliseconds, session.applied->size(),
+        core::required(document_).widthPixels, core::required(document_).heightPixels,
+        session.readMilliseconds, session.regionMilliseconds, session.applied->size(),
         std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() -
                                                   session.started)
             .count());
@@ -422,8 +423,8 @@ bool EngineContext::finishFill(bool commit) {
 void EngineContext::runFillNow(const FillRequest& request) {
   FillSession& session = fillSession_.emplace();
   session.request = request;
-  const int32_t width = document_->widthPixels;
-  const int32_t height = document_->heightPixels;
+  const int32_t width = core::required(document_).widthPixels;
+  const int32_t height = core::required(document_).heightPixels;
   std::vector<uint8_t> coverage(static_cast<size_t>(width) * height, 255);
   if (!request.whole) {
     std::vector<uint8_t> pixels;

@@ -19,6 +19,7 @@
 #include "core/half_float.h"
 #include "core/json_writer.h"
 #include "core/log.h"
+#include "core/required.h"
 #include "embedded_shaders.h"
 #include "engine_programs.h"
 #include "gpu/gles/gles_device.h"
@@ -446,7 +447,7 @@ void EngineContext::writeSurfaceTileRow(canvas::LayerId surface, int32_t tileRow
   auto shared = std::make_shared<const std::vector<uint8_t>>(std::move(pixels));
   post([this, surface, tileRow, shared] {
     runStrokeTask([this, surface, tileRow, shared] {
-      pendingSurfaceWrites_.push_back([this, surface, tileRow, shared] {
+      pendingSurfaceWrites_.emplace_back([this, surface, tileRow, shared] {
         return writeSurfaceTileRowNow(surface, tileRow, *shared);
       });
     });
@@ -603,10 +604,12 @@ bool EngineContext::startCompositePreview(int32_t requestId, int32_t maxSide) {
       return false;
     }
   }
-  const int32_t width = std::min(compositor_->levelWidth(level),
-                                 (document_->widthPixels + (1 << level) - 1) >> level);
-  const int32_t height = std::min(compositor_->levelHeight(level),
-                                  (document_->heightPixels + (1 << level) - 1) >> level);
+  const int32_t width =
+      std::min(compositor_->levelWidth(level),
+               (core::required(document_).widthPixels + (1 << level) - 1) >> level);
+  const int32_t height =
+      std::min(compositor_->levelHeight(level),
+               (core::required(document_).heightPixels + (1 << level) - 1) >> level);
   PreviewReadback readback;
   readback.requestId = requestId;
   readback.width = width;
@@ -691,7 +694,7 @@ void EngineContext::requestTimelapseFrame(int32_t requestId, int32_t maxSide,
 bool EngineContext::startTimelapseFrame(int32_t requestId, int32_t maxSide,
                                         const std::vector<canvas::LayerId>& excluded) {
   ATrace_beginSection("NanquimTimelapseFrame");
-  canvas::LayerTree tree = document_->tree;
+  canvas::LayerTree tree = core::required(document_).tree;
   for (const canvas::LayerId id : excluded) {
     std::function<bool(std::vector<canvas::LayerTreeNode>&)> hide =
         [&](std::vector<canvas::LayerTreeNode>& nodes) {
@@ -726,8 +729,8 @@ bool EngineContext::startTimelapseFrame(int32_t requestId, int32_t maxSide,
   while (level + 1 < compositor_->levelCount() && canvasSide(level) > maxSide) {
     ++level;
   }
-  const int32_t width = (document_->widthPixels + (1 << level) - 1) >> level;
-  const int32_t height = (document_->heightPixels + (1 << level) - 1) >> level;
+  const int32_t width = (core::required(document_).widthPixels + (1 << level) - 1) >> level;
+  const int32_t height = (core::required(document_).heightPixels + (1 << level) - 1) >> level;
   const gpu::rhi::Texture* target = compositor_->renderPlanAtLevel(plan, level, width, height);
   PreviewReadback readback;
   readback.requestId = requestId;
@@ -783,14 +786,17 @@ bool EngineContext::sendCompositeThumbnail(int32_t requestId, int32_t maxSide) {
     return true;
   }
   ATrace_beginSection("NanquimThumbnailFilter");
-  const double scale = std::min(1.0, static_cast<double>(maxSide) /
-                                         std::max(document_->widthPixels, document_->heightPixels));
+  const double scale = std::min(
+      1.0, static_cast<double>(maxSide) / std::max(core::required(document_).widthPixels,
+                                                   core::required(document_).heightPixels));
   const int32_t width =
-      std::max(1, static_cast<int32_t>(std::lround(document_->widthPixels * scale)));
-  const int32_t height =
-      std::max(1, static_cast<int32_t>(std::lround(document_->heightPixels * scale)));
-  const double canvasLevelWidth = document_->widthPixels / static_cast<double>(1 << level);
-  const double canvasLevelHeight = document_->heightPixels / static_cast<double>(1 << level);
+      std::max(1, static_cast<int32_t>(std::lround(core::required(document_).widthPixels * scale)));
+  const int32_t height = std::max(
+      1, static_cast<int32_t>(std::lround(core::required(document_).heightPixels * scale)));
+  const double canvasLevelWidth =
+      core::required(document_).widthPixels / static_cast<double>(1 << level);
+  const double canvasLevelHeight =
+      core::required(document_).heightPixels / static_cast<double>(1 << level);
   std::vector<uint8_t> pixels(static_cast<size_t>(width) * static_cast<size_t>(height) * 4);
   for (int32_t y = 0; y < height; ++y) {
     const auto firstRow = static_cast<int32_t>(y * canvasLevelHeight / height);
@@ -902,9 +908,9 @@ void EngineContext::setLayerTree(canvas::LayerTree tree) {
 }
 
 void EngineContext::applyLayerTree() {
-  compositor_->setLayerTree(document_->tree);
+  compositor_->setLayerTree(core::required(document_).tree);
   if (!paintSession_) {
-    compositor_->setActiveLayer(document_->tree.activeLayer);
+    compositor_->setActiveLayer(core::required(document_).tree.activeLayer);
   }
   frameRequested_ = true;
 }
@@ -2339,13 +2345,14 @@ bool EngineContext::sendThumbnails(int32_t requestId, const std::vector<canvas::
   if (!resident) {
     return false;
   }
-  const int32_t longSide = std::max(document_->widthPixels, document_->heightPixels);
+  const int32_t longSide =
+      std::max(core::required(document_).widthPixels, core::required(document_).heightPixels);
   int32_t stride = 1;
   while (stride < canvas::kTileSizePixels && longSide / stride > maxSide) {
     stride *= 2;
   }
-  const int32_t cellWidth = (document_->widthPixels + stride - 1) / stride;
-  const int32_t cellHeight = (document_->heightPixels + stride - 1) / stride;
+  const int32_t cellWidth = (core::required(document_).widthPixels + stride - 1) / stride;
+  const int32_t cellHeight = (core::required(document_).heightPixels + stride - 1) / stride;
   const int32_t width = cellWidth * static_cast<int32_t>(surfaces.size());
   if (width == 0) {
     callbacks_->onSceneRendered(requestId, 0, cellHeight, {}, "");
@@ -2421,8 +2428,8 @@ bool EngineContext::sendCompositePixels(int32_t requestId, bool deep) {
         return false;
       }
     }
-    const int32_t width = document_->widthPixels;
-    const int32_t height = document_->heightPixels;
+    const int32_t width = core::required(document_).widthPixels;
+    const int32_t height = core::required(document_).heightPixels;
     if (deep && compositor_->linearLight()) {
       callbacks_->onSceneRendered(requestId, width, height, readDeepComposite(), "");
       frameRequested_ = true;
@@ -2451,9 +2458,9 @@ bool EngineContext::sendCompositePixels(int32_t requestId, bool deep) {
 
 std::vector<uint8_t> EngineContext::readDeepComposite() {
   constexpr int32_t kBandRows = 64;
-  const int32_t width = document_->widthPixels;
-  const int32_t height = document_->heightPixels;
-  const size_t pixelsPerRow = static_cast<size_t>(width);
+  const int32_t width = core::required(document_).widthPixels;
+  const int32_t height = core::required(document_).heightPixels;
+  const auto pixelsPerRow = static_cast<size_t>(width);
   std::vector<uint8_t> result(pixelsPerRow * static_cast<size_t>(height) * 8);
   std::vector<uint8_t> halves(pixelsPerRow * kBandRows * 8);
   std::vector<uint16_t> samples(pixelsPerRow * kBandRows * 4);
@@ -2507,8 +2514,8 @@ bool EngineContext::writeTextIntoLayer(canvas::LayerId layer, const text::TextMo
 canvas::TileRange EngineContext::tilesUnder(const text::PixelRect& rect) const {
   const int32_t left = std::max(rect.x, 0);
   const int32_t top = std::max(rect.y, 0);
-  const int32_t right = std::min(rect.x + rect.width, document_->widthPixels);
-  const int32_t bottom = std::min(rect.y + rect.height, document_->heightPixels);
+  const int32_t right = std::min(rect.x + rect.width, core::required(document_).widthPixels);
+  const int32_t bottom = std::min(rect.y + rect.height, core::required(document_).heightPixels);
   if (right <= left || bottom <= top) {
     return canvas::TileRange{};
   }
@@ -2794,8 +2801,9 @@ bool EngineContext::rasterizeTextLayerNow(canvas::LayerId layer, const std::stri
 void EngineContext::fillSceneRect(const scene::FillAction& fill, canvas::LayerId surface) {
   const int32_t firstX = std::max(fill.rect[0], 0);
   const int32_t firstY = std::max(fill.rect[1], 0);
-  const int32_t endX = std::min(fill.rect[0] + fill.rect[2], document_->widthPixels);
-  const int32_t endY = std::min(fill.rect[1] + fill.rect[3], document_->heightPixels);
+  const int32_t endX = std::min(fill.rect[0] + fill.rect[2], core::required(document_).widthPixels);
+  const int32_t endY =
+      std::min(fill.rect[1] + fill.rect[3], core::required(document_).heightPixels);
   if (endX <= firstX || endY <= firstY) {
     return;
   }
@@ -4244,10 +4252,10 @@ void EngineContext::renderFrame() {
         }
       }
       const bool waitForChange = previewLevel >= 1 && adjustmentChanging();
-      const int64_t layerTileBudget = !waitForChange ? compositeLayerTileBudget_
-                                      : adjust::isSpatial(adjustmentSession_->parameters.filter)
-                                          ? 0
-                                          : 1;
+      const int64_t layerTileBudget =
+          !waitForChange ? compositeLayerTileBudget_
+          : adjust::isSpatial(core::required(adjustmentSession_).parameters.filter) ? 0
+                                                                                    : 1;
       gpuProfiler_.begin(gpu::GpuProfiler::Section::Compose);
       moreWork = compositor_->update(visible, coarsestLevel, previewLevel,
                                      frameStart + kCompositeBudgetPerFrame, layerTileBudget);

@@ -25,7 +25,7 @@ class Section {
 
   [[nodiscard]] Section child(const char* name) const {
     const Json* value = field(name);
-    return Section(value, path_ + "." + name);
+    return {value, path_ + "." + name};
   }
 
   [[nodiscard]] double number(const char* name, double fallback, double minimum,

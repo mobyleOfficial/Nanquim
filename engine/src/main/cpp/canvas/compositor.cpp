@@ -9,6 +9,7 @@
 #include "canvas/color_conversion.h"
 #include "canvas/level_selection.h"
 #include "core/log.h"
+#include "core/required.h"
 #include "embedded_shaders.h"
 
 namespace nanquim::canvas {
@@ -168,8 +169,12 @@ void collectChangedSurfaces(const std::vector<LayerTreeNode>& before,
   for (size_t index = 0; index < before.size(); ++index) {
     const LayerTreeNode& old = before[index];
     const LayerTreeNode& now = after[index];
-    const bool maskChanged = old.mask && (old.mask->enabled != now.mask->enabled ||
-                                          old.mask->inverted != now.mask->inverted);
+    // A mask added or removed counts as a change too; before, a removed mask read an empty
+    // optional.
+    const bool maskChanged =
+        old.mask.has_value() != now.mask.has_value() ||
+        (old.mask && now.mask &&
+         (old.mask->enabled != now.mask->enabled || old.mask->inverted != now.mask->inverted));
     if (old.opacity != now.opacity || old.blend != now.blend || old.hidden != now.hidden ||
         old.tint != now.tint || maskChanged) {
       collectSurfaces(now, surfaces);
@@ -760,7 +765,7 @@ void Compositor::drawActiveSurfaceWithStroke(TileCoordinate coordinate, const St
                                              const StrokeBuffer::Slot& strokeSlot,
                                              float layerOpacity,
                                              std::array<int32_t, 2> targetOrigin, bool blend) {
-  const StrokePreview& preview = *strokePreview_;
+  const StrokePreview& preview = core::required(strokePreview_);
   std::vector<std::string> defines;
   if (preview.maskTarget) {
     defines.emplace_back(kMaskTargetDefine);
@@ -794,7 +799,7 @@ void Compositor::drawActiveSurfaceWithStroke(TileCoordinate coordinate, const St
     NANQUIM_LOG_ERROR("%s", errorMessage.c_str());
     return;
   }
-  const LayerId surface = *strokeSurface();
+  const LayerId surface = core::required(strokeSurface());
   gpu::rhi::CommandContext& commands = device_.commands();
   commands.bindPipeline(*strokePipeline);
   const auto surfaceSlot = tileStore_.slotForRead(LayerTileKey{surface, coordinate});
@@ -905,9 +910,9 @@ bool Compositor::prepareTile(TileCoordinate coordinate, int64_t& layerTiles) {
         LayerTileStore::Availability::Loading) {
       allResident = false;
     }
-    if (strokePreview_->selection &&
-        tileStore_.ensureResident(LayerTileKey{*strokePreview_->selection, coordinate}) ==
-            LayerTileStore::Availability::Loading) {
+    const std::optional<LayerId>& selection = core::required(strokePreview_).selection;
+    if (selection && tileStore_.ensureResident(LayerTileKey{*selection, coordinate}) ==
+                         LayerTileStore::Availability::Loading) {
       allResident = false;
     }
   }
@@ -1423,7 +1428,7 @@ bool Compositor::drawLevelOverridePreviews(const TileRange& visible, int32_t pre
     return true;
   }
   endTarget();
-  const gpu::rhi::Texture* layer = (*levelOverride_)(previewLevel);
+  const gpu::rhi::Texture* layer = (core::required(levelOverride_))(previewLevel);
   if (layer == nullptr) {
     return false;
   }

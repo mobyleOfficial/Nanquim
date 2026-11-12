@@ -11,6 +11,7 @@
 #include "color/display_lut.h"
 #include "core/json_writer.h"
 #include "core/log.h"
+#include "core/required.h"
 #include "engine_context.h"
 #include "io/document_tile.h"
 #include "io/document_transaction.h"
@@ -619,7 +620,8 @@ nanquim::adjust::Parameters adjustmentParameters(JNIEnv* environment, jint filte
       table = nanquim::adjust::bakeTable(parameters.filter,
                                          nanquim::adjust::defaultTableData(parameters.filter));
     }
-    parameters.table = std::make_shared<const nanquim::adjust::Table>(std::move(*table));
+    parameters.table =
+        std::make_shared<const nanquim::adjust::Table>(std::move(nanquim::core::required(table)));
   }
   return parameters;
 }

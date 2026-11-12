@@ -73,12 +73,14 @@ class LiquifyField {
     std::vector<float> before;
     std::vector<float> after;
   };
-  Change snapshotAll() const;
+  [[nodiscard]] Change snapshotAll() const;
   void apply(const Change& change, bool undo);
 
   void set(int32_t column, int32_t row, std::array<double, 2> value);
   void beginRecording(Change* change);
   void endRecording();
+  // Stops recording without filling in the change, for a stroke dropped before it finished.
+  void cancelRecording() noexcept;
 
  private:
   void touched(int32_t column, int32_t row);

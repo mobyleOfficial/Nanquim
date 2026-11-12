@@ -135,7 +135,7 @@ TextRasterizer::TextRasterizer(const TextLayout& layout, std::vector<TextPaint> 
     mapping.originX = glyph.x;
     mapping.originY = glyph.y;
     mapping.transform = transform;
-    for (int16_t index = 0; index < outline.n_points; ++index) {
+    for (int32_t index = 0; index < outline.n_points; ++index) {
       outline.points[index] = toFrame(mapping.map(static_cast<double>(outline.points[index].x),
                                                   static_cast<double>(outline.points[index].y)));
     }
@@ -220,12 +220,12 @@ std::vector<TextRasterizer::ShapeSignature> TextRasterizer::signatures() const {
     };
     mix(shape.style);
     mix(shape.stroke ? 1 : 0);
-    for (int16_t index = 0; index < shape.outline.n_points; ++index) {
+    for (int32_t index = 0; index < shape.outline.n_points; ++index) {
       mix(static_cast<uint64_t>(shape.outline.points[index].x));
       mix(static_cast<uint64_t>(shape.outline.points[index].y));
       mix(static_cast<uint64_t>(static_cast<unsigned char>(shape.outline.tags[index])));
     }
-    for (int16_t index = 0; index < shape.outline.n_contours; ++index) {
+    for (int32_t index = 0; index < shape.outline.n_contours; ++index) {
       mix(static_cast<uint64_t>(shape.outline.contours[index]));
     }
     const TextPaint& paint = paints_[shape.style];

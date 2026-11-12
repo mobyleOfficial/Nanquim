@@ -4,6 +4,7 @@
 #include <string_view>
 
 #include "canvas/level_selection.h"
+#include "core/required.h"
 #include "engine_context.h"
 #include "engine_programs.h"
 
@@ -93,7 +94,8 @@ void EngineContext::endAdjustment(bool commit, int64_t historyEntry) {
 std::vector<canvas::TileCoordinate> EngineContext::adjustmentTiles() const {
   std::vector<canvas::TileCoordinate> tiles;
   const canvas::TileRange canvasTiles = compositor_->canvasTiles();
-  for (const canvas::TileCoordinate coordinate : tileStore_->tilesOf(adjustmentSession_->layer)) {
+  for (const canvas::TileCoordinate coordinate :
+       tileStore_->tilesOf(core::required(adjustmentSession_).layer)) {
     if (canvasTiles.contains(coordinate)) {
       tiles.push_back(coordinate);
     }
@@ -102,7 +104,7 @@ std::vector<canvas::TileCoordinate> EngineContext::adjustmentTiles() const {
 }
 
 std::vector<canvas::TileCoordinate> EngineContext::adjustmentOutputTiles() const {
-  const AdjustmentSession& session = *adjustmentSession_;
+  const AdjustmentSession& session = core::required(adjustmentSession_);
   std::vector<canvas::TileCoordinate> layerTiles = adjustmentTiles();
   if (!adjust::isSpatial(session.parameters.filter)) {
     return layerTiles;
@@ -164,7 +166,7 @@ bool EngineContext::paintsAdjustmentMask() const {
 }
 
 void EngineContext::adjustmentMaskChanged(const std::vector<canvas::TileCoordinate>& coordinates) {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   session.reducedMaskOutdated.insert(coordinates.begin(), coordinates.end());
   session.reducedResultOutdated = true;
   compositor_->markStrokeTilesChanged(coordinates);
@@ -216,7 +218,7 @@ void EngineContext::processAdjustment() {
 }
 
 bool EngineContext::showAdjustment() {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   bool resident = true;
   auto require = [&](canvas::LayerId surface, canvas::TileCoordinate coordinate) {
     resident = tileStore_->ensureResident({surface, coordinate}) !=
@@ -255,7 +257,7 @@ bool EngineContext::showAdjustment() {
 
 void EngineContext::renderAdjustmentTile(canvas::TileCoordinate coordinate, int32_t sampleStride,
                                          const gpu::rhi::Texture& target) {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   const bool spatial = adjust::isSpatial(session.parameters.filter);
   const auto source = tileStore_->slotForRead({session.layer, coordinate});
   if (!source && !spatial) {
@@ -296,8 +298,8 @@ void EngineContext::renderAdjustmentTile(canvas::TileCoordinate coordinate, int3
       for (const canvas::StrokeBuffer* buffer : buffers) {
         if (const auto slot = buffer->find(coordinate)) {
           inputs.stroke = AdjustmentStroke{{&buffer->pageTexture(slot->page), slot->origin},
-                                           paintSession_->commit.opacity,
-                                           paintSession_->commit.maskLuminance};
+                                           core::required(paintSession_).commit.opacity,
+                                           core::required(paintSession_).commit.maskLuminance};
           break;
         }
       }
@@ -352,7 +354,7 @@ void EngineContext::renderAdjustmentTile(canvas::TileCoordinate coordinate, int3
 }
 
 void EngineContext::prepareAdjustmentTextures() {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   const auto& table = session.parameters.table;
   if (table && table != session.uploadedTable) {
     if (!session.tableTexture) {
@@ -383,7 +385,7 @@ void EngineContext::prepareAdjustmentTextures() {
 }
 
 void EngineContext::drawAdjustment(const AdjustmentInputs& inputs, gpu::rhi::Format targetFormat) {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   const EngineProgram program = inputs.spatial == nullptr ? EngineProgram::AdjustTile
                                 : session.liquifyField    ? EngineProgram::AdjustTileLiquify
                                                           : EngineProgram::AdjustTileSpatial;
@@ -456,7 +458,7 @@ void EngineContext::drawAdjustment(const AdjustmentInputs& inputs, gpu::rhi::For
 }
 
 bool EngineContext::ensureReducedCopies(int32_t level) {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   const int32_t width = compositor_->levelWidth(level);
   const int32_t height = compositor_->levelHeight(level);
   const int32_t stride = 1 << level;
@@ -557,7 +559,7 @@ bool EngineContext::ensureReducedCopies(int32_t level) {
 }
 
 const gpu::rhi::Texture* EngineContext::renderAdjustmentLevel(int32_t level) {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   if (paintsAdjustmentMask()) {
     return nullptr;
   }
@@ -627,7 +629,7 @@ int32_t EngineContext::draftLevel() const {
 
 bool EngineContext::computeSpatial(SpatialResult& result, int32_t outputLevel, int32_t minimumLevel,
                                    std::optional<canvas::TileRange> covered) {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   const canvas::TileRange canvasTiles = compositor_->canvasTiles();
   if (minimumLevel < 0 || outputLevel > 0) {
     minimumLevel = outputLevel;
@@ -777,7 +779,7 @@ bool EngineContext::computeSpatial(SpatialResult& result, int32_t outputLevel, i
             std::min(pixel[axis] / factor + texelsPerTile, rectOrigin[axis] + rectSize[axis]);
       }
       if (slot && end[0] > first[0] && end[1] > first[1]) {
-        boxTiles.push_back({*slot, pixel, first, end});
+        boxTiles.push_back({core::required(slot), pixel, first, end});
       }
     }
     commands.beginPass(gpu::rhi::RenderTarget::of(*target), gpu::rhi::LoadAction::Clear);
@@ -912,7 +914,7 @@ bool EngineContext::adjustmentChanging() const {
 }
 
 bool EngineContext::finishAdjustment() {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   if (session.liquifyField) {
     finishLiquifyStroke();
     uploadLiquifyField();
@@ -1055,7 +1057,7 @@ void EngineContext::cancelLiquifyStroke() {
 }
 
 void EngineContext::finishLiquifyStroke() {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   if (!session.liquifyStroke) {
     return;
   }
@@ -1068,7 +1070,7 @@ void EngineContext::finishLiquifyStroke() {
 }
 
 void EngineContext::pushLiquifyStep(adjust::LiquifyField::Change change) {
-  AdjustmentSession& session = *adjustmentSession_;
+  AdjustmentSession& session = core::required(adjustmentSession_);
   session.liquifyUndo.push_back(std::move(change));
   session.liquifyRedo.clear();
 }
@@ -1113,8 +1115,8 @@ void EngineContext::scaleLiquify(float factor) {
 void EngineContext::liquifyFieldChanged() { frameRequested_ = true; }
 
 void EngineContext::uploadLiquifyField() {
-  AdjustmentSession& session = *adjustmentSession_;
-  adjust::LiquifyField& field = *session.liquifyField;
+  AdjustmentSession& session = core::required(adjustmentSession_);
+  adjust::LiquifyField& field = core::required(session.liquifyField);
   const adjust::FieldRegion region = field.takeChanged();
   if (region.isEmpty()) {
     return;
