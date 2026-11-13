@@ -87,10 +87,12 @@ ShaderProgram* ShaderVariantCache::get(const std::string& pipeline,
     }
   }
   if (!program) {
+    markCompiling(key);
     program = compute
                   ? ShaderProgram::createCompute(fragment.c_str(), errorMessage, binariesSupported_)
                   : ShaderProgram::create(vertex.c_str(), fragment.c_str(), errorMessage,
                                           binariesSupported_);
+    clearCompiling();
     if (!program) {
       errorMessage = key + ": " + errorMessage;
       return nullptr;
@@ -143,6 +145,23 @@ void ShaderVariantCache::storeBinary(const std::string& path, const ShaderProgra
                  static_cast<std::streamsize>(binary.size()));
   }
   std::rename(temporaryPath.c_str(), path.c_str());
+}
+
+void ShaderVariantCache::markCompiling(const std::string& key) const {
+  if (binaryDirectory_.empty()) {
+    return;
+  }
+  const std::string path = binaryDirectory_ + "/" + kCompilingMarker;
+  if (std::FILE* file = std::fopen(path.c_str(), "w"); file != nullptr) {
+    std::fprintf(file, "%s\n%s\n", key.c_str(), driverIdentity_.c_str());
+    std::fclose(file);
+  }
+}
+
+void ShaderVariantCache::clearCompiling() const {
+  if (!binaryDirectory_.empty()) {
+    std::remove((binaryDirectory_ + "/" + kCompilingMarker).c_str());
+  }
 }
 
 }  // namespace nanquim::gpu::gles

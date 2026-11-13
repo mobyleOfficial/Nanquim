@@ -83,7 +83,8 @@ class Compositor {
 
   [[nodiscard]] std::optional<int32_t> displayLevelOverride(const TileRange& visibleTiles) const;
 
-  static constexpr size_t kMaxLayersPerPass = 16;
+  // Matches kMaxLayers in composite_layers_fragment.glsl; see the note there.
+  static constexpr size_t kMaxLayersPerPass = 15;
 
   [[nodiscard]] int32_t widthPixels() const { return widthPixels_; }
   [[nodiscard]] int32_t heightPixels() const { return heightPixels_; }
