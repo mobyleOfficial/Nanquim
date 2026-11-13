@@ -1,8 +1,5 @@
 package com.mobyle.nanquim.command
 
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 import com.mobyle.nanquim.ui.brush.BRUSH_EDITOR_FIELDS
 import com.mobyle.nanquim.ui.brush.BrushPickerField
 import com.mobyle.nanquim.ui.brush.ChoiceField
@@ -11,6 +8,9 @@ import com.mobyle.nanquim.ui.brush.NumberField
 import com.mobyle.nanquim.ui.brush.TextField
 import com.mobyle.nanquim.ui.brush.TextureField
 import com.mobyle.nanquim.ui.brush.ToggleField
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 class BrushEditorPathsTest {
     @Test

@@ -33,7 +33,8 @@ std::optional<std::vector<uint8_t>> readBytes(const std::filesystem::path& path)
   if (!stream) {
     return std::nullopt;
   }
-  return std::vector<uint8_t>(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
+  return std::vector<uint8_t>(std::istreambuf_iterator<char>(stream),
+                              std::istreambuf_iterator<char>());
 }
 
 struct BrushFiles {
@@ -61,10 +62,12 @@ std::optional<BrushFiles> loadBrushFiles(const std::filesystem::path& path) {
       const auto& value = files.document[section]["texture"];
       name = value.is_string() ? value.get<std::string>() : "";
     }
-    return name.empty() ? std::vector<uint8_t>{} : readBytes(file.parent_path() / name).value_or(std::vector<uint8_t>{});
+    return name.empty() ? std::vector<uint8_t>{}
+                        : readBytes(file.parent_path() / name).value_or(std::vector<uint8_t>{});
   };
   std::string error;
-  files.brush = stroke::loadBrush(files.document.dump(), texture("shape", "shape.png"), texture("grain", ""), error);
+  files.brush = stroke::loadBrush(files.document.dump(), texture("shape", "shape.png"),
+                                  texture("grain", ""), error);
   if (!files.brush) {
     std::fprintf(stderr, "%s: %s\n", file.string().c_str(), error.c_str());
     return std::nullopt;
@@ -82,7 +85,8 @@ std::map<std::string, std::string> options(const std::vector<std::string>& args,
   return result;
 }
 
-double numberOption(const std::map<std::string, std::string>& values, const char* name, double fallback) {
+double numberOption(const std::map<std::string, std::string>& values, const char* name,
+                    double fallback) {
   const auto found = values.find(name);
   return found == values.end() ? fallback : std::stod(found->second);
 }
@@ -115,7 +119,8 @@ int brushSheet(const std::vector<std::string>& args) {
 int sheetTemplate(const std::vector<std::string>& args) {
   const double scale = numberOption(options(args, 2), "scale", 1);
   const auto size = static_cast<int32_t>(std::lround(reference::kSheetSize * scale));
-  if (!reference::writePng(args[1], reference::Rgba8Image{size, size, reference::renderSheetTemplate(scale)})) {
+  if (!reference::writePng(
+          args[1], reference::Rgba8Image{size, size, reference::renderSheetTemplate(scale)})) {
     std::fprintf(stderr, "cannot write %s\n", args[1].c_str());
     return kExitFailure;
   }
@@ -132,10 +137,12 @@ int brushStatistics(const std::vector<std::string>& args) {
   return kExitSuccess;
 }
 
-reference::Rgba8Image sideBySide(const reference::Rgba8Image& target, const reference::Rgba8Image& actual) {
+reference::Rgba8Image sideBySide(const reference::Rgba8Image& target,
+                                 const reference::Rgba8Image& actual) {
   const int32_t width = target.width;
   const int32_t height = target.height;
-  reference::Rgba8Image out{width * 3, height, std::vector<uint8_t>(static_cast<size_t>(width) * 3 * height * 4, 255)};
+  reference::Rgba8Image out{width * 3, height,
+                            std::vector<uint8_t>(static_cast<size_t>(width) * 3 * height * 4, 255)};
   auto luminance = [](const uint8_t* pixel) {
     const double alpha = pixel[3] / 255.0;
     const double over = [&] {
@@ -153,11 +160,14 @@ reference::Rgba8Image sideBySide(const reference::Rgba8Image& target, const refe
       const size_t source = (static_cast<size_t>(y) * width + x) * 4;
       for (int32_t panel = 0; panel < 2; ++panel) {
         const auto& image = panel == 0 ? target : actual;
-        std::copy_n(&image.pixels[source], 4, &out.pixels[(static_cast<size_t>(y) * width * 3 + x + panel * width) * 4]);
+        std::copy_n(&image.pixels[source], 4,
+                    &out.pixels[(static_cast<size_t>(y) * width * 3 + x + panel * width) * 4]);
       }
-      const double difference = luminance(&target.pixels[source]) - luminance(&actual.pixels[source]);
+      const double difference =
+          luminance(&target.pixels[source]) - luminance(&actual.pixels[source]);
       uint8_t* pixel = &out.pixels[(static_cast<size_t>(y) * width * 3 + x + 2 * width) * 4];
-      const auto amount = static_cast<uint8_t>(std::lround(std::clamp(std::abs(difference), 0.0, 1.0) * 255));
+      const auto amount =
+          static_cast<uint8_t>(std::lround(std::clamp(std::abs(difference), 0.0, 1.0) * 255));
       pixel[0] = difference > 0 ? 255 : static_cast<uint8_t>(255 - amount);
       pixel[1] = static_cast<uint8_t>(255 - amount);
       pixel[2] = difference > 0 ? static_cast<uint8_t>(255 - amount) : 255;
@@ -177,8 +187,8 @@ void printComparison(const reference::StatisticsComparison& comparison) {
               reference::kAcceptanceDistance);
   for (size_t index = 0; index < std::min<size_t>(10, entries.size()); ++index) {
     const auto& entry = entries[index];
-    std::printf("  %-22s target %9.4f  nanquim %9.4f  (%+.2f)\n", entry.name.c_str(), entry.target, entry.actual,
-                entry.normalizedDifference);
+    std::printf("  %-22s target %9.4f  nanquim %9.4f  (%+.2f)\n", entry.name.c_str(), entry.target,
+                entry.actual, entry.normalizedDifference);
   }
 }
 
@@ -190,7 +200,8 @@ int brushCompare(const std::vector<std::string>& args) {
     std::fprintf(stderr, "both images must be test sheets of the same square size\n");
     return kExitFailure;
   }
-  const auto comparison = reference::compareStatistics(reference::measureSheet(*target), reference::measureSheet(*actual));
+  const auto comparison = reference::compareStatistics(reference::measureSheet(*target),
+                                                       reference::measureSheet(*actual));
   printComparison(comparison);
   if (!reference::writePng(args[3], sideBySide(*target, *actual))) {
     std::fprintf(stderr, "cannot write %s\n", args[3].c_str());
@@ -215,8 +226,10 @@ int brushTune(const std::vector<std::string>& args) {
     size_t start = 0;
     while (start < chosen->second.size()) {
       const size_t comma = chosen->second.find(',', start);
-      const std::string path = chosen->second.substr(start, comma == std::string::npos ? std::string::npos : comma - start);
-      const auto found = std::find_if(standard.begin(), standard.end(), [&](const auto& p) { return p.path == path; });
+      const std::string path = chosen->second.substr(
+          start, comma == std::string::npos ? std::string::npos : comma - start);
+      const auto found = std::find_if(standard.begin(), standard.end(),
+                                      [&](const auto& p) { return p.path == path; });
       if (found == standard.end()) {
         std::fprintf(stderr, "unknown tunable parameter %s\n", path.c_str());
         return kExitUsage;
@@ -229,15 +242,17 @@ int brushTune(const std::vector<std::string>& args) {
   }
   const auto evaluations = static_cast<int32_t>(numberOption(values, "evaluations", 200));
   const double scale = numberOption(values, "scale", 0.5);
-  const auto result = reference::tuneBrush(files->document, *files->brush, reference::measureSheet(*target), parameters,
-                                           evaluations, scale, [](int32_t evaluation, double best) {
-                                             if (evaluation % 10 == 0) {
-                                               std::fprintf(stderr, "evaluation %d: best distance %.3f\n", evaluation, best);
-                                             }
-                                           });
+  const auto result = reference::tuneBrush(
+      files->document, *files->brush, reference::measureSheet(*target), parameters, evaluations,
+      scale, [](int32_t evaluation, double best) {
+        if (evaluation % 10 == 0) {
+          std::fprintf(stderr, "evaluation %d: best distance %.3f\n", evaluation, best);
+        }
+      });
   std::ofstream output(args[3]);
   output << result.brush.dump(2) << "\n";
-  std::printf("distance %.3f -> %.3f after %d evaluations\n", result.initialDistance, result.distance, result.evaluations);
+  std::printf("distance %.3f -> %.3f after %d evaluations\n", result.initialDistance,
+              result.distance, result.evaluations);
   return output ? kExitSuccess : kExitFailure;
 }
 

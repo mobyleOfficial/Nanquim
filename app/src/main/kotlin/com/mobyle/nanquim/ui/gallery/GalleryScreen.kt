@@ -11,9 +11,9 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -31,8 +31,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -63,8 +63,6 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.command.GalleryCommandIds
 import com.mobyle.nanquim.gallery.ArtworkEntity
@@ -72,6 +70,8 @@ import com.mobyle.nanquim.gallery.Gallery
 import com.mobyle.nanquim.gallery.GalleryItem
 import com.mobyle.nanquim.gallery.GallerySort
 import com.mobyle.nanquim.ui.common.LocalWindowLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.hypot
 
@@ -83,6 +83,7 @@ fun GalleryScreen(
     onPhoto: () -> Unit,
     onShare: (List<String>) -> Unit,
     onOpenSettings: () -> Unit,
+    banner: (@Composable (Modifier) -> Unit)? = null,
 ) {
     val allItems by gallery.items.collectAsState()
     val items = gallery.visibleItems(allItems)
@@ -102,14 +103,20 @@ fun GalleryScreen(
             } else if (items.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        if (gallery.searchQuery.isBlank()) stringResource(R.string.gallery_empty) else stringResource(R.string.gallery_empty_search, gallery.searchQuery),
+                        if (gallery.searchQuery.isBlank()) {
+                            stringResource(
+                                R.string.gallery_empty,
+                            )
+                        } else {
+                            stringResource(R.string.gallery_empty_search, gallery.searchQuery)
+                        },
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(CELL_MINIMUM_WIDTH),
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                    modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
@@ -123,6 +130,8 @@ fun GalleryScreen(
                         )
                     }
                 }
+                // Out of the way of the feature: only under a filled grid, never while selecting or previewing.
+                if (banner != null && !gallery.selecting && gallery.previewId == null) banner(Modifier.padding(top = 8.dp))
             }
         }
         gallery.previewId?.let { previewId ->
@@ -178,7 +187,9 @@ private fun GalleryTopBar(
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             val ready = gallery.loaded
             if (openStack != null) {
-                TextButton(onClick = { onCommand(GalleryCommandIds.OPEN_STACK, mapOf("stackId" to null)) }) { Text(stringResource(R.string.gallery_back)) }
+                TextButton(
+                    onClick = { onCommand(GalleryCommandIds.OPEN_STACK, mapOf("stackId" to null)) },
+                ) { Text(stringResource(R.string.gallery_back)) }
             }
             Text(
                 openStack?.name ?: stringResource(R.string.gallery_title),
@@ -259,16 +270,28 @@ private fun SelectionBar(
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
     ) {
         Text(pluralStringResource(R.plurals.gallery_selected_count, ids.size, ids.size), Modifier.weight(1f))
-        TextButton(enabled = enabled, onClick = { onShare(gallery.selectedArtworkIds()) }) { Text(stringResource(R.string.gallery_action_share)) }
-        TextButton(enabled = enabled, onClick = { onCommand(GalleryCommandIds.DUPLICATE, mapOf("ids" to ids)) }) { Text(stringResource(R.string.gallery_action_duplicate)) }
+        TextButton(
+            enabled = enabled,
+            onClick = { onShare(gallery.selectedArtworkIds()) },
+        ) { Text(stringResource(R.string.gallery_action_share)) }
+        TextButton(enabled = enabled, onClick = {
+            onCommand(GalleryCommandIds.DUPLICATE, mapOf("ids" to ids))
+        }) { Text(stringResource(R.string.gallery_action_duplicate)) }
         if (insideStack) {
-            TextButton(enabled = enabled, onClick = { onCommand(GalleryCommandIds.UNSTACK, mapOf("ids" to ids)) }) { Text(stringResource(R.string.gallery_action_unstack)) }
+            TextButton(enabled = enabled, onClick = {
+                onCommand(GalleryCommandIds.UNSTACK, mapOf("ids" to ids))
+            }) { Text(stringResource(R.string.gallery_action_unstack)) }
         } else {
-            TextButton(enabled = gallery.selectedArtworkIds().size >= 2, onClick = { onCommand(GalleryCommandIds.STACK, mapOf("ids" to ids)) }) {
+            TextButton(
+                enabled = gallery.selectedArtworkIds().size >= 2,
+                onClick = { onCommand(GalleryCommandIds.STACK, mapOf("ids" to ids)) },
+            ) {
                 Text(stringResource(R.string.gallery_action_stack))
             }
         }
-        TextButton(enabled = enabled, onClick = onDelete) { Text(stringResource(R.string.gallery_action_delete), color = MaterialTheme.colorScheme.error) }
+        TextButton(enabled = enabled, onClick = onDelete) {
+            Text(stringResource(R.string.gallery_action_delete), color = MaterialTheme.colorScheme.error)
+        }
     }
 }
 
@@ -385,7 +408,12 @@ private fun PreviewPager(
             val artwork = artworks[page]
             Column(Modifier.fillMaxSize().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Thumbnail(gallery, artwork, Modifier.weight(1f).fillMaxWidth())
-                Text(artwork.name, color = Color.White, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 12.dp))
+                Text(
+                    artwork.name,
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(top = 12.dp),
+                )
             }
         }
         TextButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).windowInsetsPadding(WindowInsets.safeDrawing)) {
@@ -406,7 +434,9 @@ fun RenameDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = { OutlinedTextField(value = text, onValueChange = { text = it }, singleLine = true) },
-        confirmButton = { TextButton(enabled = text.isNotBlank(), onClick = { onConfirm(text.trim()) }) { Text(stringResource(R.string.gallery_ok)) } },
+        confirmButton = {
+            TextButton(enabled = text.isNotBlank(), onClick = { onConfirm(text.trim()) }) { Text(stringResource(R.string.gallery_ok)) }
+        },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.gallery_cancel)) } },
     )
 }

@@ -1,9 +1,17 @@
 package com.mobyle.nanquim.automation
 
 import androidx.compose.runtime.snapshotFlow
-import kotlinx.coroutines.CoroutineScope
+import com.mobyle.nanquim.brush.library.BrushTool
+import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.command.stateJson
+import com.mobyle.nanquim.command.toJson
+import com.mobyle.nanquim.document.layer.toJson
+import com.mobyle.nanquim.engine.Engine
+import com.mobyle.nanquim.engine.EngineEvent
+import com.mobyle.nanquim.engine.SceneRender
 import com.mobyle.nanquim.help.Help
+import com.mobyle.nanquim.settings.AppSettings
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -16,14 +24,6 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
-import com.mobyle.nanquim.brush.library.BrushTool
-import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.command.toJson
-import com.mobyle.nanquim.settings.AppSettings
-import com.mobyle.nanquim.document.layer.toJson
-import com.mobyle.nanquim.engine.Engine
-import com.mobyle.nanquim.engine.EngineEvent
-import com.mobyle.nanquim.engine.SceneRender
 
 class CanvasAutomationHost(
     private val canvas: CanvasSession,
@@ -109,7 +109,13 @@ class CanvasAutomationHost(
                 putJsonObject("history") {
                     put("undo", session.history.undoCount)
                     put("redo", session.history.redoCount)
-                    put("nextUndo", session.history.nextUndo?.label?.name?.let(::JsonPrimitive) ?: JsonNull)
+                    put(
+                        "nextUndo",
+                        session.history.nextUndo
+                            ?.label
+                            ?.name
+                            ?.let(::JsonPrimitive) ?: JsonNull,
+                    )
                 }
             }
             put("tool", canvas.canvasTool.name)

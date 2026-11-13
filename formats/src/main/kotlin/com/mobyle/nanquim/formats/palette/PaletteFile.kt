@@ -1,5 +1,6 @@
 package com.mobyle.nanquim.formats.palette
 
+import com.mobyle.nanquim.document.layer.RgbaColor
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
@@ -12,7 +13,6 @@ import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
-import com.mobyle.nanquim.document.layer.RgbaColor
 
 data class Palette(
     val name: String,

@@ -1,27 +1,9 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.double
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
 import com.mobyle.nanquim.R
+import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.color.ColorProfileLibrary
 import com.mobyle.nanquim.color.isPrintProfile
-import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.gallery.CanvasSize
-import com.mobyle.nanquim.gallery.Gallery
-import com.mobyle.nanquim.gallery.GalleryException
-import com.mobyle.nanquim.gallery.GallerySort
-import com.mobyle.nanquim.navigation.AppDestination
-import com.mobyle.nanquim.navigation.AppNavigator
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -36,6 +18,24 @@ import com.mobyle.nanquim.document.layer.PixelFormat
 import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.document.layer.maximumLayers
 import com.mobyle.nanquim.formats.nanquim.CanvasUnit
+import com.mobyle.nanquim.gallery.CanvasSize
+import com.mobyle.nanquim.gallery.Gallery
+import com.mobyle.nanquim.gallery.GalleryException
+import com.mobyle.nanquim.gallery.GallerySort
+import com.mobyle.nanquim.navigation.AppDestination
+import com.mobyle.nanquim.navigation.AppNavigator
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 
 object GalleryCommandIds {
     const val NEW_CANVAS = "gallery.newCanvas"
@@ -91,7 +91,9 @@ fun registerGalleryCommands(
         parameters: List<ParameterSpec> = emptyList(),
         availability: (AppState) -> Availability = { Availability.Enabled },
         handler: suspend (JsonObject) -> CommandResult,
-    ) = registry.register(CommandSpec(id, titleRes, CommandCategory.Gallery, parameters, undoable = false, availability = availability)) { _, arguments ->
+    ) = registry.register(
+        CommandSpec(id, titleRes, CommandCategory.Gallery, parameters, undoable = false, availability = availability),
+    ) { _, arguments ->
         try {
             handler(arguments)
         } catch (error: GalleryException) {
@@ -144,7 +146,8 @@ fun registerGalleryCommands(
                     "bitsPerChannel is 8 or 16",
                 )
         val dpi = arguments.getValue("dpi").jsonPrimitive.double
-        val size = CanvasSize(arguments.getValue("width").jsonPrimitive.double, arguments.getValue("height").jsonPrimitive.double, unit, dpi)
+        val size =
+            CanvasSize(arguments.getValue("width").jsonPrimitive.double, arguments.getValue("height").jsonPrimitive.double, unit, dpi)
         if (size.widthPx > MAXIMUM_CANVAS_SIDE_PX || size.heightPx > MAXIMUM_CANVAS_SIDE_PX) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Canvas larger than $MAXIMUM_CANVAS_SIDE_PX px")
         }
@@ -184,11 +187,24 @@ fun registerGalleryCommands(
     }
 
     registry.register(
-        CommandSpec(GalleryCommandIds.SAVE, R.string.command_document_save, CommandCategory.Canvas, undoable = false, availability = requiresCanvas),
+        CommandSpec(
+            GalleryCommandIds.SAVE,
+            R.string.command_document_save,
+            CommandCategory.Canvas,
+            undoable = false,
+            availability = requiresCanvas,
+        ),
     ) { _, _ ->
         val done = kotlinx.coroutines.CompletableDeferred<Boolean>()
         canvasSession.persistence.saveNow(withThumbnail = true) { ok -> done.complete(ok) }
-        if (done.await()) CommandResult.Success() else CommandResult.Failure(CommandErrorCode.HandlerFailed, canvasSession.persistence.lastError ?: "Save failed")
+        if (done.await()) {
+            CommandResult.Success()
+        } else {
+            CommandResult.Failure(
+                CommandErrorCode.HandlerFailed,
+                canvasSession.persistence.lastError ?: "Save failed",
+            )
+        }
     }
 
     register(GalleryCommandIds.DUPLICATE, R.string.command_gallery_duplicate, listOf(idsParameter)) { arguments ->
@@ -210,7 +226,11 @@ fun registerGalleryCommands(
         CommandResult.Success()
     }
 
-    register(GalleryCommandIds.STACK, R.string.command_gallery_stack, listOf(idsParameter, ParameterSpec("name", ParameterType.String, JsonNull))) { arguments ->
+    register(
+        GalleryCommandIds.STACK,
+        R.string.command_gallery_stack,
+        listOf(idsParameter, ParameterSpec("name", ParameterType.String, JsonNull)),
+    ) { arguments ->
         val stackId =
             gallery.stack(arguments.ids("ids"), arguments.optionalString("name") ?: stackName())
                 ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "A stack needs at least two artworks")
@@ -240,18 +260,30 @@ fun registerGalleryCommands(
         CommandResult.Success()
     }
 
-    register(GalleryCommandIds.OPEN_STACK, R.string.command_gallery_open_stack, listOf(ParameterSpec("stackId", ParameterType.String, JsonNull))) { arguments ->
+    register(
+        GalleryCommandIds.OPEN_STACK,
+        R.string.command_gallery_open_stack,
+        listOf(ParameterSpec("stackId", ParameterType.String, JsonNull)),
+    ) { arguments ->
         gallery.openStackId = arguments.optionalString("stackId")
         gallery.changeSelecting(false)
         CommandResult.Success()
     }
 
-    register(GalleryCommandIds.SELECT_MODE, R.string.command_gallery_select, listOf(ParameterSpec("enabled", ParameterType.Boolean))) { arguments ->
+    register(
+        GalleryCommandIds.SELECT_MODE,
+        R.string.command_gallery_select,
+        listOf(ParameterSpec("enabled", ParameterType.Boolean)),
+    ) { arguments ->
         gallery.changeSelecting(arguments.getValue("enabled").jsonPrimitive.content == "true")
         CommandResult.Success()
     }
 
-    register(GalleryCommandIds.TOGGLE_SELECTED, R.string.command_gallery_toggle_selected, listOf(ParameterSpec("id", ParameterType.String))) { arguments ->
+    register(
+        GalleryCommandIds.TOGGLE_SELECTED,
+        R.string.command_gallery_toggle_selected,
+        listOf(ParameterSpec("id", ParameterType.String)),
+    ) { arguments ->
         if (!gallery.selecting) gallery.changeSelecting(true)
         gallery.toggleSelected(arguments.string("id"))
         CommandResult.Success()
@@ -271,7 +303,11 @@ fun registerGalleryCommands(
         CommandResult.Success()
     }
 
-    register(GalleryCommandIds.PREVIEW, R.string.command_gallery_preview, listOf(ParameterSpec("id", ParameterType.String, JsonNull))) { arguments ->
+    register(
+        GalleryCommandIds.PREVIEW,
+        R.string.command_gallery_preview,
+        listOf(ParameterSpec("id", ParameterType.String, JsonNull)),
+    ) { arguments ->
         gallery.previewId = arguments.optionalString("id")
         CommandResult.Success()
     }
@@ -299,7 +335,11 @@ fun registerGalleryCommands(
         CommandResult.Success()
     }
 
-    register(GalleryCommandIds.PRESET_DELETE, R.string.command_gallery_preset_delete, listOf(ParameterSpec("id", ParameterType.String))) { arguments ->
+    register(
+        GalleryCommandIds.PRESET_DELETE,
+        R.string.command_gallery_preset_delete,
+        listOf(ParameterSpec("id", ParameterType.String)),
+    ) { arguments ->
         gallery.deletePreset(arguments.string("id"))
         CommandResult.Success()
     }

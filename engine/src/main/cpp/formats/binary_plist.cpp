@@ -381,7 +381,11 @@ std::vector<KeyedArchive::Object> KeyedArchive::array(const Object& object,
 namespace {
 
 constexpr int kMaximumJsonDepth = 16;
-constexpr size_t kMaximumJsonElements = 1'000'000;
+constexpr size_t kMaximumJsonElements = 250'000;
+// Shared references let a small archive name the same string or data many times, and each one is
+// copied into the JSON. This caps the text produced, so the cost follows the output size limit
+// instead of the number of references.
+constexpr size_t kMaximumJsonTextBytes = size_t{32} * 1024 * 1024;
 
 std::string base64(const std::string& bytes) {
   static constexpr char kAlphabet[] =
@@ -422,9 +426,10 @@ class JsonConverter {
       case Type::Date:
         return std::isfinite(object.real) ? nlohmann::json(object.real) : nlohmann::json(nullptr);
       case Type::String:
-        return object.text;
+        return spend(object.text.size()) ? nlohmann::json(object.text) : nlohmann::json(nullptr);
       case Type::Data:
-        return base64(object.text);
+        return spend((object.text.size() + 2) / 3 * 4) ? nlohmann::json(base64(object.text))
+                                                       : nlohmann::json(nullptr);
       case Type::Array:
       case Type::Set: {
         nlohmann::json array = nlohmann::json::array();
@@ -441,6 +446,15 @@ class JsonConverter {
   }
 
  private:
+  bool spend(size_t bytes) {
+    if (bytes > kMaximumJsonTextBytes - textBytes_) {
+      textBytes_ = kMaximumJsonTextBytes;
+      return false;
+    }
+    textBytes_ += bytes;
+    return true;
+  }
+
   nlohmann::json element(uint64_t reference, int depth) {
     const auto value = archive_.resolve(reference);
     return value ? convert(*value, depth + 1) : nlohmann::json(nullptr);
@@ -450,7 +464,8 @@ class JsonConverter {
     const std::string className = archive_.className(object);
     const BinaryPlist& plist = archive_.plist();
     if (className == "NSString" || className == "NSMutableString") {
-      return archive_.text(object).value_or(std::string());
+      std::string text = archive_.text(object).value_or(std::string());
+      return spend(text.size()) ? nlohmann::json(std::move(text)) : nlohmann::json(nullptr);
     }
     if (className == "NSArray" || className == "NSMutableArray" || className == "NSSet" ||
         className == "NSMutableSet") {
@@ -493,6 +508,7 @@ class JsonConverter {
 
   const KeyedArchive& archive_;
   size_t elements_ = 0;
+  size_t textBytes_ = 0;
 };
 
 }  // namespace

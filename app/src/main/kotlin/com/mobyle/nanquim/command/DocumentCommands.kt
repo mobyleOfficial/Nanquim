@@ -1,19 +1,5 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.serialization.json.boolean
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.double
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.document.command.AppState
@@ -31,6 +17,20 @@ import com.mobyle.nanquim.document.layer.BlendMode
 import com.mobyle.nanquim.document.layer.LayerOperationException
 import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.document.session.DocumentSession
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 
 object DocumentCommandIds {
     const val UNDO = "edit.undo"
@@ -114,7 +114,14 @@ fun registerDocumentCommands(
         undoable: Boolean = true,
         action: (DocumentSession, JsonObject) -> JsonObject?,
     ) = registry.register(
-        CommandSpec(id = id, titleRes = titleRes, category = category, parameters = parameters, undoable = undoable, availability = requiresDocument),
+        CommandSpec(
+            id = id,
+            titleRes = titleRes,
+            category = category,
+            parameters = parameters,
+            undoable = undoable,
+            availability = requiresDocument,
+        ),
     ) { _, arguments ->
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No open document")
         try {
@@ -128,7 +135,8 @@ fun registerDocumentCommands(
     val optionalLayerId = ParameterSpec("layerId", ParameterType.Integer, defaultValue = JsonNull, minimum = 1.0)
     val layerIds = ParameterSpec("layerIds", ParameterType.Array, defaultValue = JsonNull)
 
-    fun DocumentSession.target(arguments: JsonObject) = arguments.optionalInt("layerId") ?: state.activeLayerId ?: throw LayerOperationException("No active layer")
+    fun DocumentSession.target(arguments: JsonObject) =
+        arguments.optionalInt("layerId") ?: state.activeLayerId ?: throw LayerOperationException("No active layer")
 
     fun DocumentSession.targets(arguments: JsonObject) = arguments.ids("layerIds") ?: selectedIds.toList()
 
@@ -182,7 +190,8 @@ fun registerDocumentCommands(
             arguments.getValue("y").jsonPrimitive.double,
             arguments.int("sampleSize"),
         ) { done.complete(it) }
-        val color = done.await() ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "The point is outside the canvas")
+        val color =
+            done.await() ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "The point is outside the canvas")
         CommandResult.Success(
             buildJsonObject {
                 put("red", color.red)
@@ -192,7 +201,11 @@ fun registerDocumentCommands(
         )
     }
     register(DocumentCommandIds.LAYER_NEW, R.string.command_layer_new) { session, _ -> id(session.newLayer()) }
-    register(DocumentCommandIds.LAYER_DUPLICATE, R.string.command_layer_duplicate, parameters = listOf(optionalLayerId)) { session, arguments ->
+    register(
+        DocumentCommandIds.LAYER_DUPLICATE,
+        R.string.command_layer_duplicate,
+        parameters = listOf(optionalLayerId),
+    ) { session, arguments ->
         id(session.duplicate(session.target(arguments)))
     }
     register(DocumentCommandIds.LAYER_DELETE, R.string.command_layer_delete, parameters = listOf(layerIds)) { session, arguments ->
@@ -223,7 +236,11 @@ fun registerDocumentCommands(
     register(
         DocumentCommandIds.LAYER_SET_BLEND,
         R.string.command_layer_set_blend,
-        parameters = listOf(layerId, ParameterSpec("blend", ParameterType.Enumeration, allowedValues = BlendMode.GROUP_MODES.map { it.id })),
+        parameters =
+            listOf(
+                layerId,
+                ParameterSpec("blend", ParameterType.Enumeration, allowedValues = BlendMode.GROUP_MODES.map { it.id }),
+            ),
     ) { session, arguments ->
         session.setBlend(arguments.int("layerId"), BlendMode.fromId(arguments.getValue("blend").jsonPrimitive.content)!!)
         null
@@ -238,11 +255,27 @@ fun registerDocumentCommands(
         session.apply(arguments.int("layerId"), arguments.boolean(name))
         null
     }
-    registerFlag(DocumentCommandIds.LAYER_SET_HIDDEN, R.string.command_layer_set_hidden, "hidden") { layer, value -> setHidden(layer, value) }
+    registerFlag(
+        DocumentCommandIds.LAYER_SET_HIDDEN,
+        R.string.command_layer_set_hidden,
+        "hidden",
+    ) { layer, value -> setHidden(layer, value) }
     registerFlag(DocumentCommandIds.LAYER_LOCK, R.string.command_layer_lock, "locked") { layer, value -> setLocked(layer, value) }
-    registerFlag(DocumentCommandIds.LAYER_ALPHA_LOCK, R.string.command_layer_alpha_lock, "enabled") { layer, value -> setAlphaLock(layer, value) }
-    registerFlag(DocumentCommandIds.LAYER_SET_ASSISTED, R.string.command_layer_set_assisted, "enabled") { layer, value -> setAssisted(layer, value) }
-    registerFlag(DocumentCommandIds.LAYER_SET_PRIVATE, R.string.command_layer_set_private, "enabled") { layer, value -> setPrivate(layer, value) }
+    registerFlag(
+        DocumentCommandIds.LAYER_ALPHA_LOCK,
+        R.string.command_layer_alpha_lock,
+        "enabled",
+    ) { layer, value -> setAlphaLock(layer, value) }
+    registerFlag(
+        DocumentCommandIds.LAYER_SET_ASSISTED,
+        R.string.command_layer_set_assisted,
+        "enabled",
+    ) { layer, value -> setAssisted(layer, value) }
+    registerFlag(
+        DocumentCommandIds.LAYER_SET_PRIVATE,
+        R.string.command_layer_set_private,
+        "enabled",
+    ) { layer, value -> setPrivate(layer, value) }
     registry.register(
         CommandSpec(
             id = DocumentCommandIds.LAYER_SELECT_AT,
@@ -254,31 +287,71 @@ fun registerDocumentCommands(
         ),
     ) { _, arguments ->
         val picked = kotlinx.coroutines.CompletableDeferred<Int?>()
-        canvas.selectLayerAt(arguments.getValue("x").jsonPrimitive.double, arguments.getValue("y").jsonPrimitive.double) { picked.complete(it) }
+        canvas.selectLayerAt(
+            arguments.getValue("x").jsonPrimitive.double,
+            arguments.getValue("y").jsonPrimitive.double,
+        ) { picked.complete(it) }
         val id = picked.await()
         CommandResult.Success(JsonObject(mapOf("layerId" to (id?.let(::JsonPrimitive) ?: JsonNull))))
     }
-    registerFlag(DocumentCommandIds.LAYER_CLIPPING, R.string.command_layer_clipping, "enabled") { layer, value -> setClipping(layer, value) }
-    registerFlag(DocumentCommandIds.LAYER_SET_REFERENCE, R.string.command_layer_set_reference, "enabled") { layer, value -> setReference(layer, value) }
-    registerFlag(DocumentCommandIds.LAYER_MASK_SET_ENABLED, R.string.command_layer_mask_set_enabled, "enabled") { layer, value -> setMaskEnabled(layer, value) }
-    registerFlag(DocumentCommandIds.LAYER_MASK_SET_INVERTED, R.string.command_layer_mask_set_inverted, "inverted") { layer, value -> setMaskInverted(layer, value) }
-    register(DocumentCommandIds.LAYER_SET_COLLAPSED, R.string.command_layer_set_collapsed, parameters = listOf(layerId, ParameterSpec("collapsed", ParameterType.Boolean)), undoable = false) { session, arguments ->
+    registerFlag(
+        DocumentCommandIds.LAYER_CLIPPING,
+        R.string.command_layer_clipping,
+        "enabled",
+    ) { layer, value -> setClipping(layer, value) }
+    registerFlag(
+        DocumentCommandIds.LAYER_SET_REFERENCE,
+        R.string.command_layer_set_reference,
+        "enabled",
+    ) { layer, value -> setReference(layer, value) }
+    registerFlag(
+        DocumentCommandIds.LAYER_MASK_SET_ENABLED,
+        R.string.command_layer_mask_set_enabled,
+        "enabled",
+    ) { layer, value -> setMaskEnabled(layer, value) }
+    registerFlag(
+        DocumentCommandIds.LAYER_MASK_SET_INVERTED,
+        R.string.command_layer_mask_set_inverted,
+        "inverted",
+    ) { layer, value -> setMaskInverted(layer, value) }
+    register(
+        DocumentCommandIds.LAYER_SET_COLLAPSED,
+        R.string.command_layer_set_collapsed,
+        parameters = listOf(layerId, ParameterSpec("collapsed", ParameterType.Boolean)),
+        undoable = false,
+    ) { session, arguments ->
         session.setCollapsed(arguments.int("layerId"), arguments.boolean("collapsed"))
         null
     }
 
-    register(DocumentCommandIds.LAYER_MASK_ADD, R.string.command_layer_mask_add, parameters = listOf(optionalLayerId)) { session, arguments ->
+    register(
+        DocumentCommandIds.LAYER_MASK_ADD,
+        R.string.command_layer_mask_add,
+        parameters = listOf(optionalLayerId),
+    ) { session, arguments ->
         buildJsonObject { put("maskId", session.addMask(session.target(arguments))) }
     }
-    register(DocumentCommandIds.LAYER_MASK_DELETE, R.string.command_layer_mask_delete, parameters = listOf(optionalLayerId)) { session, arguments ->
+    register(
+        DocumentCommandIds.LAYER_MASK_DELETE,
+        R.string.command_layer_mask_delete,
+        parameters = listOf(optionalLayerId),
+    ) { session, arguments ->
         session.deleteMask(session.target(arguments))
         null
     }
-    register(DocumentCommandIds.LAYER_MASK_APPLY, R.string.command_layer_mask_apply, parameters = listOf(optionalLayerId)) { session, arguments ->
+    register(
+        DocumentCommandIds.LAYER_MASK_APPLY,
+        R.string.command_layer_mask_apply,
+        parameters = listOf(optionalLayerId),
+    ) { session, arguments ->
         session.applyMask(session.target(arguments))
         null
     }
-    register(DocumentCommandIds.LAYER_MERGE_DOWN, R.string.command_layer_merge_down, parameters = listOf(optionalLayerId)) { session, arguments ->
+    register(
+        DocumentCommandIds.LAYER_MERGE_DOWN,
+        R.string.command_layer_merge_down,
+        parameters = listOf(optionalLayerId),
+    ) { session, arguments ->
         session.mergeDown(session.target(arguments))
         null
     }
@@ -286,7 +359,11 @@ fun registerDocumentCommands(
         session.mergeLayers(session.targets(arguments))
         null
     }
-    register(DocumentCommandIds.LAYER_COMBINE_DOWN, R.string.command_layer_combine_down, parameters = listOf(optionalLayerId)) { session, arguments ->
+    register(
+        DocumentCommandIds.LAYER_COMBINE_DOWN,
+        R.string.command_layer_combine_down,
+        parameters = listOf(optionalLayerId),
+    ) { session, arguments ->
         id(session.combineDown(session.target(arguments)))
     }
     register(DocumentCommandIds.LAYER_GROUP, R.string.command_layer_group, parameters = listOf(layerIds)) { session, arguments ->
@@ -312,7 +389,12 @@ fun registerDocumentCommands(
     ) { session, arguments ->
         val color =
             (arguments["color"] as? JsonArray)?.let { values ->
-                val components = values.map { it.jsonPrimitive.double.toFloat().coerceIn(0f, 1f) }
+                val components =
+                    values.map {
+                        it.jsonPrimitive.double
+                            .toFloat()
+                            .coerceIn(0f, 1f)
+                    }
                 if (components.size !in 3..4) throw LayerOperationException("A color has 3 or 4 components")
                 RgbaColor(components[0], components[1], components[2], components.getOrElse(3) { 1f })
             }
@@ -404,11 +486,21 @@ fun registerDocumentCommands(
         session.select(arguments.int("layerId"), arguments.boolean("mask"))
         null
     }
-    register(DocumentCommandIds.LAYER_TOGGLE_SELECTED, R.string.command_layer_toggle_selected, parameters = listOf(layerId), undoable = false) { session, arguments ->
+    register(
+        DocumentCommandIds.LAYER_TOGGLE_SELECTED,
+        R.string.command_layer_toggle_selected,
+        parameters = listOf(layerId),
+        undoable = false,
+    ) { session, arguments ->
         session.toggleSelected(arguments.int("layerId"))
         null
     }
-    register(DocumentCommandIds.LAYER_SOLO, R.string.command_layer_solo, parameters = listOf(optionalLayerId), undoable = false) { session, arguments ->
+    register(
+        DocumentCommandIds.LAYER_SOLO,
+        R.string.command_layer_solo,
+        parameters = listOf(optionalLayerId),
+        undoable = false,
+    ) { session, arguments ->
         session.setSolo(arguments.optionalInt("layerId"))
         null
     }

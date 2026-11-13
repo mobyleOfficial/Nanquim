@@ -1,0 +1,61 @@
+name: Report a problem
+description: Something in Nanquim does not work as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. When you open this form from the app (Settings › Report a problem), the version and device fields are already filled in.
+        Reports here are public: do not include personal information.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can we make it happen again?
+      placeholder: |
+        1. Open an artwork
+        2. Pick the Smudge tool
+        3. …
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      placeholder: "1.0.0 (10000)"
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      placeholder: "samsung SM-T733"
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android version
+      placeholder: "14 (API 34)"
+    validations:
+      required: true
+  - type: input
+    id: renderer
+    attributes:
+      label: Graphics renderer
+      placeholder: "gles or vulkan"
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Screenshots, a screen recording, or the diagnostics file (Settings › long-press the version › Export).
+    validations:
+      required: false

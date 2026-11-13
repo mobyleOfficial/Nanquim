@@ -12,8 +12,18 @@ plugins {
 
 val firebaseConfigured = file("google-services.json").exists()
 if (firebaseConfigured) {
-    apply(plugin = libs.plugins.google.services.get().pluginId)
-    apply(plugin = libs.plugins.firebase.crashlytics.get().pluginId)
+    apply(
+        plugin =
+            libs.plugins.google.services
+                .get()
+                .pluginId,
+    )
+    apply(
+        plugin =
+            libs.plugins.firebase.crashlytics
+                .get()
+                .pluginId,
+    )
 }
 
 val keystoreProperties =
@@ -22,6 +32,18 @@ val keystoreProperties =
         if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use(::load)
     }
 val releaseKeystore = keystoreProperties.getProperty("storeFile")?.let(rootProject::file)?.takeIf { it.exists() }
+
+// AdMob IDs for the gallery banner live in ads.properties (ignored by git; see ads.properties.example). Debug builds
+// always use Google's test IDs; a release build without ads.properties shows no ads at all.
+val adsProperties =
+    Properties().apply {
+        val adsPropertiesFile = rootProject.file("ads.properties")
+        if (adsPropertiesFile.exists()) adsPropertiesFile.inputStream().use(::load)
+    }
+val admobAppId: String? = adsProperties.getProperty("admobAppId")?.takeIf { it.isNotBlank() }
+val galleryBannerId: String? = adsProperties.getProperty("galleryBannerId")?.takeIf { it.isNotBlank() }
+val testAdmobAppId = "ca-app-pub-3940256099942544~3347511713"
+val testBannerId = "ca-app-pub-3940256099942544/9214589741"
 
 android {
     namespace = "com.mobyle.nanquim"
@@ -40,8 +62,9 @@ android {
             libs.versions.targetSdk
                 .get()
                 .toInt()
-        versionCode = 1
-        versionName = "0.2.0"
+        // versionCode = major * 10000 + minor * 100 + patch, so every release sorts after the last.
+        versionCode = 10000
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -59,12 +82,19 @@ android {
     buildTypes {
         debug {
             buildConfigField("boolean", "DEVELOPER_TOOLS", "true")
+            manifestPlaceholders["admobAppId"] = testAdmobAppId
+            buildConfigField("boolean", "ADS_ENABLED", "true")
+            buildConfigField("String", "ADS_GALLERY_BANNER_ID", "\"$testBannerId\"")
         }
         release {
             signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             buildConfigField("boolean", "DEVELOPER_TOOLS", "false")
+            val adsConfigured = admobAppId != null && galleryBannerId != null
+            manifestPlaceholders["admobAppId"] = if (adsConfigured) admobAppId!! else testAdmobAppId
+            buildConfigField("boolean", "ADS_ENABLED", adsConfigured.toString())
+            buildConfigField("String", "ADS_GALLERY_BANNER_ID", "\"${if (adsConfigured) galleryBannerId else ""}\"")
             if (firebaseConfigured) {
                 configure<CrashlyticsExtension> { nativeSymbolUploadEnabled = true }
             }
@@ -75,6 +105,7 @@ android {
             matchingFallbacks += listOf("release")
             isDebuggable = false
             buildConfigField("boolean", "DEVELOPER_TOOLS", "true")
+            buildConfigField("boolean", "ADS_ENABLED", "false")
         }
     }
 
@@ -154,6 +185,9 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics.ndk)
+    implementation(libs.play.review.ktx)
+    implementation(libs.play.services.ads)
+    implementation(libs.user.messaging.platform)
     ksp(libs.androidx.room.compiler)
     debugImplementation(libs.androidx.compose.ui.tooling)
 

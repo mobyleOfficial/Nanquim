@@ -2,6 +2,12 @@ package com.mobyle.nanquim.engine
 
 import android.view.MotionEvent
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.document.layer.BlendMode
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.addMask
+import com.mobyle.nanquim.document.layer.addRasterLayer
+import com.mobyle.nanquim.document.layer.setBlend
+import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -20,12 +26,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import com.mobyle.nanquim.document.layer.BlendMode
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.addMask
-import com.mobyle.nanquim.document.layer.addRasterLayer
-import com.mobyle.nanquim.document.layer.setBlend
-import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -70,7 +70,17 @@ class DocumentSaveTest(
         }
     }
 
-    private fun open() = assertNull(engine.openDocumentFolder(state.widthPx, state.heightPx, state.toEngineLayerTree().toString(), "save-test", folder.path, surfaces))
+    private fun open() =
+        assertNull(
+            engine.openDocumentFolder(
+                state.widthPx,
+                state.heightPx,
+                state.toEngineLayerTree().toString(),
+                "save-test",
+                folder.path,
+                surfaces,
+            ),
+        )
 
     private fun save(): DocumentSaveResult {
         val done = CountDownLatch(1)
@@ -115,7 +125,11 @@ class DocumentSaveTest(
                 toolType = MotionEvent.TOOL_TYPE_STYLUS,
             )
         }
-        engine.beginStroke(StrokeTool.Paint, surface, StrokeStyle(sizePx = 40f, opacity = 0.9f, red = random.nextFloat(), green = 0.4f, blue = random.nextFloat(), maskTarget = mask))
+        engine.beginStroke(
+            StrokeTool.Paint,
+            surface,
+            StrokeStyle(sizePx = 40f, opacity = 0.9f, red = random.nextFloat(), green = 0.4f, blue = random.nextFloat(), maskTarget = mask),
+        )
         engine.addStrokeSamples(samples)
         engine.endStroke()
     }
@@ -160,7 +174,11 @@ class DocumentSaveTest(
             assertTrue(tile.isFile)
             tile.writeBytes(byteArrayOf(4, 34, 77, 24, 1, 2, 3))
             val warning = CompletableEvent()
-            val collector = CoroutineScope(Dispatchers.Default).launch(start = CoroutineStart.UNDISPATCHED) { warning.value = engine.events.filterIsInstance<EngineEvent.DocumentTilesCorrupt>().first() }
+            val collector =
+                CoroutineScope(Dispatchers.Default).launch(start = CoroutineStart.UNDISPATCHED) {
+                    warning.value =
+                        engine.events.filterIsInstance<EngineEvent.DocumentTilesCorrupt>().first()
+                }
             open()
             composite()
             withTimeout(10_000) { collector.join() }

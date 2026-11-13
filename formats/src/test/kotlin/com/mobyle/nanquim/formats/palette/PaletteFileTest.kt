@@ -1,10 +1,10 @@
 package com.mobyle.nanquim.formats.palette
 
+import com.mobyle.nanquim.document.layer.RgbaColor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import com.mobyle.nanquim.document.layer.RgbaColor
 
 class PaletteFileTest {
     private val palette =

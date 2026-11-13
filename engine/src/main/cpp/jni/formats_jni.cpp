@@ -433,13 +433,11 @@ JNIEXPORT jboolean JNICALL Java_com_mobyle_nanquim_engine_AnimationFileWriter_na
   return ok ? JNI_TRUE : JNI_FALSE;
 }
 
-JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_AnimationFileWriter_nativeFinish(JNIEnv* environment,
-                                                                                  jclass,
-                                                                                  jlong handle) {
+JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_AnimationFileWriter_nativeFinish(
+    JNIEnv* environment, jclass, jlong handle) {
   std::unique_ptr<nanquim::formats::AnimationWriter> writer(
       reinterpret_cast<nanquim::formats::AnimationWriter*>(handle));
   const bool ok = writer->finish();
   return ok ? nullptr : environment->NewStringUTF(writer->error().c_str());
 }
-
 }

@@ -46,11 +46,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.diagnostics.ShapeTraceRecorder
 import com.mobyle.nanquim.diagnostics.ShapeTraceView
-import com.mobyle.nanquim.ui.common.ScreenHeader
 import com.mobyle.nanquim.document.shape.QuickShape
 import com.mobyle.nanquim.document.shape.ShapeKind
 import com.mobyle.nanquim.document.shape.ShapePoint
 import com.mobyle.nanquim.document.shape.ShapeTraceSet
+import com.mobyle.nanquim.ui.common.ScreenHeader
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

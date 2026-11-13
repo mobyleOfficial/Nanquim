@@ -1,15 +1,15 @@
 package com.mobyle.nanquim.canvas.input
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 import com.mobyle.nanquim.document.shape.LineShape
 import com.mobyle.nanquim.document.shape.PolygonShape
 import com.mobyle.nanquim.document.shape.QuickShapeStroke
 import com.mobyle.nanquim.document.shape.ShapeKind
 import com.mobyle.nanquim.engine.StrokeSample
 import com.mobyle.nanquim.engine.StrokeSampleBuffer
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import kotlin.math.hypot
 
 class QuickShapeSnapTest {

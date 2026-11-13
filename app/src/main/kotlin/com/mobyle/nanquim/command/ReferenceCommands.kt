@@ -2,15 +2,6 @@ package com.mobyle.nanquim.command
 
 import android.content.ContentResolver
 import androidx.core.net.toUri
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.put
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.document.command.AppState
@@ -26,6 +17,15 @@ import com.mobyle.nanquim.document.reference.ReferenceCorner
 import com.mobyle.nanquim.document.reference.ReferenceMode
 import com.mobyle.nanquim.document.reference.ReferenceSettings
 import com.mobyle.nanquim.document.reference.ReferenceView
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.put
 
 object ReferenceCommandIds {
     const val TOGGLE = "reference.toggle"

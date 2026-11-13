@@ -1,11 +1,5 @@
 package com.mobyle.nanquim.formats.interchange
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import com.mobyle.nanquim.document.layer.BlendMode
 import com.mobyle.nanquim.document.layer.LayerGroup
 import com.mobyle.nanquim.document.layer.RasterLayer
@@ -13,6 +7,12 @@ import com.mobyle.nanquim.formats.nanquim.DocumentInfo
 import com.mobyle.nanquim.formats.nanquim.LayerUuids
 import com.mobyle.nanquim.formats.nanquim.ManifestReadResult
 import com.mobyle.nanquim.formats.nanquim.NanquimManifest
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.Instant
 
 class ImportJsonTest {

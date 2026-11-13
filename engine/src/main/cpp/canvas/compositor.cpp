@@ -9,6 +9,7 @@
 #include "canvas/color_conversion.h"
 #include "canvas/level_selection.h"
 #include "core/log.h"
+#include "core/required.h"
 #include "embedded_shaders.h"
 
 namespace nanquim::canvas {
@@ -132,7 +133,8 @@ TileRange scaleRangeToLevel(const TileRange& levelZeroRange, int32_t level) {
                    (levelZeroRange.endRow + factor - 1) / factor};
 }
 
-bool sameStructure(const std::vector<LayerTreeNode>& left, const std::vector<LayerTreeNode>& right) {
+bool sameStructure(const std::vector<LayerTreeNode>& left,
+                   const std::vector<LayerTreeNode>& right) {
   if (left.size() != right.size()) {
     return false;
   }
@@ -167,8 +169,12 @@ void collectChangedSurfaces(const std::vector<LayerTreeNode>& before,
   for (size_t index = 0; index < before.size(); ++index) {
     const LayerTreeNode& old = before[index];
     const LayerTreeNode& now = after[index];
+    // A mask added or removed counts as a change too; before, a removed mask read an empty
+    // optional.
     const bool maskChanged =
-        old.mask && (old.mask->enabled != now.mask->enabled || old.mask->inverted != now.mask->inverted);
+        old.mask.has_value() != now.mask.has_value() ||
+        (old.mask && now.mask &&
+         (old.mask->enabled != now.mask->enabled || old.mask->inverted != now.mask->inverted));
     if (old.opacity != now.opacity || old.blend != now.blend || old.hidden != now.hidden ||
         old.tint != now.tint || maskChanged) {
       collectSurfaces(now, surfaces);
@@ -354,9 +360,9 @@ void Compositor::allocateCaches() {
 void Compositor::rebuildPlan() { plan_ = buildCompositePlan(tree_, activeLayer_); }
 
 void Compositor::setLayerTree(LayerTree tree) {
-  const bool structural = !sameStructure(tree_.layers, tree.layers) ||
-                          tree_.background != tree.background ||
-                          tree_.backgroundHidden != tree.backgroundHidden || tree_.solo != tree.solo;
+  const bool structural =
+      !sameStructure(tree_.layers, tree.layers) || tree_.background != tree.background ||
+      tree_.backgroundHidden != tree.backgroundHidden || tree_.solo != tree.solo;
   std::unordered_set<LayerId> changed;
   if (!structural) {
     collectChangedSurfaces(tree_.layers, tree.layers, changed);
@@ -706,7 +712,8 @@ std::array<float, 4> Compositor::documentTint(const std::array<float, 4>& tint) 
   if (tint[3] <= 0 || !linearLight()) {
     return tint;
   }
-  return {static_cast<float>(srgbToLinearValue(tint[0])), static_cast<float>(srgbToLinearValue(tint[1])),
+  return {static_cast<float>(srgbToLinearValue(tint[0])),
+          static_cast<float>(srgbToLinearValue(tint[1])),
           static_cast<float>(srgbToLinearValue(tint[2])), tint[3]};
 }
 
@@ -758,7 +765,7 @@ void Compositor::drawActiveSurfaceWithStroke(TileCoordinate coordinate, const St
                                              const StrokeBuffer::Slot& strokeSlot,
                                              float layerOpacity,
                                              std::array<int32_t, 2> targetOrigin, bool blend) {
-  const StrokePreview& preview = *strokePreview_;
+  const StrokePreview& preview = core::required(strokePreview_);
   std::vector<std::string> defines;
   if (preview.maskTarget) {
     defines.emplace_back(kMaskTargetDefine);
@@ -792,7 +799,7 @@ void Compositor::drawActiveSurfaceWithStroke(TileCoordinate coordinate, const St
     NANQUIM_LOG_ERROR("%s", errorMessage.c_str());
     return;
   }
-  const LayerId surface = *strokeSurface();
+  const LayerId surface = core::required(strokeSurface());
   gpu::rhi::CommandContext& commands = device_.commands();
   commands.bindPipeline(*strokePipeline);
   const auto surfaceSlot = tileStore_.slotForRead(LayerTileKey{surface, coordinate});
@@ -903,9 +910,9 @@ bool Compositor::prepareTile(TileCoordinate coordinate, int64_t& layerTiles) {
         LayerTileStore::Availability::Loading) {
       allResident = false;
     }
-    if (strokePreview_->selection &&
-        tileStore_.ensureResident(LayerTileKey{*strokePreview_->selection, coordinate}) ==
-            LayerTileStore::Availability::Loading) {
+    const std::optional<LayerId>& selection = core::required(strokePreview_).selection;
+    if (selection && tileStore_.ensureResident(LayerTileKey{*selection, coordinate}) ==
+                         LayerTileStore::Availability::Loading) {
       allResident = false;
     }
   }
@@ -1007,7 +1014,8 @@ void Compositor::composeGeneral(TileCoordinate coordinate) {
   if (plan_.activeOperation && !belowDirty_.empty()) {
     const size_t active = *plan_.activeOperation;
     if (belowDirty_[index] != 0) {
-      const int32_t belowParity = evaluate(plan_, coordinate, 0, active, Start::Background, 1, false);
+      const int32_t belowParity =
+          evaluate(plan_, coordinate, 0, active, Start::Background, 1, false);
       bindTarget(*belowCache_);
       setViewport(canvas);
       setTileScissor(coordinate);
@@ -1030,7 +1038,8 @@ void Compositor::composeGeneral(TileCoordinate coordinate) {
       setScissor(tileRect(0, 0, kTileSizePixels));
       drawRegionCopy(*aboveCache_, tileOrigin(coordinate), {0, 0}, true);
     } else {
-      parity = evaluate(plan_, coordinate, active, operationCount, Start::BelowCache, 1, withStroke);
+      parity =
+          evaluate(plan_, coordinate, active, operationCount, Start::BelowCache, 1, withStroke);
     }
   } else {
     parity = evaluate(plan_, coordinate, 0, operationCount, Start::Background, 1, withStroke);
@@ -1115,9 +1124,9 @@ int32_t Compositor::evaluate(const CompositePlan& plan, TileCoordinate coordinat
       ++index;
       continue;
     }
-    const bool overridden =
-        withStroke && activeLayer_ && operation.kind == PlanOperation::Kind::Draw &&
-        operation.layer == *activeLayer_;
+    const bool overridden = withStroke && activeLayer_ &&
+                            operation.kind == PlanOperation::Kind::Draw &&
+                            operation.layer == *activeLayer_;
     if (operation.isPlainOver() && !overridden) {
       std::vector<OverLayer> run;
       while (index < end) {
@@ -1133,8 +1142,7 @@ int32_t Compositor::evaluate(const CompositePlan& plan, TileCoordinate coordinat
       drawLayers(coordinate, run, sampleStride, {0, 0});
       continue;
     }
-    const int32_t sourceParity =
-        operation.kind == PlanOperation::Kind::Pop ? parity[level + 1] : 0;
+    const int32_t sourceParity = operation.kind == PlanOperation::Kind::Pop ? parity[level + 1] : 0;
     bindTarget(scratch(operation.level, 1 - parity[level]));
     drawBlendStep(operation, coordinate, sampleStride, regionSize, parity[level], sourceParity,
                   withStroke);
@@ -1145,8 +1153,8 @@ int32_t Compositor::evaluate(const CompositePlan& plan, TileCoordinate coordinat
 }
 
 void Compositor::drawBlendStep(const PlanOperation& operation, TileCoordinate coordinate,
-                               int32_t sampleStride, int32_t /*regionSize*/,
-                               int32_t backdropParity, int32_t sourceParity, bool withStroke) {
+                               int32_t sampleStride, int32_t /*regionSize*/, int32_t backdropParity,
+                               int32_t sourceParity, bool withStroke) {
   const gpu::rhi::Pipeline* blendPipeline = pipeline(Program::Blend, false);
   if (blendPipeline == nullptr) {
     return;
@@ -1173,7 +1181,8 @@ void Compositor::drawBlendStep(const PlanOperation& operation, TileCoordinate co
     const bool maskOverridden = active && maskTarget;
     if (layerOverridden) {
       sourceTexture = strokeOverride_.get();
-    } else if (const auto slot = tileStore_.slotForRead(LayerTileKey{operation.layer, coordinate})) {
+    } else if (const auto slot =
+                   tileStore_.slotForRead(LayerTileKey{operation.layer, coordinate})) {
       sourceTexture = &tileStore_.pageTexture(slot->page);
       parameters.sourceOrigin = {slotOriginX(*slot), slotOriginY(*slot)};
       parameters.sourceStride = sampleStride;
@@ -1419,7 +1428,7 @@ bool Compositor::drawLevelOverridePreviews(const TileRange& visible, int32_t pre
     return true;
   }
   endTarget();
-  const gpu::rhi::Texture* layer = (*levelOverride_)(previewLevel);
+  const gpu::rhi::Texture* layer = (core::required(levelOverride_))(previewLevel);
   if (layer == nullptr) {
     return false;
   }
@@ -1512,7 +1521,8 @@ CompositorStats Compositor::stats() const {
   stats.lastVisibleResultMilliseconds = lastVisibleResultMilliseconds_;
   const int64_t texelBytes = bytesPerPixel(tileStore_.pixelFormat());
   for (const Level& level : levels_) {
-    stats.compositeBytes += static_cast<int64_t>(level.widthPixels) * level.heightPixels * texelBytes;
+    stats.compositeBytes +=
+        static_cast<int64_t>(level.widthPixels) * level.heightPixels * texelBytes;
   }
   if (belowCache_) {
     stats.cacheBytes = static_cast<int64_t>(widthPixels_) * heightPixels_ * texelBytes * 2;

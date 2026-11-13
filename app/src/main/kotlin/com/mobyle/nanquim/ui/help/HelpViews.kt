@@ -47,17 +47,20 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.input.CanvasTool
 import com.mobyle.nanquim.help.Help
 import com.mobyle.nanquim.help.WelcomeCard
+import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun WelcomeOverlay(help: Help) {
+fun WelcomeOverlay(
+    help: Help,
+    onStartDrawing: (() -> Unit)? = null,
+) {
     val cards = WelcomeCard.entries
     val pager = rememberPagerState(initialPage = help.welcomeCard.coerceIn(0, cards.lastIndex)) { cards.size }
     val scope = rememberCoroutineScope()
@@ -101,12 +104,31 @@ fun WelcomeOverlay(help: Help) {
                     Modifier.fillMaxWidth().padding(start = 12.dp, end = 20.dp, top = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    TextButton(onClick = help::finishWelcome) { Text(stringResource(R.string.welcome_skip)) }
+                    TextButton(onClick = { help.finishWelcome(completed = false) }) { Text(stringResource(R.string.welcome_skip)) }
                     Spacer(Modifier.weight(1f))
                     val last = pager.currentPage == cards.lastIndex
                     Button(onClick = {
-                        if (last) help.finishWelcome() else scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
-                    }) { Text(stringResource(if (last) R.string.welcome_done else R.string.welcome_next)) }
+                        if (last) {
+                            help.finishWelcome(completed = true)
+                            onStartDrawing?.invoke()
+                        } else {
+                            scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
+                        }
+                    }) {
+                        Text(
+                            stringResource(
+                                if (!last) {
+                                    R.string.welcome_next
+                                } else if (onStartDrawing !=
+                                    null
+                                ) {
+                                    R.string.welcome_done
+                                } else {
+                                    R.string.welcome_close
+                                },
+                            ),
+                        )
+                    }
                 }
             }
         }
@@ -122,6 +144,9 @@ private fun CardContent(card: WelcomeCard) {
             WelcomeCard.Brushes -> R.string.welcome_brushes_title to R.string.welcome_brushes_body
             WelcomeCard.Layers -> R.string.welcome_layers_title to R.string.welcome_layers_body
             WelcomeCard.Color -> R.string.welcome_color_title to R.string.welcome_color_body
+            WelcomeCard.QuickShape -> R.string.welcome_quick_shape_title to R.string.welcome_quick_shape_body
+            WelcomeCard.Animation -> R.string.welcome_animation_title to R.string.welcome_animation_body
+            WelcomeCard.Share -> R.string.welcome_share_title to R.string.welcome_share_body
         }
     val titleText = stringResource(title)
     Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -225,6 +250,41 @@ private fun DrawScope.illustrate(
             val ring = center + Offset((cos(angle) * unit * 3f).toFloat(), (sin(angle) * unit * 3f).toFloat())
             drawCircle(ink, radius = unit * 0.7f, center = ring, style = Stroke(width = unit * 0.3f))
         }
+        WelcomeCard.QuickShape -> {
+            // A wobbly hand-drawn circle and the clean one it snaps to.
+            val wobble =
+                Path().apply {
+                    for (step in 0..36) {
+                        val angle = step / 36.0 * 2 * PI
+                        val radius = unit * (3.4f + 0.35f * sin(angle * 5).toFloat())
+                        val point = center + Offset((cos(angle) * radius).toFloat(), (sin(angle) * radius).toFloat())
+                        if (step == 0) moveTo(point.x, point.y) else lineTo(point.x, point.y)
+                    }
+                }
+            drawPath(wobble, ink.copy(alpha = 0.35f), style = line)
+            drawCircle(accent, radius = unit * 3.4f, center = center, style = line)
+            finger(center + Offset(unit * 3.4f, 0f))
+        }
+        WelcomeCard.Animation -> {
+            // Three frames of a bouncing ball, the earlier ones fainter, like onion skin.
+            for (index in 0..2) {
+                val frame = Offset(unit * (1f + index * 2.6f), unit * 2f)
+                drawRect(ink, topLeft = frame, size = Size(unit * 2.2f, unit * 5f), style = Stroke(width = unit * 0.2f))
+                val height = listOf(1.2f, 3.6f, 1.8f)[index]
+                drawCircle(
+                    accent.copy(alpha = 0.4f + index * 0.3f),
+                    radius = unit * 0.6f,
+                    center =
+                        frame + Offset(unit * 1.1f, unit * height),
+                )
+            }
+        }
+        WelcomeCard.Share -> {
+            // A picture leaving its frame along an arrow.
+            drawRect(ink, topLeft = Offset(unit * 1.2f, unit * 3.4f), size = Size(unit * 4f, unit * 4f), style = line)
+            drawCircle(accent, radius = unit * 0.8f, center = Offset(unit * 3.2f, unit * 5.4f))
+            arrow(Offset(unit * 5.6f, unit * 4.4f), Offset(unit * 8.6f, unit * 1.6f), ink, line)
+        }
     }
 }
 
@@ -274,3 +334,74 @@ fun ToolTipCard(
         }
     }
 }
+
+/** One step of the first-canvas tour, placed next to the part of the screen it talks about. */
+@Composable
+fun CanvasTourCard(
+    step: Int,
+    onNext: () -> Unit,
+    onSkip: () -> Unit,
+) {
+    val (text, alignment) =
+        when (step) {
+            0 -> R.string.tour_tools to Alignment.TopCenter
+            1 -> R.string.tour_sliders to Alignment.CenterStart
+            else -> R.string.tour_actions to Alignment.TopStart
+        }
+    Box(
+        Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .padding(
+                top =
+                    if (alignment ==
+                        Alignment.CenterStart
+                    ) {
+                        0.dp
+                    } else {
+                        TOUR_TOP_PADDING
+                    },
+                start =
+                    if (alignment ==
+                        Alignment.CenterStart
+                    ) {
+                        TOUR_SIDE_PADDING
+                    } else {
+                        16.dp
+                    },
+                end = 16.dp,
+            ),
+        contentAlignment = alignment,
+    ) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.inverseSurface,
+            contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+            shadowElevation = 6.dp,
+            modifier = Modifier.widthIn(max = 420.dp),
+        ) {
+            Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 4.dp)) {
+                Text(stringResource(text), style = MaterialTheme.typography.bodyMedium)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.tour_progress, step + 1, Help.TOUR_STEPS),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(
+                        onClick = onSkip,
+                    ) { Text(stringResource(R.string.welcome_skip), color = MaterialTheme.colorScheme.inversePrimary) }
+                    TextButton(onClick = onNext) {
+                        Text(
+                            stringResource(if (step + 1 < Help.TOUR_STEPS) R.string.welcome_next else R.string.tip_ok),
+                            color = MaterialTheme.colorScheme.inversePrimary,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private val TOUR_TOP_PADDING = 64.dp
+private val TOUR_SIDE_PADDING = 96.dp

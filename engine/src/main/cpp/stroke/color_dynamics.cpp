@@ -73,12 +73,12 @@ std::array<double, 4> dynamicColor(const ColorDynamicsParameters& dynamics,
   const double curvedPressure =
       dynamics.pressureCurve ? dynamics.pressureCurve->evaluate(pressure) : pressure;
   std::array<double, 4> color = primary;
-  const double secondaryWeight = std::clamp(
-      dynamics.secondaryColorByPressure * curvedPressure +
-          dynamics.tiltSecondaryColor * normalizedTilt +
-          dynamics.strokeSecondaryColorJitter * stroke.secondary +
-          dynamics.secondaryColorJitter * dab.secondary,
-      0.0, 1.0);
+  const double secondaryWeight =
+      std::clamp(dynamics.secondaryColorByPressure * curvedPressure +
+                     dynamics.tiltSecondaryColor * normalizedTilt +
+                     dynamics.strokeSecondaryColorJitter * stroke.secondary +
+                     dynamics.secondaryColorJitter * dab.secondary,
+                 0.0, 1.0);
   if (secondaryWeight > 0) {
     for (int channel = 0; channel < 3; ++channel) {
       color[channel] += (secondary[channel] - color[channel]) * secondaryWeight;
@@ -91,14 +91,14 @@ std::array<double, 4> dynamicColor(const ColorDynamicsParameters& dynamics,
   hsb.hue += kHueTurnsPerUnit *
              (dynamics.strokeHueJitter * stroke.hue + dynamics.pressureHue * curvedPressure +
               dynamics.tiltHue * normalizedTilt + dynamics.hueJitter * dab.hue);
-  hsb.saturation +=
-      dynamics.strokeSaturationJitter * stroke.saturation +
-      dynamics.pressureSaturation * curvedPressure + dynamics.tiltSaturation * normalizedTilt +
-      dynamics.saturationJitter * dab.saturation;
-  hsb.brightness +=
-      dynamics.strokeBrightnessJitter * stroke.brightness +
-      dynamics.pressureBrightness * curvedPressure + dynamics.tiltBrightness * normalizedTilt +
-      dynamics.brightnessJitter * dab.brightness;
+  hsb.saturation += dynamics.strokeSaturationJitter * stroke.saturation +
+                    dynamics.pressureSaturation * curvedPressure +
+                    dynamics.tiltSaturation * normalizedTilt +
+                    dynamics.saturationJitter * dab.saturation;
+  hsb.brightness += dynamics.strokeBrightnessJitter * stroke.brightness +
+                    dynamics.pressureBrightness * curvedPressure +
+                    dynamics.tiltBrightness * normalizedTilt +
+                    dynamics.brightnessJitter * dab.brightness;
   hsb.saturation = std::clamp(hsb.saturation, 0.0, 1.0);
   hsb.brightness = std::clamp(hsb.brightness, 0.0, 1.0) *
                    (1.0 - dynamics.strokeDarknessJitter * stroke.darkness) *

@@ -2,6 +2,9 @@ package com.mobyle.nanquim.brush.library
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.engine.Engine
+import com.mobyle.nanquim.engine.EngineConfig
+import com.mobyle.nanquim.engine.StrokeTool
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -9,9 +12,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.mobyle.nanquim.engine.Engine
-import com.mobyle.nanquim.engine.EngineConfig
-import com.mobyle.nanquim.engine.StrokeTool
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)

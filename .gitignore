@@ -38,6 +38,7 @@ venv/
 *.jks
 *.keystore
 keystore.properties
+ads.properties
 
 # Secrets and credentials
 .env

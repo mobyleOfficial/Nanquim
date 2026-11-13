@@ -2,6 +2,10 @@ package com.mobyle.nanquim.engine
 
 import android.graphics.BitmapFactory
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.document.layer.toEngineLayerTree
+import com.mobyle.nanquim.formats.interchange.ImportJson
+import com.mobyle.nanquim.formats.nanquim.NanquimManifest
+import com.mobyle.nanquim.formats.nanquim.SurfaceFormat
 import org.junit.After
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -10,10 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import com.mobyle.nanquim.document.layer.toEngineLayerTree
-import com.mobyle.nanquim.formats.interchange.ImportJson
-import com.mobyle.nanquim.formats.nanquim.NanquimManifest
-import com.mobyle.nanquim.formats.nanquim.SurfaceFormat
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit

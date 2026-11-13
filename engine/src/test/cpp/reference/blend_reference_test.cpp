@@ -20,7 +20,8 @@ TEST(BlendReferenceTest, SeparableModesMatchTheirFormulas) {
   EXPECT_NEAR(blendSeparable(BlendMode::HardLight, 0.5, 0.75), 0.75, kTolerance);
   EXPECT_NEAR(blendSeparable(BlendMode::SoftLight, 0.16, 0.75), 0.16 + 0.5 * (0.398336 - 0.16),
               1e-12);
-  EXPECT_NEAR(blendSeparable(BlendMode::SoftLight, 0.64, 0.75), 0.64 + 0.5 * (0.8 - 0.64), kTolerance);
+  EXPECT_NEAR(blendSeparable(BlendMode::SoftLight, 0.64, 0.75), 0.64 + 0.5 * (0.8 - 0.64),
+              kTolerance);
   EXPECT_NEAR(blendSeparable(BlendMode::SoftLight, 0.5, 0.25), 0.5 - 0.5 * 0.5 * 0.5, kTolerance);
   EXPECT_EQ(blendSeparable(BlendMode::ColorDodge, 0, 1), 0);
   EXPECT_EQ(blendSeparable(BlendMode::ColorDodge, 0.3, 1), 1);

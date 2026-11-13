@@ -10,7 +10,6 @@ namespace nanquim::canvas {
 
 namespace {
 
-
 int64_t sizeOf(const std::shared_ptr<const std::vector<uint8_t>>& compressed) {
   return compressed ? static_cast<int64_t>(compressed->size()) : 0;
 }
@@ -297,10 +296,9 @@ void HistoryStore::spillOverBudget() {
     if (entry.spilling || entry.applying || !entry.readyReported) {
       continue;
     }
-    const bool hasRamPayload = std::any_of(entry.tiles.begin(), entry.tiles.end(),
-                                           [](const TileHistory& tile) {
-                                             return tile.before.compressed || tile.after.compressed;
-                                           });
+    const bool hasRamPayload = std::any_of(
+        entry.tiles.begin(), entry.tiles.end(),
+        [](const TileHistory& tile) { return tile.before.compressed || tile.after.compressed; });
     if (hasRamPayload && (oldest == nullptr || entry.sequence < oldest->sequence)) {
       oldest = &entry;
       oldestId = entryId;
@@ -336,8 +334,8 @@ void HistoryStore::spillOverBudget() {
   }
   spillingBytes_ += blobBytes;
   const uint64_t generation = generation_;
-  ioPool_.post([this, post = postToRenderThread_, file = spillFile_, entryId = oldestId,
-                generation, blobBytes, blobs = std::move(blobs)] {
+  ioPool_.post([this, post = postToRenderThread_, file = spillFile_, entryId = oldestId, generation,
+                blobBytes, blobs = std::move(blobs)] {
     std::vector<std::optional<io::ScratchLocation>> locations;
     locations.reserve(blobs.size());
     for (const Blob& blob : blobs) {

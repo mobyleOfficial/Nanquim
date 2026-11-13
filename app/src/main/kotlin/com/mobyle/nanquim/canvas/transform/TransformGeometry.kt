@@ -96,7 +96,9 @@ object TransformGeometry {
         targetQuad: List<Point>,
         size: Int,
     ): List<Point> {
-        val h = homography(sourceQuad, targetQuad) ?: return List(size * size) { bilinear(targetQuad, (it % size) / (size - 1.0), (it / size) / (size - 1.0)) }
+        val h =
+            homography(sourceQuad, targetQuad)
+                ?: return List(size * size) { bilinear(targetQuad, (it % size) / (size - 1.0), (it / size) / (size - 1.0)) }
         return List(size * size) { index ->
             project(h, bilinear(sourceQuad, (index % size) / (size - 1.0), (index / size) / (size - 1.0))).first
         }
@@ -156,6 +158,7 @@ object TransformGeometry {
         val row = ft.toInt().coerceIn(0, cells - 1)
         val ls = fs - column
         val lt = ft - row
+
         fun at(
             i: Int,
             j: Int,
@@ -164,8 +167,22 @@ object TransformGeometry {
             val cj = j.coerceIn(0, cells)
             val base = grid[cj * size + ci]
             if (ci == i && cj == j) return base
-            val ni = if (i < 0) 1 else if (i > cells) cells - 1 else ci
-            val nj = if (j < 0) 1 else if (j > cells) cells - 1 else cj
+            val ni =
+                if (i < 0) {
+                    1
+                } else if (i > cells) {
+                    cells - 1
+                } else {
+                    ci
+                }
+            val nj =
+                if (j < 0) {
+                    1
+                } else if (j > cells) {
+                    cells - 1
+                } else {
+                    cj
+                }
             val inner = grid[nj * size + ni]
             return Point(2 * base.x - inner.x, 2 * base.y - inner.y)
         }
@@ -185,6 +202,7 @@ object TransformGeometry {
     ): Point {
         val t2 = t * t
         val t3 = t2 * t
+
         fun axis(
             a: Double,
             b: Double,
@@ -220,5 +238,4 @@ object TransformGeometry {
         val dy = point.y - pivot.y
         return Point(pivot.x + dx * cos(angle) - dy * sin(angle), pivot.y + dx * sin(angle) + dy * cos(angle))
     }
-
 }

@@ -11,8 +11,8 @@ namespace nanquim::core {
 namespace {
 
 TEST(HalfFloat, ExactValuesRoundTrip) {
-  for (const float value : {0.0F, 1.0F, -1.0F, 0.5F, 2.0F, 65504.0F, 1.0F / 1024.0F, 6.103515625e-05F,
-                            5.9604644775390625e-08F}) {
+  for (const float value : {0.0F, 1.0F, -1.0F, 0.5F, 2.0F, 65504.0F, 1.0F / 1024.0F,
+                            6.103515625e-05F, 5.9604644775390625e-08F}) {
     EXPECT_EQ(halfToFloat(floatToHalf(value)), value) << value;
   }
   EXPECT_EQ(floatToHalf(1.0F), 0x3C00);
@@ -44,7 +44,8 @@ TEST(PixelFormat, SizesAndNames) {
   using canvas::PixelFormat;
   EXPECT_EQ(canvas::tileBytes(PixelFormat::Rgba8PremulSrgb), 256 * 256 * 4);
   EXPECT_EQ(canvas::tileBytes(PixelFormat::Rgba16fPremulLinear), 256 * 256 * 8);
-  for (const PixelFormat format : {PixelFormat::Rgba8PremulSrgb, PixelFormat::Rgba16fPremulLinear}) {
+  for (const PixelFormat format :
+       {PixelFormat::Rgba8PremulSrgb, PixelFormat::Rgba16fPremulLinear}) {
     EXPECT_EQ(canvas::parsePixelFormat(canvas::pixelFormatName(format)), format);
   }
   EXPECT_FALSE(canvas::parsePixelFormat("rgba32f").has_value());

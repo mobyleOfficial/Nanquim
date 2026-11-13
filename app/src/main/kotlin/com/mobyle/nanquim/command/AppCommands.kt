@@ -1,34 +1,20 @@
 package com.mobyle.nanquim.command
 
-import androidx.work.WorkManager
-
 import android.content.ContentResolver
 import android.net.Uri
 import androidx.core.net.toUri
-import kotlinx.serialization.json.boolean
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
+import androidx.work.WorkManager
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.BrushUiState
 import com.mobyle.nanquim.brush.library.BrushGroup
 import com.mobyle.nanquim.canvas.CanvasSession
+import com.mobyle.nanquim.canvas.adjust.GradientLibrary
+import com.mobyle.nanquim.color.ColorProfileLibrary
+import com.mobyle.nanquim.color.PaletteLibrary
 import com.mobyle.nanquim.diagnostics.DiagnosticsExporter
 import com.mobyle.nanquim.diagnostics.ShapeTraceRecorder
 import com.mobyle.nanquim.diagnostics.TouchSessionRecorder
-import com.mobyle.nanquim.gallery.ArtworkTransfer
-import com.mobyle.nanquim.gallery.Gallery
-import com.mobyle.nanquim.gallery.TransferReport
-import com.mobyle.nanquim.navigation.AppDestination
-import com.mobyle.nanquim.navigation.AppNavigator
-import com.mobyle.nanquim.keyboard.KeyboardShortcutSettings
-import com.mobyle.nanquim.macro.Macros
-import com.mobyle.nanquim.settings.AppSettings
-import com.mobyle.nanquim.settings.QuickMenuSettings
-import com.mobyle.nanquim.settings.StorageCleaner
-import com.mobyle.nanquim.settings.ThemeMode
-import com.mobyle.nanquim.text.FontLibrary
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
@@ -39,10 +25,23 @@ import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.engine.Renderer
 import com.mobyle.nanquim.formats.interchange.ImportWarning
+import com.mobyle.nanquim.gallery.ArtworkTransfer
+import com.mobyle.nanquim.gallery.Gallery
+import com.mobyle.nanquim.gallery.TransferReport
+import com.mobyle.nanquim.keyboard.KeyboardShortcutSettings
+import com.mobyle.nanquim.macro.Macros
+import com.mobyle.nanquim.navigation.AppDestination
+import com.mobyle.nanquim.navigation.AppNavigator
+import com.mobyle.nanquim.settings.AppSettings
+import com.mobyle.nanquim.settings.QuickMenuSettings
+import com.mobyle.nanquim.settings.StorageCleaner
+import com.mobyle.nanquim.settings.ThemeMode
+import com.mobyle.nanquim.text.FontLibrary
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 import java.io.File
-import com.mobyle.nanquim.canvas.adjust.GradientLibrary
-import com.mobyle.nanquim.color.ColorProfileLibrary
-import com.mobyle.nanquim.color.PaletteLibrary
 
 object AppCommandIds {
     const val SETTINGS_OPEN = "settings.open"
@@ -63,6 +62,7 @@ object AppCommandIds {
     const val ABOUT_OPEN = "settings.about.open"
     const val SUPPORT_OPEN = "settings.support.open"
     const val SETTINGS_PROJECTED_CANVAS = "settings.projectedCanvas.set"
+    const val SETTINGS_CONFIRM_EXIT = "settings.confirmExit.set"
 }
 
 class NanquimAppState(
@@ -157,7 +157,17 @@ fun createAppCommandRegistry(
         copyName = { name -> gallery.copyName(name) },
         stackName = { gallery.stackName() },
     )
-    registerTransferCommands(registry, transfer, gallery, canvasSession, contentResolver, shareSheet, cacheDirectory, brushUi, brushImportReport)
+    registerTransferCommands(
+        registry,
+        transfer,
+        gallery,
+        canvasSession,
+        contentResolver,
+        shareSheet,
+        cacheDirectory,
+        brushUi,
+        brushImportReport,
+    )
 
     fun registerNavigation(
         id: String,
@@ -206,6 +216,19 @@ fun createAppCommandRegistry(
 
     registry.register(
         CommandSpec(
+            id = AppCommandIds.SETTINGS_CONFIRM_EXIT,
+            titleRes = R.string.command_settings_confirm_exit,
+            category = CommandCategory.Settings,
+            parameters = listOf(ParameterSpec("enabled", ParameterType.Boolean)),
+            undoable = false,
+        ),
+    ) { _, arguments ->
+        appSettings.changeConfirmExit(arguments.getValue("enabled").jsonPrimitive.boolean)
+        CommandResult.Success()
+    }
+
+    registry.register(
+        CommandSpec(
             id = AppCommandIds.SETTINGS_RENDERER,
             titleRes = R.string.command_settings_renderer,
             category = CommandCategory.Settings,
@@ -227,7 +250,12 @@ fun createAppCommandRegistry(
     }
 
     registry.register(
-        CommandSpec(id = AppCommandIds.SETTINGS_CLEAR_CACHE, titleRes = R.string.command_settings_clear_cache, category = CommandCategory.Settings, undoable = false),
+        CommandSpec(
+            id = AppCommandIds.SETTINGS_CLEAR_CACHE,
+            titleRes = R.string.command_settings_clear_cache,
+            category = CommandCategory.Settings,
+            undoable = false,
+        ),
     ) { _, _ ->
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { storageCleaner.clearCaches() }
         CommandResult.Success()

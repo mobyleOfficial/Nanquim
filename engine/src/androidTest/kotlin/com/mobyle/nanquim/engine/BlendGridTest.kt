@@ -1,6 +1,9 @@
 package com.mobyle.nanquim.engine
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.document.layer.BlendMode
+import com.mobyle.nanquim.formats.blend.BlendReference
+import com.mobyle.nanquim.formats.blend.Rgba
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.addJsonObject
@@ -16,9 +19,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import com.mobyle.nanquim.document.layer.BlendMode
-import com.mobyle.nanquim.formats.blend.BlendReference
-import com.mobyle.nanquim.formats.blend.Rgba
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit

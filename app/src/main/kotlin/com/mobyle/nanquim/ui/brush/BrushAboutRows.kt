@@ -40,15 +40,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.BrushAbout
 import com.mobyle.nanquim.brush.BrushEditorSession
 import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.document.brush.BrushDocument
 import com.mobyle.nanquim.document.brush.BrushResetPoints
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 private val AUTHOR_PREVIEW_SIZE = 96.dp
 private const val SIGNATURE_STROKE_DP = 3f

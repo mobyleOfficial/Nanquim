@@ -48,7 +48,11 @@ class TimelapseExport(
         val readable = segments.mapNotNull(::probe)
         if (readable.isEmpty()) return false
         val target = readable.last()
-        val sameSize = readable.all { it.width == target.width && it.height == target.height && it.format.getString(MediaFormat.KEY_MIME) == target.format.getString(MediaFormat.KEY_MIME) }
+        val sameSize =
+            readable.all {
+                it.width == target.width && it.height == target.height &&
+                    it.format.getString(MediaFormat.KEY_MIME) == target.format.getString(MediaFormat.KEY_MIME)
+            }
         return if (length == TimelapseLength.Full && cardLines.isEmpty() && sameSize) {
             remux(readable, output)
         } else {
@@ -61,7 +65,12 @@ class TimelapseExport(
             val extractor = MediaExtractor()
             try {
                 extractor.setDataSource(file.path)
-                val track = (0 until extractor.trackCount).firstOrNull { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true } ?: return null
+                val track =
+                    (0 until extractor.trackCount).firstOrNull {
+                        extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") ==
+                            true
+                    }
+                        ?: return null
                 extractor.selectTrack(track)
                 val format = extractor.getTrackFormat(track)
                 var frames = 0
@@ -69,7 +78,13 @@ class TimelapseExport(
                     frames++
                     extractor.advance()
                 }
-                if (frames == 0) null else Segment(file, format, format.getInteger(MediaFormat.KEY_WIDTH), format.getInteger(MediaFormat.KEY_HEIGHT), frames)
+                if (frames ==
+                    0
+                ) {
+                    null
+                } else {
+                    Segment(file, format, format.getInteger(MediaFormat.KEY_WIDTH), format.getInteger(MediaFormat.KEY_HEIGHT), frames)
+                }
             } finally {
                 extractor.release()
             }
@@ -92,12 +107,28 @@ class TimelapseExport(
                 val extractor = MediaExtractor()
                 try {
                     extractor.setDataSource(segment.file.path)
-                    extractor.selectTrack((0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true })
+                    extractor.selectTrack(
+                        (0 until extractor.trackCount).first {
+                            extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") ==
+                                true
+                        },
+                    )
                     var last = 0L
                     while (true) {
                         val size = extractor.readSampleData(buffer, 0)
                         if (size < 0) break
-                        info.set(0, size, offset + extractor.sampleTime, if ((extractor.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC) != 0) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0)
+                        info.set(
+                            0,
+                            size,
+                            offset + extractor.sampleTime,
+                            if ((extractor.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC) !=
+                                0
+                            ) {
+                                MediaCodec.BUFFER_FLAG_KEY_FRAME
+                            } else {
+                                0
+                            },
+                        )
                         muxer.writeSampleData(track, buffer, info)
                         last = maxOf(last, extractor.sampleTime)
                         extractor.advance()
@@ -123,8 +154,10 @@ class TimelapseExport(
         height: Int,
         output: File,
     ): Boolean {
-        val encoder = VideoFileEncoder.create(output.path, VideoFileEncoder.AVC, width, height, FRAMES_PER_SECOND, webm = false) ?: return false
+        val encoder =
+            VideoFileEncoder.create(output.path, VideoFileEncoder.AVC, width, height, FRAMES_PER_SECOND, webm = false) ?: return false
         var frame = 0
+
         fun add(rgba: ByteArray) {
             encoder.addFrame(rgba, frame++ * FRAME_MICROSECONDS)
         }
@@ -162,7 +195,11 @@ class TimelapseExport(
     ) {
         val extractor = MediaExtractor()
         extractor.setDataSource(segment.file.path)
-        val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
+        val track =
+            (0 until extractor.trackCount).first {
+                extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") ==
+                    true
+            }
         extractor.selectTrack(track)
         val format = extractor.getTrackFormat(track)
         val decoder = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
@@ -191,7 +228,15 @@ class TimelapseExport(
                     if (info.size > 0) {
                         decoder.getOutputImage(index)?.use { image ->
                             val rgba = rgbaOf(image, segment.width, segment.height)
-                            onFrame(if (segment.width == width && segment.height == height) rgba else letterbox(rgba, segment.width, segment.height, width, height))
+                            onFrame(
+                                if (segment.width == width &&
+                                    segment.height == height
+                                ) {
+                                    rgba
+                                } else {
+                                    letterbox(rgba, segment.width, segment.height, width, height)
+                                },
+                            )
                         }
                     }
                     decoder.releaseOutputBuffer(index, false)
@@ -243,7 +288,17 @@ class TimelapseExport(
         val canvas = Canvas(target)
         canvas.drawColor(Color.BLACK)
         val scale = min(targetWidth.toFloat() / width, targetHeight.toFloat() / height)
-        canvas.drawBitmap(source, Matrix().apply { setScale(scale, scale); postTranslate((targetWidth - width * scale) / 2, (targetHeight - height * scale) / 2) }, Paint(Paint.FILTER_BITMAP_FLAG))
+        canvas.drawBitmap(
+            source,
+            Matrix().apply {
+                setScale(scale, scale)
+                postTranslate(
+                    (targetWidth - width * scale) / 2,
+                    (targetHeight - height * scale) / 2,
+                )
+            },
+            Paint(Paint.FILTER_BITMAP_FLAG),
+        )
         val out = ByteBuffer.allocate(targetWidth * targetHeight * 4)
         target.copyPixelsToBuffer(out)
         source.recycle()
@@ -258,7 +313,11 @@ class TimelapseExport(
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(CARD_BACKGROUND)
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; textAlign = Paint.Align.CENTER }
+        val paint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                textAlign = Paint.Align.CENTER
+            }
         cardLines.forEachIndexed { index, line ->
             paint.textSize = height * if (index == 0) 0.08f else 0.045f
             paint.typeface = if (index == 0) Typeface.DEFAULT_BOLD else Typeface.DEFAULT

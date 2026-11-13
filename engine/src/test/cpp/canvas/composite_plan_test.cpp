@@ -134,9 +134,10 @@ TEST(CompositePlanTest, LayersInsideIsolatedGroupsOrClippingRunsHaveNoCaches) {
 
 TEST(CompositePlanTest, NestedGroupsShareTheirRootUnit) {
   LayerTree tree;
-  tree.layers = {raster(1),
-                 group(9, {raster(2), group(8, {raster(3)}, BlendMode::Screen)}, BlendMode::Multiply),
-                 raster(4)};
+  tree.layers = {
+      raster(1),
+      group(9, {raster(2), group(8, {raster(3)}, BlendMode::Screen)}, BlendMode::Multiply),
+      raster(4)};
   const CompositePlan plan = buildCompositePlan(tree, std::nullopt);
   EXPECT_EQ(plan.levels, 3);
   EXPECT_EQ(plan.unitCount, 3);
@@ -168,8 +169,9 @@ TEST(CompositePlanTest, RandomTreesMatchTheReferenceCompositor) {
           nodes.push_back(std::move(node));
           continue;
         }
-        LayerTreeNode layer = raster(nextId++, static_cast<BlendMode>(random() % kLayerBlendModeCount),
-                                     static_cast<float>(0.2 + 0.8 * unit(random)));
+        LayerTreeNode layer =
+            raster(nextId++, static_cast<BlendMode>(random() % kLayerBlendModeCount),
+                   static_cast<float>(0.2 + 0.8 * unit(random)));
         layer.clipping = random() % 3 == 0;
         layer.hidden = random() % 10 == 0;
         Image pixels(kWidth, kHeight);
@@ -202,8 +204,8 @@ TEST(CompositePlanTest, RandomTreesMatchTheReferenceCompositor) {
     tree.background = {0.9F, 0.8F, 0.7F, 1};
     tree.backgroundHidden = random() % 4 == 0;
     const CompositePlan plan = buildCompositePlan(tree, std::nullopt);
-    const Image expected = reference::composeLayerTree(
-        tree, kWidth, kHeight, [&surfaces](LayerId id) -> const Image* {
+    const Image expected =
+        reference::composeLayerTree(tree, kWidth, kHeight, [&surfaces](LayerId id) -> const Image* {
           auto found = surfaces.find(id);
           return found == surfaces.end() ? nullptr : &found->second;
         });

@@ -1,5 +1,8 @@
 package com.mobyle.nanquim.color
 
+import com.mobyle.nanquim.document.layer.RgbaColor
+import com.mobyle.nanquim.formats.palette.Palette
+import com.mobyle.nanquim.formats.palette.PaletteSwatch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -8,9 +11,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
-import com.mobyle.nanquim.document.layer.RgbaColor
-import com.mobyle.nanquim.formats.palette.Palette
-import com.mobyle.nanquim.formats.palette.PaletteSwatch
 import java.io.File
 
 class PaletteLibraryTest {

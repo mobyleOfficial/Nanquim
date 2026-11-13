@@ -186,7 +186,9 @@ class LayerTileStore {
     [[nodiscard]] bool hasValidDiskCopy() const {
       return disk.has_value() && diskVersion == version;
     }
-    [[nodiscard]] bool hasValidFileCopy() const { return fileVersion != 0 && fileVersion == version; }
+    [[nodiscard]] bool hasValidFileCopy() const {
+      return fileVersion != 0 && fileVersion == version;
+    }
   };
 
   struct PendingReadback {

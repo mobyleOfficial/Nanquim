@@ -3,6 +3,17 @@ package com.mobyle.nanquim.document
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.mobyle.nanquim.document.animation.AnimationSettings
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.textModels
+import com.mobyle.nanquim.engine.DocumentSaveResult
+import com.mobyle.nanquim.engine.Engine
+import com.mobyle.nanquim.formats.NanquimFileType
+import com.mobyle.nanquim.formats.nanquim.AnimationJson
+import com.mobyle.nanquim.formats.nanquim.DocumentColorProfile
+import com.mobyle.nanquim.formats.nanquim.DocumentInfo
+import com.mobyle.nanquim.formats.nanquim.LayerUuids
+import com.mobyle.nanquim.formats.nanquim.NanquimManifest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -10,17 +21,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
-import com.mobyle.nanquim.document.animation.AnimationSettings
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.textModels
-import com.mobyle.nanquim.engine.DocumentSaveResult
-import com.mobyle.nanquim.engine.Engine
-import com.mobyle.nanquim.formats.NanquimFileType
-import com.mobyle.nanquim.formats.nanquim.DocumentColorProfile
-import com.mobyle.nanquim.formats.nanquim.DocumentInfo
-import com.mobyle.nanquim.formats.nanquim.AnimationJson
-import com.mobyle.nanquim.formats.nanquim.LayerUuids
-import com.mobyle.nanquim.formats.nanquim.NanquimManifest
 import java.io.File
 import java.time.Instant
 

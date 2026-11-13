@@ -1,15 +1,5 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.document.command.AppState
@@ -25,6 +15,16 @@ import com.mobyle.nanquim.document.layer.CanvasAnchor
 import com.mobyle.nanquim.document.layer.CanvasOperation
 import com.mobyle.nanquim.document.layer.LayerOperationException
 import com.mobyle.nanquim.document.layer.PixelFormat
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 import kotlin.coroutines.resume
 
 object CanvasSizeCommandIds {

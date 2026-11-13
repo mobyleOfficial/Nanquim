@@ -67,7 +67,8 @@ ShaderProgram* ShaderVariantCache::get(const std::string& pipeline,
     return nullptr;
   }
   const bool compute = found->second.vertexSource == nullptr;
-  const std::string vertex = compute ? std::string() : withDefines(found->second.vertexSource, defines);
+  const std::string vertex =
+      compute ? std::string() : withDefines(found->second.vertexSource, defines);
   const std::string fragment = withDefines(found->second.fragmentSource, defines);
 
   std::string binaryPath;
@@ -86,10 +87,10 @@ ShaderProgram* ShaderVariantCache::get(const std::string& pipeline,
     }
   }
   if (!program) {
-    program = compute ? ShaderProgram::createCompute(fragment.c_str(), errorMessage,
-                                                     binariesSupported_)
-                      : ShaderProgram::create(vertex.c_str(), fragment.c_str(), errorMessage,
-                                              binariesSupported_);
+    program = compute
+                  ? ShaderProgram::createCompute(fragment.c_str(), errorMessage, binariesSupported_)
+                  : ShaderProgram::create(vertex.c_str(), fragment.c_str(), errorMessage,
+                                          binariesSupported_);
     if (!program) {
       errorMessage = key + ": " + errorMessage;
       return nullptr;

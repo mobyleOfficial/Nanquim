@@ -1,13 +1,13 @@
 #include "gpu/vulkan/vulkan_probe.h"
 
 #define VK_USE_PLATFORM_ANDROID_KHR
-#include <time.h>
 #include <vulkan/vulkan.h>
 
 #include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstring>
+#include <ctime>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <string>
@@ -57,7 +57,8 @@ json summary(std::vector<double> values) {
   }
   std::sort(values.begin(), values.end());
   const auto at = [&](double fraction) {
-    return values[std::min(values.size() - 1, static_cast<size_t>(fraction * values.size()))];
+    return values[std::min(values.size() - 1,
+                           static_cast<size_t>(fraction * static_cast<double>(values.size())))];
   };
   return json{{"count", values.size()},
               {"min", values.front()},
@@ -275,7 +276,7 @@ class Probe {
     json heaps = json::array();
     for (uint32_t i = 0; i < memory.memoryHeapCount; ++i) {
       heaps.push_back(
-          {{"megabytes", memory.memoryHeaps[i].size / (1024 * 1024)},
+          {{"megabytes", memory.memoryHeaps[i].size / (VkDeviceSize{1024} * 1024)},
            {"deviceLocal", (memory.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) != 0}});
     }
     device["memoryHeaps"] = heaps;
@@ -449,8 +450,8 @@ class Probe {
     return pass;
   }
 
-  VkSwapchainKHR createHandle(VkPresentModeKHR mode, VkFormat format, VkColorSpaceKHR colorSpace,
-                              uint32_t imageCount) const {
+  [[nodiscard]] VkSwapchainKHR createHandle(VkPresentModeKHR mode, VkFormat format,
+                                            VkColorSpaceKHR colorSpace, uint32_t imageCount) const {
     const bool shared = mode == VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR ||
                         mode == VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR;
     auto info = make<VkSwapchainCreateInfoKHR>(VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR);
@@ -897,7 +898,7 @@ class Probe {
     return result;
   }
 
-  uint32_t memoryType(uint32_t bits, VkMemoryPropertyFlags wanted) const {
+  [[nodiscard]] uint32_t memoryType(uint32_t bits, VkMemoryPropertyFlags wanted) const {
     for (uint32_t i = 0; i < memory_.memoryTypeCount; ++i) {
       if ((bits & (1U << i)) != 0 && (memory_.memoryTypes[i].propertyFlags & wanted) == wanted) {
         return i;

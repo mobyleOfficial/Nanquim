@@ -75,10 +75,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.ui.common.LocalWindowLayout
-import com.mobyle.nanquim.ui.common.onSecondaryClick
 import com.mobyle.nanquim.brush.BrushAnimation
 import com.mobyle.nanquim.brush.BrushThumbnail
 import com.mobyle.nanquim.brush.BrushThumbnails
@@ -91,6 +88,9 @@ import com.mobyle.nanquim.brush.library.BrushTool
 import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.command.STAMP_SOURCE_IMAGE
 import com.mobyle.nanquim.command.STAMP_SOURCE_SELECTION
+import com.mobyle.nanquim.ui.common.LocalWindowLayout
+import com.mobyle.nanquim.ui.common.onSecondaryClick
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
@@ -611,6 +611,7 @@ private fun BrushRow(
         }
         DropdownMenu(expanded = previewOpen, onDismissRequest = { onCommand(BrushCommandIds.LIBRARY_SHOW_PREVIEW, emptyMap()) }) {
             LargePreview(entry.brushId, thumbnails)
+
             fun item(
                 labelRes: Int,
                 command: String,

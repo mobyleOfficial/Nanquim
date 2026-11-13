@@ -6,13 +6,13 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.edit
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import com.mobyle.nanquim.canvas.input.Gesture
 import com.mobyle.nanquim.canvas.input.GestureAction
 import com.mobyle.nanquim.canvas.input.GestureConfiguration
 import com.mobyle.nanquim.canvas.input.PalmSupport
 import com.mobyle.nanquim.engine.Engine
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 
 class InputSettings(
     private val preferences: SharedPreferences,

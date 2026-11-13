@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.ui.canvas
 
-import com.mobyle.nanquim.ui.common.LabeledSwitch
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,7 +46,6 @@ import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.canvas.input.CanvasTool
 import com.mobyle.nanquim.command.GuideCommandIds
 import com.mobyle.nanquim.command.ToolCommandIds
-import com.mobyle.nanquim.ui.color.ColorSlider
 import com.mobyle.nanquim.document.color.ColorComponent
 import com.mobyle.nanquim.document.color.ColorValue
 import com.mobyle.nanquim.document.guide.GridGeometry
@@ -60,6 +58,8 @@ import com.mobyle.nanquim.document.guide.SymmetryGeometry
 import com.mobyle.nanquim.document.guide.SymmetryGuide
 import com.mobyle.nanquim.document.guide.SymmetryKind
 import com.mobyle.nanquim.engine.Point
+import com.mobyle.nanquim.ui.color.ColorSlider
+import com.mobyle.nanquim.ui.common.LabeledSwitch
 import kotlin.math.ceil
 import kotlin.math.exp
 import kotlin.math.ln
@@ -276,7 +276,11 @@ fun GuideToolBar(
                     }
                 }
             }
-            LabeledSwitch(stringResource(R.string.guide_visible), guides.visible, { onCommand(GuideCommandIds.TOGGLE, mapOf("visible" to it)) })
+            LabeledSwitch(
+                stringResource(R.string.guide_visible),
+                guides.visible,
+                { onCommand(GuideCommandIds.TOGGLE, mapOf("visible" to it)) },
+            )
             val hueLabel = stringResource(R.string.guide_color)
             LabeledRow(hueLabel) {
                 ColorSlider(

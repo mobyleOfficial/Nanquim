@@ -84,7 +84,9 @@ interface GalleryDao {
         name: String,
     )
 
-    @Query("DELETE FROM stacks WHERE id NOT IN (SELECT stackId FROM artworks WHERE stackId IS NOT NULL GROUP BY stackId HAVING COUNT(*) >= 2)")
+    @Query(
+        "DELETE FROM stacks WHERE id NOT IN (SELECT stackId FROM artworks WHERE stackId IS NOT NULL GROUP BY stackId HAVING COUNT(*) >= 2)",
+    )
     suspend fun deleteSmallStacks()
 
     @Query("UPDATE artworks SET stackId = NULL WHERE stackId IS NOT NULL AND stackId NOT IN (SELECT id FROM stacks)")

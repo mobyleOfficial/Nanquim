@@ -3,16 +3,6 @@ package com.mobyle.nanquim.command
 import android.content.ContentResolver
 import android.provider.OpenableColumns
 import androidx.core.net.toUri
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.color.ColorProfileEntry
@@ -29,6 +19,16 @@ import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.engine.ColorProfiles
 import com.mobyle.nanquim.formats.nanquim.NanquimManifest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import java.io.IOException
 import kotlin.coroutines.resume
 
@@ -196,7 +196,10 @@ fun registerColorProfileCommands(
         }
         val entry = library.entry(id) ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "No profile $id")
         if (!entry.isPrintProfile) {
-            return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "${entry.name} is not a CMYK profile that converts both ways")
+            return@register CommandResult.Failure(
+                CommandErrorCode.InvalidArguments,
+                "${entry.name} is not a CMYK profile that converts both ways",
+            )
         }
         canvas.assignCmykProfile(library.printProfile(id))
         CommandResult.Success(buildJsonObject { put("cmykProfile", entry.name) })

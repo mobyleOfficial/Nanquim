@@ -37,7 +37,11 @@ fun VideoScrubber(
     var time by remember(layer.id, video.timeMicroseconds) { mutableFloatStateOf(video.timeMicroseconds.toFloat()) }
     val duration = video.durationMicroseconds.coerceAtLeast(1).toFloat()
     Surface(modifier = modifier, shape = RoundedCornerShape(16.dp), tonalElevation = 3.dp) {
-        Row(Modifier.padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             Text(stringResource(R.string.video_time, clock(time.toLong()), clock(video.durationMicroseconds)))
             Slider(
                 value = time,
@@ -45,11 +49,22 @@ fun VideoScrubber(
                     time = it
                     onCommand(VideoCommandIds.SET_TIME, mapOf("layerId" to layer.id, "timeMicroseconds" to it.toLong(), "final" to false))
                 },
-                onValueChangeFinished = { onCommand(VideoCommandIds.SET_TIME, mapOf("layerId" to layer.id, "timeMicroseconds" to time.toLong(), "final" to true)) },
+                onValueChangeFinished = {
+                    onCommand(
+                        VideoCommandIds.SET_TIME,
+                        mapOf(
+                            "layerId" to layer.id,
+                            "timeMicroseconds" to time.toLong(),
+                            "final" to true,
+                        ),
+                    )
+                },
                 valueRange = 0f..duration,
                 modifier = Modifier.width(SCRUBBER_WIDTH),
             )
-            TextButton(onClick = { onCommand(VideoCommandIds.RASTERIZE, mapOf("layerId" to layer.id)) }) { Text(stringResource(R.string.video_rasterize)) }
+            TextButton(onClick = {
+                onCommand(VideoCommandIds.RASTERIZE, mapOf("layerId" to layer.id))
+            }) { Text(stringResource(R.string.video_rasterize)) }
         }
     }
 }

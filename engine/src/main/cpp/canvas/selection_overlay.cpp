@@ -79,9 +79,9 @@ void SelectionOverlay::markTileChanged(const LayerTileKey& key) {
   if (!surface_ || key.layer != *surface_ || !canvasTiles_.contains(key.coordinate)) {
     return;
   }
-  const auto index = static_cast<size_t>((key.coordinate.row - canvasTiles_.firstRow) *
-                                             (canvasTiles_.endColumn - canvasTiles_.firstColumn) +
-                                         (key.coordinate.column - canvasTiles_.firstColumn));
+  const auto index = static_cast<size_t>(key.coordinate.row - canvasTiles_.firstRow) *
+                         static_cast<size_t>(canvasTiles_.endColumn - canvasTiles_.firstColumn) +
+                     static_cast<size_t>(key.coordinate.column - canvasTiles_.firstColumn);
   if (dirty_[index] == 0) {
     dirty_[index] = 1;
     ++dirtyCount_;

@@ -34,9 +34,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.input.Gesture
 import com.mobyle.nanquim.canvas.input.GestureAction
@@ -47,6 +44,9 @@ import com.mobyle.nanquim.command.GestureCommandIds
 import com.mobyle.nanquim.command.QuickShapeCommandIds
 import com.mobyle.nanquim.settings.InputSettings
 import com.mobyle.nanquim.ui.common.ScreenHeader
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalLayoutApi::class)

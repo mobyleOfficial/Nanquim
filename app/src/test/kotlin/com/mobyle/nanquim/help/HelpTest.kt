@@ -1,12 +1,12 @@
 package com.mobyle.nanquim.help
 
 import android.content.SharedPreferences
+import com.mobyle.nanquim.canvas.input.CanvasTool
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.canvas.input.CanvasTool
 
 class HelpTest {
     private val preferences = MemoryPreferences()
@@ -56,6 +56,46 @@ class HelpTest {
         assertFalse(help.tipSeen(CanvasTool.Smudge))
         help.showTip(CanvasTool.Smudge)
         assertEquals(CanvasTool.Smudge, help.tip)
+    }
+
+    @Test
+    fun theCanvasTourRunsOnceAfterTheIntroduction() {
+        val help = Help(preferences)
+        help.showWelcomeIfFirstLaunch()
+        help.canvasShown()
+        assertNull(help.tourStep)
+        help.finishWelcome(completed = true)
+        help.canvasShown()
+        assertEquals(0, help.tourStep)
+        help.toolSelected(CanvasTool.Eraser)
+        assertNull(help.tip)
+        repeat(Help.TOUR_STEPS) { help.nextTourStep() }
+        assertNull(help.tourStep)
+        val nextLaunch = Help(preferences)
+        nextLaunch.canvasShown()
+        assertNull(nextLaunch.tourStep)
+    }
+
+    @Test
+    fun replayingTheIntroductionAlsoReplaysTheTour() {
+        val help = Help(preferences)
+        help.canvasShown()
+        help.finishTour()
+        help.showWelcome()
+        help.finishWelcome()
+        help.canvasShown()
+        assertEquals(0, help.tourStep)
+    }
+
+    @Test
+    fun finishingTheIntroductionReportsHowItEnded() {
+        val reports = mutableListOf<Pair<Boolean, Int>>()
+        val help = Help(preferences).apply { onWelcomeFinished = { completed, card -> reports += completed to card } }
+        help.showWelcome()
+        help.welcomeCard = 2
+        help.finishWelcome(completed = false)
+        help.finishWelcome(completed = false)
+        assertEquals(listOf(false to 2), reports)
     }
 
     private class MemoryPreferences : SharedPreferences {

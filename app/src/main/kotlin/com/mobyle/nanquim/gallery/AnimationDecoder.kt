@@ -3,11 +3,11 @@ package com.mobyle.nanquim.gallery
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
-import android.media.MediaExtractor
-import android.media.MediaFormat
 import android.media.Image
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
+import android.media.MediaExtractor
+import android.media.MediaFormat
 import java.io.File
 import java.nio.ByteBuffer
 import java.util.zip.ZipFile
@@ -38,7 +38,11 @@ object AnimationDecoder {
         }
     }
 
-    private fun ByteArray.startsWith(text: String): Boolean = text.indices.all { index -> index < size && (this[index].toInt() and 0xFF) == text[index].code }
+    private fun ByteArray.startsWith(text: String): Boolean =
+        text.indices.all { index ->
+            index < size &&
+                (this[index].toInt() and 0xFF) == text[index].code
+        }
 
     private fun sample(
         bitmap: Bitmap,
@@ -67,11 +71,13 @@ object AnimationDecoder {
 
     private fun gifTiming(bytes: ByteArray): Pair<Int, Long> {
         fun u8(index: Int) = bytes[index].toInt() and 0xFF
+
         fun u16(index: Int) = u8(index) or (u8(index + 1) shl 8)
         var offset = 13
         if (u8(10) and 0x80 != 0) offset += 3 * (1 shl ((u8(10) and 7) + 1))
         var frames = 0
         var delay = 0L
+
         fun skipSubBlocks(start: Int): Int {
             var position = start
             while (position < bytes.size && u8(position) != 0) position += u8(position) + 1
@@ -122,7 +128,12 @@ object AnimationDecoder {
         points: List<Pair<Int, Int>>,
     ): Decoded =
         ZipFile(file).use { zip ->
-            val entries = zip.entries().toList().filter { it.name.endsWith(".png") }.sortedBy { it.name }
+            val entries =
+                zip
+                    .entries()
+                    .toList()
+                    .filter { it.name.endsWith(".png") }
+                    .sortedBy { it.name }
             val bitmaps = frames.map { index -> zip.getInputStream(entries[index]).use { BitmapFactory.decodeStream(it) } }
             val first = bitmaps.firstOrNull()
             Decoded("pngSequence", first?.width ?: 0, first?.height ?: 0, entries.size, 0, bitmaps.map { sample(it, points) })
@@ -194,8 +205,10 @@ object AnimationDecoder {
             val x = px.coerceIn(0, image.width - 1)
             val y = py.coerceIn(0, image.height - 1)
             val value = (luma.buffer.get(y * luma.rowStride + x * luma.pixelStride).toInt() and 0xFF) - 16.0
-            val cb = (blueDifference.buffer.get(y / 2 * blueDifference.rowStride + x / 2 * blueDifference.pixelStride).toInt() and 0xFF) - 128.0
-            val cr = (redDifference.buffer.get(y / 2 * redDifference.rowStride + x / 2 * redDifference.pixelStride).toInt() and 0xFF) - 128.0
+            val cb =
+                (blueDifference.buffer.get(y / 2 * blueDifference.rowStride + x / 2 * blueDifference.pixelStride).toInt() and 0xFF) - 128.0
+            val cr =
+                (redDifference.buffer.get(y / 2 * redDifference.rowStride + x / 2 * redDifference.pixelStride).toInt() and 0xFF) - 128.0
             val red = 1.1644 * value + 1.7927 * cr
             val green = 1.1644 * value - 0.2132 * cb - 0.5329 * cr
             val blue = 1.1644 * value + 2.1124 * cb

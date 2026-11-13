@@ -63,21 +63,20 @@ void publish(JNIEnv* environment, const PadHandle& handle, const PixelRect& chan
 
 extern "C" {
 
-JNIEXPORT jlong JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeCreate(JNIEnv*, jclass, jint width,
-                                                                      jint height) {
+JNIEXPORT jlong JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeCreate(JNIEnv*, jclass,
+                                                                             jint width,
+                                                                             jint height) {
   return reinterpret_cast<jlong>(new PadHandle{BrushPad(width, height), nullptr, std::nullopt, 0});
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeDestroy(JNIEnv*, jclass,
-                                                                      jlong handle) {
+                                                                             jlong handle) {
   delete fromHandle(handle);
 }
 
-JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeSetBrush(JNIEnv* environment,
-                                                                          jclass, jlong handle,
-                                                                          jstring brushJson,
-                                                                          jbyteArray shapePng,
-                                                                          jbyteArray grainPng) {
+JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeSetBrush(
+    JNIEnv* environment, jclass, jlong handle, jstring brushJson, jbyteArray shapePng,
+    jbyteArray grainPng) {
   std::string error;
   auto brush =
       nanquim::stroke::loadBrush(stringOf(environment, brushJson), bytesOf(environment, shapePng),
@@ -89,9 +88,8 @@ JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeSetBrush
   return nullptr;
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeSetPressureCurve(JNIEnv* environment,
-                                                                               jclass, jlong handle,
-                                                                               jfloatArray points) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeSetPressureCurve(
+    JNIEnv* environment, jclass, jlong handle, jfloatArray points) {
   std::optional<nanquim::stroke::Curve> curve;
   if (points != nullptr) {
     const jsize count = environment->GetArrayLength(points);
@@ -138,17 +136,18 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeAddSamples(
   publish(environment, pad, pad.pad.addSamples(decoded), output, rect);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeEndStroke(JNIEnv* environment, jclass,
-                                                                        jlong handle,
-                                                                        jobject output,
-                                                                        jintArray rect) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeEndStroke(JNIEnv* environment,
+                                                                               jclass, jlong handle,
+                                                                               jobject output,
+                                                                               jintArray rect) {
   PadHandle& pad = *fromHandle(handle);
   publish(environment, pad, pad.pad.endStroke(), output, rect);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeClear(JNIEnv* environment, jclass,
-                                                                    jlong handle, jobject output,
-                                                                    jintArray rect) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_BrushPad_nativeClear(JNIEnv* environment,
+                                                                           jclass, jlong handle,
+                                                                           jobject output,
+                                                                           jintArray rect) {
   PadHandle& pad = *fromHandle(handle);
   pad.pad.clear();
   publish(environment, pad, PixelRect{0, 0, pad.pad.width(), pad.pad.height()}, output, rect);

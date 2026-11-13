@@ -13,6 +13,9 @@ work = "2.10.1"
 glance = "1.2.0"
 firebaseBom = "34.19.0"
 googleServices = "4.5.0"
+playReview = "2.0.2"
+playServicesAds = "24.4.0"
+ump = "3.2.0"
 firebaseCrashlyticsPlugin = "3.0.8"
 ksp = "2.2.20-2.0.4"
 junitJupiter = "5.13.4"
@@ -56,6 +59,9 @@ androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", versi
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
+user-messaging-platform = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
+play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "playReview" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestJunit" }

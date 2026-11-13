@@ -202,7 +202,8 @@ TEST(DocumentTile, HalfFloatLayersAndMasks) {
   std::vector<uint8_t> negativeZero(engineBytes, 0);
   const uint16_t minusZero = 0x8000;
   std::memcpy(negativeZero.data() + 6, &minusZero, 2);
-  EXPECT_TRUE(isImplicitEngineTile(negativeZero.data(), DocumentTileFormat::Rgba16f, inside, kHalf));
+  EXPECT_TRUE(
+      isImplicitEngineTile(negativeZero.data(), DocumentTileFormat::Rgba16f, inside, kHalf));
   std::vector<uint8_t> mask(documentTileBytes(DocumentTileFormat::R8), 255);
   mask[3] = 128;
   std::vector<uint8_t> maskEngine(engineBytes);

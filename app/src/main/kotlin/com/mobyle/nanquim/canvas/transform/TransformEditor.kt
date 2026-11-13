@@ -155,7 +155,11 @@ class TransformEditor(
     ): Boolean {
         val current = state ?: return false
         val radius = HANDLE_RADIUS_SCREEN_PX / zoom
-        val handle = handles(zoom).minByOrNull { TransformGeometry.distance(it.point, point) }?.takeIf { TransformGeometry.distance(it.point, point) <= radius }
+        val handle =
+            handles(zoom).minByOrNull { TransformGeometry.distance(it.point, point) }?.takeIf {
+                TransformGeometry.distance(it.point, point) <=
+                    radius
+            }
         drag =
             when {
                 handle != null -> Drag.Handle(point, handle)
@@ -303,7 +307,10 @@ class TransformEditor(
             if (width <= 0 || height <= 0) return@transform current
             val scale = min(canvasWidth / width, canvasHeight / height)
             val quad = rectangle(Point(canvasWidth / 2, canvasHeight / 2), width * scale, height * scale, 0.0)
-            current.copy(targetQuad = quad, warpGrid = current.warpGrid?.let { TransformGeometry.warpGrid(current.sourceQuad, quad, current.warpSize) })
+            current.copy(
+                targetQuad = quad,
+                warpGrid = current.warpGrid?.let { TransformGeometry.warpGrid(current.sourceQuad, quad, current.warpSize) },
+            )
         }
 
     fun reset() =
@@ -343,7 +350,13 @@ class TransformEditor(
         val quad = state?.targetQuad ?: return null
         val center = TransformGeometry.center(quad)
         val angle = atan2(quad[1].y - quad[0].y, quad[1].x - quad[0].x) * 180 / PI
-        return doubleArrayOf(center.x, center.y, TransformGeometry.distance(quad[0], quad[1]), TransformGeometry.distance(quad[0], quad[3]), angle)
+        return doubleArrayOf(
+            center.x,
+            center.y,
+            TransformGeometry.distance(quad[0], quad[1]),
+            TransformGeometry.distance(quad[0], quad[3]),
+            angle,
+        )
     }
 
     fun setFitted(value: Boolean) {
@@ -411,6 +424,7 @@ class TransformEditor(
         val right = quad.maxOf { it.x } + delta.x
         val top = quad.minOf { it.y } + delta.y
         val bottom = quad.maxOf { it.y } + delta.y
+
         fun snap(candidates: List<Pair<Double, Double>>): Double {
             val best = candidates.minByOrNull { abs(it.second - it.first) } ?: return 0.0
             return if (abs(best.second - best.first) <= tolerance) best.second - best.first else 0.0
@@ -455,8 +469,26 @@ class TransformEditor(
             }
             is TransformHandle.Corner ->
                 when (mode) {
-                    TransformMode.Distort, TransformMode.Warp -> start.copy(targetQuad = quad.toMutableList().also { it[handle.index] = point })
-                    else -> start.copy(targetQuad = scaledCorner(quad, handle.index, point, uniform = mode == TransformMode.Uniform, snapping = snapping, start = start))
+                    TransformMode.Distort, TransformMode.Warp ->
+                        start.copy(
+                            targetQuad =
+                                quad.toMutableList().also {
+                                    it[handle.index] =
+                                        point
+                                },
+                        )
+                    else ->
+                        start.copy(
+                            targetQuad =
+                                scaledCorner(
+                                    quad,
+                                    handle.index,
+                                    point,
+                                    uniform = mode == TransformMode.Uniform,
+                                    snapping = snapping,
+                                    start = start,
+                                ),
+                        )
                 }
             is TransformHandle.Edge -> {
                 val a = handle.index
@@ -606,7 +638,16 @@ class TransformEditor(
         return top + right + bottom + left
     }
 
-    private fun parallelogram(quad: List<Point>) = listOf(quad[0], quad[1], Point(quad[1].x + quad[3].x - quad[0].x, quad[1].y + quad[3].y - quad[0].y), quad[3])
+    private fun parallelogram(quad: List<Point>) =
+        listOf(
+            quad[0],
+            quad[1],
+            Point(
+                quad[1].x + quad[3].x - quad[0].x,
+                quad[1].y + quad[3].y - quad[0].y,
+            ),
+            quad[3],
+        )
 
     private fun axisQuad(lifted: LiftedContent): List<Point> {
         val left = lifted.x.toDouble()
@@ -661,4 +702,3 @@ class TransformEditor(
         private const val PULL_SPREAD = 0.8
     }
 }
-

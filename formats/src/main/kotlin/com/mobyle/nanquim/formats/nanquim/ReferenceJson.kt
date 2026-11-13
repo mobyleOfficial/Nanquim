@@ -1,5 +1,9 @@
 package com.mobyle.nanquim.formats.nanquim
 
+import com.mobyle.nanquim.document.reference.ReferenceCorner
+import com.mobyle.nanquim.document.reference.ReferenceMode
+import com.mobyle.nanquim.document.reference.ReferenceSettings
+import com.mobyle.nanquim.document.reference.ReferenceView
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -8,10 +12,6 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
-import com.mobyle.nanquim.document.reference.ReferenceCorner
-import com.mobyle.nanquim.document.reference.ReferenceMode
-import com.mobyle.nanquim.document.reference.ReferenceSettings
-import com.mobyle.nanquim.document.reference.ReferenceView
 
 internal object ReferenceJson {
     const val IMAGE_PATH = "reference/image.png"

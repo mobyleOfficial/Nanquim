@@ -111,7 +111,13 @@ class VideoFileEncoder private constructor(
                 redBuffer.put(y * redDifference.rowStride + x * redDifference.pixelStride, cr.roundToInt().coerceIn(16, 240).toByte())
             }
         }
-        codec.queueInputBuffer(index, 0, width * height * 3 / 2, startMicroseconds, if (endOfStream) MediaCodec.BUFFER_FLAG_END_OF_STREAM else 0)
+        codec.queueInputBuffer(
+            index,
+            0,
+            width * height * 3 / 2,
+            startMicroseconds,
+            if (endOfStream) MediaCodec.BUFFER_FLAG_END_OF_STREAM else 0,
+        )
     }
 
     private fun drain(endOfStream: Boolean) {
@@ -165,7 +171,9 @@ class VideoFileEncoder private constructor(
             height: Int,
         ): Pair<Int, Int>? {
             val encoders = encodersOf(mime)
+
             fun sizeAt(factor: Double) = (width * factor).toInt().let { it - it % 2 } to (height * factor).toInt().let { it - it % 2 }
+
             fun fits(factor: Double) = sizeAt(factor).let { (w, h) -> w >= 2 && h >= 2 && encoders.any { takes(it, mime, w, h) } }
             if (fits(1.0)) return sizeAt(1.0)
             var low = MINIMUM_SCALE
@@ -195,7 +203,8 @@ class VideoFileEncoder private constructor(
             return try {
                 codec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
                 codec.start()
-                val muxer = MediaMuxer(path, if (webm) MediaMuxer.OutputFormat.MUXER_OUTPUT_WEBM else MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+                val muxer =
+                    MediaMuxer(path, if (webm) MediaMuxer.OutputFormat.MUXER_OUTPUT_WEBM else MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
                 VideoFileEncoder(codec, muxer, width, height, 1_000_000L / framesPerSecond)
             } catch (exception: Exception) {
                 codec.release()
@@ -211,7 +220,10 @@ class VideoFileEncoder private constructor(
         ): MediaFormat =
             MediaFormat.createVideoFormat(mime, width, height).apply {
                 setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
-                setInteger(MediaFormat.KEY_BIT_RATE, maxOf(2_000_000, (width.toLong() * height * framesPerSecond / 5).coerceAtMost(60_000_000).toInt()))
+                setInteger(
+                    MediaFormat.KEY_BIT_RATE,
+                    maxOf(2_000_000, (width.toLong() * height * framesPerSecond / 5).coerceAtMost(60_000_000).toInt()),
+                )
                 setInteger(MediaFormat.KEY_FRAME_RATE, framesPerSecond)
                 setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, KEY_FRAME_SECONDS)
                 setInteger(MediaFormat.KEY_COLOR_STANDARD, MediaFormat.COLOR_STANDARD_BT709)

@@ -83,7 +83,7 @@ bool parseUniformLayout(std::string_view source, UniformLayout& layout, std::str
     }
     return true;
   }
-  const size_t bodyStart = static_cast<size_t>(begin.position(0) + begin.length(0));
+  const auto bodyStart = static_cast<size_t>(begin.position(0) + begin.length(0));
   const size_t bodyEnd = text.find("UNIFORMS_END", bodyStart);
   if (bodyEnd == std::string::npos) {
     errorMessage = "UNIFORMS_BEGIN without UNIFORMS_END";

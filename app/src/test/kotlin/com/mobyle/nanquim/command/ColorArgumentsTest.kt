@@ -1,11 +1,11 @@
 package com.mobyle.nanquim.command
 
+import com.mobyle.nanquim.document.color.ColorValue
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.document.color.ColorValue
 
 class ColorArgumentsTest {
     private val previous = ColorValue.fromHsb(200f, 0.5f, 0.5f, alpha = 0.6f)

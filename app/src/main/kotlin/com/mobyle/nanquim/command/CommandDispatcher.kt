@@ -1,12 +1,12 @@
 package com.mobyle.nanquim.command
 
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonObject
 import com.mobyle.nanquim.document.command.CommandContext
 import com.mobyle.nanquim.document.command.CommandRegistry
 import com.mobyle.nanquim.document.command.CommandResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonObject
 
 class CommandDispatcher(
     val registry: CommandRegistry,

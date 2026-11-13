@@ -95,8 +95,7 @@ inline std::string_view blendModeId(BlendMode mode) {
 }
 
 inline bool isLayerBlendMode(BlendMode mode) {
-  return static_cast<int32_t>(mode) >= 0 &&
-         static_cast<int32_t>(mode) < kLayerBlendModeCount;
+  return static_cast<int32_t>(mode) >= 0 && static_cast<int32_t>(mode) < kLayerBlendModeCount;
 }
 
 }  // namespace nanquim::canvas

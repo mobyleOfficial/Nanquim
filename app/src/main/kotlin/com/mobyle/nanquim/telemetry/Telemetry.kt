@@ -19,9 +19,24 @@ enum class ArtworkOpenSource(
 }
 
 class Telemetry private constructor(
-    private val analytics: FirebaseAnalytics?,
-    private val crashlytics: FirebaseCrashlytics?,
+    private val analyticsInstance: FirebaseAnalytics?,
+    private val crashlyticsInstance: FirebaseCrashlytics?,
 ) {
+    @Volatile
+    private var collecting = analyticsInstance != null
+
+    private val analytics: FirebaseAnalytics? get() = analyticsInstance.takeIf { collecting }
+
+    private val crashlytics: FirebaseCrashlytics? get() = crashlyticsInstance.takeIf { collecting }
+
+    /** The user's choice in Settings › Privacy. Firebase remembers it across launches too. */
+    fun setCollectionEnabled(enabled: Boolean) {
+        val analytics = analyticsInstance ?: return
+        collecting = enabled
+        analytics.setAnalyticsCollectionEnabled(enabled)
+        crashlyticsInstance?.setCrashlyticsCollectionEnabled(enabled)
+    }
+
     fun screenShown(name: String) {
         crashlytics?.setCustomKey(KEY_SCREEN, name)
         analytics?.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, Bundle().apply { putString(FirebaseAnalytics.Param.SCREEN_NAME, name) })
@@ -91,6 +106,18 @@ class Telemetry private constructor(
         crashlytics?.setCustomKey(KEY_MEMORY_BUDGET_MB, bytes / BYTES_PER_MEGABYTE)
     }
 
+    fun welcomeFinished(
+        completed: Boolean,
+        card: Int,
+    ) {
+        analytics?.logEvent(
+            if (completed) EVENT_WELCOME_COMPLETED else EVENT_WELCOME_SKIPPED,
+            Bundle().apply {
+                putLong(PARAM_CARD, card.toLong())
+            },
+        )
+    }
+
     fun engineFailed(error: EngineEvent.Error) {
         crashlytics?.recordException(EngineFailure("${error.code}: ${error.message}"))
         analytics?.logEvent(EVENT_ENGINE_FAILURE, Bundle().apply { putString(PARAM_REASON, error.code.name) })
@@ -121,13 +148,17 @@ class Telemetry private constructor(
         fun create(
             context: Context,
             analyticsEnabled: Boolean,
+            userAllows: Boolean,
         ): Telemetry {
             if (FirebaseApp.getApps(context).isEmpty()) return Disabled
             if (!analyticsEnabled) {
                 FirebaseAnalytics.getInstance(context).setAnalyticsCollectionEnabled(false)
                 return Disabled
             }
-            return Telemetry(FirebaseAnalytics.getInstance(context), FirebaseCrashlytics.getInstance())
+            return Telemetry(
+                FirebaseAnalytics.getInstance(context),
+                FirebaseCrashlytics.getInstance(),
+            ).also { it.setCollectionEnabled(userAllows) }
         }
 
         const val EVENT_APP_START = "app_start"
@@ -136,6 +167,9 @@ class Telemetry private constructor(
         const val EVENT_ARTWORK_CLOSE = "artwork_close"
         const val EVENT_ARTWORK_BACKGROUND_SAVE = "artwork_background_save"
         const val EVENT_ENGINE_FAILURE = "engine_failure"
+        const val EVENT_WELCOME_COMPLETED = "welcome_completed"
+        const val EVENT_WELCOME_SKIPPED = "welcome_skipped"
+        const val PARAM_CARD = "card"
         const val PARAM_DURATION = "duration_ms"
         const val PARAM_ACTIVITY_DURATION = "activity_duration_ms"
         const val PARAM_READ_DURATION = "read_ms"

@@ -27,19 +27,21 @@ nlohmann::json::json_pointer pointerOf(const std::string& path) {
   return nlohmann::json::json_pointer(pointer);
 }
 
-nlohmann::json withValues(const nlohmann::json& document, const std::vector<TunableParameter>& parameters,
+nlohmann::json withValues(const nlohmann::json& document,
+                          const std::vector<TunableParameter>& parameters,
                           const std::vector<double>& normalized) {
   nlohmann::json result = document;
   for (size_t index = 0; index < parameters.size(); ++index) {
     const TunableParameter& parameter = parameters[index];
-    const double value =
-        parameter.minimum + (parameter.maximum - parameter.minimum) * std::clamp(normalized[index], 0.0, 1.0);
+    const double value = parameter.minimum + (parameter.maximum - parameter.minimum) *
+                                                 std::clamp(normalized[index], 0.0, 1.0);
     result[pointerOf(parameter.path)] = value;
   }
   return result;
 }
 
-std::vector<double> normalizedValues(const nlohmann::json& document, const std::vector<TunableParameter>& parameters) {
+std::vector<double> normalizedValues(const nlohmann::json& document,
+                                     const std::vector<TunableParameter>& parameters) {
   std::vector<double> values;
   for (const TunableParameter& parameter : parameters) {
     double value = parameter.minimum;
@@ -47,7 +49,8 @@ std::vector<double> normalizedValues(const nlohmann::json& document, const std::
     if (document.contains(pointer) && document.at(pointer).is_number()) {
       value = document.at(pointer).get<double>();
     }
-    values.push_back(std::clamp((value - parameter.minimum) / (parameter.maximum - parameter.minimum), 0.0, 1.0));
+    values.push_back(std::clamp(
+        (value - parameter.minimum) / (parameter.maximum - parameter.minimum), 0.0, 1.0));
   }
   return values;
 }
@@ -56,20 +59,13 @@ std::vector<double> normalizedValues(const nlohmann::json& document, const std::
 
 std::vector<TunableParameter> standardTunableParameters() {
   return {
-      {"path.spacing", 0.01, 1.0},
-      {"path.jitterLateral", 0, 1},
-      {"taper.stylus.start", 0, 300},
-      {"taper.stylus.end", 0, 300},
-      {"taper.stylus.minSize", 0, 1},
-      {"taper.stylus.minOpacity", 0, 1},
-      {"dynamics.size.min", 0, 1},
-      {"dynamics.opacity.min", 0, 1},
-      {"dynamics.size.jitter", 0, 1},
-      {"dynamics.opacity.jitter", 0, 1},
-      {"shape.scatter", 0, 1},
-      {"shape.hardness", 0, 1},
-      {"grain.scale", 0.1, 8},
-      {"grain.depth", 0, 1},
+      {"path.spacing", 0.01, 1.0},    {"path.jitterLateral", 0, 1},
+      {"taper.stylus.start", 0, 300}, {"taper.stylus.end", 0, 300},
+      {"taper.stylus.minSize", 0, 1}, {"taper.stylus.minOpacity", 0, 1},
+      {"dynamics.size.min", 0, 1},    {"dynamics.opacity.min", 0, 1},
+      {"dynamics.size.jitter", 0, 1}, {"dynamics.opacity.jitter", 0, 1},
+      {"shape.scatter", 0, 1},        {"shape.hardness", 0, 1},
+      {"grain.scale", 0.1, 8},        {"grain.depth", 0, 1},
       {"render.flow", 0.05, 1},
   };
 }
@@ -117,7 +113,8 @@ std::vector<double> minimizeNelderMead(const std::function<double(const std::vec
   std::vector<size_t> order(simplex.size());
   while (count < maximumEvaluations) {
     std::iota(order.begin(), order.end(), 0);
-    std::sort(order.begin(), order.end(), [&](size_t a, size_t b) { return values[a] < values[b]; });
+    std::sort(order.begin(), order.end(),
+              [&](size_t a, size_t b) { return values[a] < values[b]; });
     const size_t best = order.front();
     const size_t worst = order.back();
     const size_t secondWorst = order[order.size() - 2];
@@ -190,7 +187,8 @@ TuningResult tuneBrush(const nlohmann::json& brushDocument, const stroke::Loaded
   double bestDistance = INFINITY;
   int32_t evaluation = 0;
   auto distanceOf = [&](const std::vector<double>& normalized) {
-    const auto image = renderTestSheet(withValues(brushDocument, parameters, normalized), textures, scale);
+    const auto image =
+        renderTestSheet(withValues(brushDocument, parameters, normalized), textures, scale);
     const double distance = compareStatistics(target, measureSheet(image)).distance;
     bestDistance = std::min(bestDistance, distance);
     if (progress) {
@@ -201,10 +199,14 @@ TuningResult tuneBrush(const nlohmann::json& brushDocument, const stroke::Loaded
   const auto start = normalizedValues(brushDocument, parameters);
   TuningResult result;
   result.initialDistance =
-      compareStatistics(target, measureSheet(renderTestSheet(brushDocument, textures, scale))).distance;
-  const auto best = minimizeNelderMead(distanceOf, start, maximumEvaluations, 0.15, &result.evaluations);
+      compareStatistics(target, measureSheet(renderTestSheet(brushDocument, textures, scale)))
+          .distance;
+  const auto best =
+      minimizeNelderMead(distanceOf, start, maximumEvaluations, 0.15, &result.evaluations);
   result.brush = withValues(brushDocument, parameters, best);
-  result.distance = compareStatistics(target, measureSheet(renderTestSheet(result.brush, textures, scale))).distance;
+  result.distance =
+      compareStatistics(target, measureSheet(renderTestSheet(result.brush, textures, scale)))
+          .distance;
   if (result.distance > result.initialDistance) {
     result.brush = brushDocument;
     result.distance = result.initialDistance;

@@ -1,7 +1,5 @@
 package com.mobyle.nanquim.ui.canvas
 
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.material3.ripple
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -33,6 +31,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,12 +57,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.library.BrushLibrary
@@ -80,10 +77,13 @@ import com.mobyle.nanquim.command.ReferenceCommandIds
 import com.mobyle.nanquim.command.SliderNames
 import com.mobyle.nanquim.command.TimelapseCommandIds
 import com.mobyle.nanquim.command.ToolCommandIds
+import com.mobyle.nanquim.engine.Point
 import com.mobyle.nanquim.gallery.TimelapseLength
 import com.mobyle.nanquim.ui.common.LocalWindowLayout
 import com.mobyle.nanquim.ui.common.NanquimIcons
-import com.mobyle.nanquim.engine.Point
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
@@ -277,7 +277,11 @@ private fun ActionsMenuButton(
                 onCommand(AnimationCommandIds.SET_ENABLED, mapOf("enabled" to !animationOn))
             }
             HorizontalDivider()
-            val recording = session.artwork?.info?.timelapse?.enabled == true
+            val recording =
+                session.artwork
+                    ?.info
+                    ?.timelapse
+                    ?.enabled == true
             item(R.string.command_timelapse_set_enabled, enabled = session.artwork != null, checked = recording) {
                 onCommand(TimelapseCommandIds.SET_ENABLED, mapOf("enabled" to !recording))
             }
@@ -340,7 +344,8 @@ fun ToolSliders(
                     onCommand(ToolCommandIds.BRUSH_SET_SIZE, mapOf("sizePx" to settings.limits.sizeAt(slider)))
                 }
                 val opacityLabel = stringResource(R.string.tool_opacity)
-                val opacityText = stringResource(R.string.tool_opacity_value, (settings.limits.opacityAt(settings.opacitySlider) * 100).roundToInt())
+                val opacityText =
+                    stringResource(R.string.tool_opacity_value, (settings.limits.opacityAt(settings.opacitySlider) * 100).roundToInt())
                 VerticalSlider(settings.opacitySlider, opacityLabel, opacityText, sliderLength) { slider ->
                     onCommand(ToolCommandIds.BRUSH_SET_OPACITY, mapOf("opacity" to settings.limits.opacityAt(slider)))
                 }
