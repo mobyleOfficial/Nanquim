@@ -2,15 +2,18 @@
 precision highp float;
 precision highp int;
 
-const int kMaxLayers = 16;
+// 15, not 16: the array starts at unit 1 (unit 0 is the upload unit), so 16 layers would
+// need unit 16 and 16 fragment samplers, the bare ES 3.1 minimum. The Samsung Xclipse GLES
+// compiler crashes on that shader; Compositor::kMaxLayersPerPass must match.
+const int kMaxLayers = 15;
 
 layout(binding = 1) uniform highp sampler2D atlasPages[kMaxLayers];
 
 UNIFORMS_BEGIN(CompositeLayersParameters)
   UNIFORM(int, layerCount)
-  UNIFORM_ARRAY(ivec2, layerSlotOrigin, 16)
-  UNIFORM_ARRAY(float, layerOpacity, 16)
-  UNIFORM_ARRAY(vec4, layerTint, 16)
+  UNIFORM_ARRAY(ivec2, layerSlotOrigin, 15)
+  UNIFORM_ARRAY(float, layerOpacity, 15)
+  UNIFORM_ARRAY(vec4, layerTint, 15)
   UNIFORM(ivec2, targetOrigin)
   UNIFORM(int, sampleStride)
 UNIFORMS_END
@@ -43,6 +46,5 @@ void main() {
   if (layerCount > 12) result = over(tinted(texelFetch(atlasPages[12], layerSlotOrigin[12] + local, 0), layerTint[12]) * layerOpacity[12], result);
   if (layerCount > 13) result = over(tinted(texelFetch(atlasPages[13], layerSlotOrigin[13] + local, 0), layerTint[13]) * layerOpacity[13], result);
   if (layerCount > 14) result = over(tinted(texelFetch(atlasPages[14], layerSlotOrigin[14] + local, 0), layerTint[14]) * layerOpacity[14], result);
-  if (layerCount > 15) result = over(tinted(texelFetch(atlasPages[15], layerSlotOrigin[15] + local, 0), layerTint[15]) * layerOpacity[15], result);
   fragmentColor = result;
 }
