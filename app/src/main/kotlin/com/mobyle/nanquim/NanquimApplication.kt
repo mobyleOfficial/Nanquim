@@ -119,6 +119,7 @@ class NanquimApplication : Application() {
         val renderer = developerRenderer() ?: appSettings.renderer
         appSettings.startedRenderer = renderer
         telemetry.memoryBudgetChanged(memoryBudgetPolicy.currentBytes)
+        reportInterruptedShaderCompile()
         Engine(EngineConfig(memoryBudgetPolicy.currentBytes, scratchDirectory().absolutePath, renderer = renderer)).also { engine ->
             applicationScope.launch { engine.unrecoverableError.filterNotNull().collect(telemetry::engineFailed) }
             engine.requestGpuInfo { info ->
@@ -487,6 +488,17 @@ class NanquimApplication : Application() {
 
     private fun scratchDirectory(): File = File(cacheDir, "engine").apply { mkdirs() }
 
+    /**
+     * The engine leaves this marker behind when the GPU driver crashes the process while it
+     * compiles a shader; report which program it was, so the native crash can be traced to it.
+     */
+    private fun reportInterruptedShaderCompile() {
+        val marker = File(scratchDirectory(), "shaders/$SHADER_COMPILING_MARKER")
+        val lines = runCatching { marker.readLines() }.getOrNull() ?: return
+        marker.delete()
+        telemetry.shaderCompileInterrupted(program = lines.getOrNull(0).orEmpty(), driver = lines.getOrNull(1).orEmpty())
+    }
+
     private fun developerRenderer(): Renderer? {
         val value =
             runCatching {
@@ -498,6 +510,9 @@ class NanquimApplication : Application() {
 
     private companion object {
         const val COLOR_SAVE_INTERVAL_MILLIS = 500L
+
+        /** Kept in sync with ShaderVariantCache::kCompilingMarker in the engine. */
+        const val SHADER_COMPILING_MARKER = "compiling.txt"
         const val MEMORY_SAMPLE_INTERVAL_MILLISECONDS = 2_000L
         const val QUICK_MENU_PREFERENCES = "quick-menu"
 

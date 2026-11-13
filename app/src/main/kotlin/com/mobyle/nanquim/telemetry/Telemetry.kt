@@ -123,6 +123,16 @@ class Telemetry private constructor(
         analytics?.logEvent(EVENT_ENGINE_FAILURE, Bundle().apply { putString(PARAM_REASON, error.code.name) })
     }
 
+    fun shaderCompileInterrupted(
+        program: String,
+        driver: String,
+    ) {
+        val crashlytics = crashlytics ?: return
+        crashlytics.setCustomKey(KEY_SHADER_COMPILE_CRASH, program)
+        crashlytics.setCustomKey(KEY_GPU_DRIVER, driver)
+        crashlytics.recordException(ShaderCompileInterrupted("Previous run crashed compiling $program on $driver"))
+    }
+
     private inline fun performance(
         event: String,
         parameters: Bundle.() -> Unit,
@@ -139,6 +149,10 @@ class Telemetry private constructor(
     }
 
     class EngineFailure(
+        message: String,
+    ) : Exception(message)
+
+    class ShaderCompileInterrupted(
         message: String,
     ) : Exception(message)
 
@@ -186,6 +200,8 @@ class Telemetry private constructor(
         private const val KEY_RENDERER = "renderer"
         private const val KEY_RENDERER_STARTED = "renderer_started"
         private const val KEY_MEMORY_BUDGET_MB = "memory_budget_mb"
+        private const val KEY_SHADER_COMPILE_CRASH = "shader_compile_crash"
+        private const val KEY_GPU_DRIVER = "gpu_driver"
         private const val BYTES_PER_MEGABYTE = 1024L * 1024L
     }
 }
