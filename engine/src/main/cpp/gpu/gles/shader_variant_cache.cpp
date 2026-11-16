@@ -148,6 +148,9 @@ void ShaderVariantCache::storeBinary(const std::string& path, const ShaderProgra
 }
 
 void ShaderVariantCache::markCompiling(const std::string& key) const {
+  // Logged before the driver sees the source, so a crash inside the compiler leaves the program
+  // name as the last engine line in logcat.
+  NANQUIM_LOG_INFO("Compiling shader %s on %s", key.c_str(), driverIdentity_.c_str());
   if (binaryDirectory_.empty()) {
     return;
   }
