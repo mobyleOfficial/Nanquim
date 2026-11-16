@@ -53,10 +53,10 @@ struct CompositeLayersParameters {
   int32_t padding1;
 };
 static_assert(offsetof(CompositeLayersParameters, layerSlotOrigin) == 16);
-static_assert(offsetof(CompositeLayersParameters, layerOpacity) == 272);
-static_assert(offsetof(CompositeLayersParameters, layerTint) == 528);
-static_assert(offsetof(CompositeLayersParameters, targetOrigin) == 784);
-static_assert(sizeof(CompositeLayersParameters) == 800);
+static_assert(offsetof(CompositeLayersParameters, layerOpacity) == 256);
+static_assert(offsetof(CompositeLayersParameters, layerTint) == 496);
+static_assert(offsetof(CompositeLayersParameters, targetOrigin) == 736);
+static_assert(sizeof(CompositeLayersParameters) == 752);
 
 struct CompositeRegionCopyParameters {
   std::array<int32_t, 2> targetOrigin;

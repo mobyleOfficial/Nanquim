@@ -12,6 +12,10 @@ namespace nanquim::gpu::gles {
 
 class ShaderVariantCache {
  public:
+  // Written to the binary directory while the driver compiles a program, and removed after.
+  // A driver crash leaves it behind, so the app can report which program was compiling.
+  static constexpr const char* kCompilingMarker = "compiling.txt";
+
   explicit ShaderVariantCache(std::string binaryDirectory);
 
   void initialize();
@@ -37,6 +41,8 @@ class ShaderVariantCache {
 
   [[nodiscard]] std::unique_ptr<ShaderProgram> loadBinary(const std::string& path) const;
   void storeBinary(const std::string& path, const ShaderProgram& program) const;
+  void markCompiling(const std::string& key) const;
+  void clearCompiling() const;
 
   std::string binaryDirectory_;
   std::string driverIdentity_;
