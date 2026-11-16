@@ -4,7 +4,10 @@ precision highp int;
 
 const int kMaximumHalfWidth = 100;
 
-layout(binding = 1) uniform highp sampler2D pages[3];
+// Separate samplers, not an array: the Samsung Xclipse GLES compiler crashes on sampler2D arrays.
+layout(binding = 1) uniform highp sampler2D page0;
+layout(binding = 2) uniform highp sampler2D page1;
+layout(binding = 3) uniform highp sampler2D page2;
 
 UNIFORMS_BEGIN(SelectionBlurParameters)
   UNIFORM_ARRAY(ivec2, slotOrigins, 3)
@@ -27,12 +30,12 @@ float valueAt(int position, ivec2 local) {
     return 0.0;
   }
   if (tile == 0) {
-    return hasTiles[0] ? texelFetch(pages[0], slotOrigins[0] + texel, 0).r : 0.0;
+    return hasTiles[0] ? texelFetch(page0, slotOrigins[0] + texel, 0).r : 0.0;
   }
   if (tile == 1) {
-    return hasTiles[1] ? texelFetch(pages[1], slotOrigins[1] + texel, 0).r : 0.0;
+    return hasTiles[1] ? texelFetch(page1, slotOrigins[1] + texel, 0).r : 0.0;
   }
-  return hasTiles[2] ? texelFetch(pages[2], slotOrigins[2] + texel, 0).r : 0.0;
+  return hasTiles[2] ? texelFetch(page2, slotOrigins[2] + texel, 0).r : 0.0;
 }
 
 void main() {

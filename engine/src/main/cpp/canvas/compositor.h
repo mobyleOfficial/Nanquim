@@ -83,7 +83,7 @@ class Compositor {
 
   [[nodiscard]] std::optional<int32_t> displayLevelOverride(const TileRange& visibleTiles) const;
 
-  // Matches kMaxLayers in composite_layers_fragment.glsl; see the note there.
+  // Matches the atlasPage samplers in composite_layers_fragment.glsl (units 1-15).
   static constexpr size_t kMaxLayersPerPass = 15;
 
   [[nodiscard]] int32_t widthPixels() const { return widthPixels_; }
