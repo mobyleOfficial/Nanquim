@@ -8,6 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
+import com.google.android.ump.ConsentDebugSettings
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
@@ -41,7 +43,7 @@ class GalleryAds(
     /** Asks for consent when needed (a form shows only the first time, and only where required), then starts the SDK. */
     fun start(activity: Activity) {
         if (!enabled) return
-        val parameters = ConsentRequestParameters.Builder().build()
+        val parameters = ConsentRequestParameters.Builder().apply { consentDebugSettings(activity)?.let(::setConsentDebugSettings) }.build()
         consent.requestConsentInfoUpdate(
             activity,
             parameters,
@@ -75,7 +77,36 @@ class GalleryAds(
     private fun initializeIfAllowed(activity: Activity) {
         if (!consent.canRequestAds() || !initializing.compareAndSet(false, true)) return
         val context = activity.applicationContext
+        // The gallery is for every age: no ad above PG, whatever the AdMob console says.
+        MobileAds.setRequestConfiguration(
+            RequestConfiguration.Builder().setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_PG).build(),
+        )
         // Google recommends starting the SDK off the main thread.
         thread(name = "ads-init") { MobileAds.initialize(context) { mainThread.post { ready = true } } }
+    }
+
+    /**
+     * Debug builds only, from `admob.debugGeography` and `admob.testDeviceIds` in local.properties: pretend the device
+     * is in that region and forget the last answer, so the consent form shows on every launch.
+     */
+    private fun consentDebugSettings(activity: Activity): ConsentDebugSettings? {
+        val geography =
+            when (BuildConfig.ADS_DEBUG_GEOGRAPHY) {
+                "EEA" -> ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA
+                "OTHER" -> ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_OTHER
+                "REGULATED_US_STATE" -> ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_REGULATED_US_STATE
+                else -> return null
+            }
+        consent.reset()
+        return ConsentDebugSettings
+            .Builder(activity)
+            .setDebugGeography(geography)
+            .apply {
+                BuildConfig.ADS_TEST_DEVICE_IDS
+                    .split(',')
+                    .map(String::trim)
+                    .filter(String::isNotEmpty)
+                    .forEach(::addTestDeviceHashedId)
+            }.build()
     }
 }
