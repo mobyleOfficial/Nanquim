@@ -77,8 +77,8 @@ android {
                 .get()
                 .toInt()
         // Bumped by one for every Play upload.
-        versionCode = 3
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Consent testing is for debug builds only; see the AdMob settings above.
         buildConfigField("String", "ADS_TEST_DEVICE_IDS", "\"\"")
