@@ -26,9 +26,17 @@ class SamplerArrayCompileProbeTest {
         check(EGL14.eglInitialize(display, version, 0, version, 1))
         val configs = arrayOfNulls<EGLConfig>(1)
         val count = IntArray(1)
-        val attributes = intArrayOf(EGL14.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT, EGL14.EGL_SURFACE_TYPE, EGL14.EGL_PBUFFER_BIT, EGL14.EGL_NONE)
+        val attributes =
+            intArrayOf(EGL14.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT, EGL14.EGL_SURFACE_TYPE, EGL14.EGL_PBUFFER_BIT, EGL14.EGL_NONE)
         check(EGL14.eglChooseConfig(display, attributes, 0, configs, 0, 1, count, 0) && count[0] > 0)
-        context = EGL14.eglCreateContext(display, configs[0], EGL14.EGL_NO_CONTEXT, intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 3, EGL14.EGL_NONE), 0)
+        context =
+            EGL14.eglCreateContext(
+                display,
+                configs[0],
+                EGL14.EGL_NO_CONTEXT,
+                intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 3, EGL14.EGL_NONE),
+                0,
+            )
         surface = EGL14.eglCreatePbufferSurface(display, configs[0], intArrayOf(EGL14.EGL_WIDTH, 1, EGL14.EGL_HEIGHT, 1, EGL14.EGL_NONE), 0)
         check(EGL14.eglMakeCurrent(display, surface, surface, context))
         Log.i(TAG, "Driver: ${GLES31.glGetString(GLES31.GL_RENDERER)} | ${GLES31.glGetString(GLES31.GL_VERSION)}")
@@ -42,11 +50,17 @@ class SamplerArrayCompileProbeTest {
         EGL14.eglTerminate(display)
     }
 
-    @Test fun a_selectionBlurAsShipped() = compiles("A selection_blur as shipped", selectionBlur(separateSamplers = false, boolUniforms = true))
+    @Test fun a_selectionBlurAsShipped() =
+        compiles(
+            "A selection_blur as shipped",
+            selectionBlur(separateSamplers = false, boolUniforms = true),
+        )
 
-    @Test fun b_selectionBlurSeparateSamplers() = compiles("B selection_blur separate samplers", selectionBlur(separateSamplers = true, boolUniforms = true))
+    @Test fun b_selectionBlurSeparateSamplers() =
+        compiles("B selection_blur separate samplers", selectionBlur(separateSamplers = true, boolUniforms = true))
 
-    @Test fun c_selectionBlurIntInsteadOfBool() = compiles("C selection_blur int uniforms", selectionBlur(separateSamplers = false, boolUniforms = false))
+    @Test fun c_selectionBlurIntInsteadOfBool() =
+        compiles("C selection_blur int uniforms", selectionBlur(separateSamplers = false, boolUniforms = false))
 
     @Test fun d_minimalSamplerArray() =
         compiles(
@@ -65,7 +79,11 @@ class SamplerArrayCompileProbeTest {
 
     @Test fun e_compositeLayersAsShipped() = compiles("E composite_layers as shipped", compositeLayers(separateSamplers = false))
 
-    @Test fun f_compositeLayersSeparateSamplers() = compiles("F composite_layers separate samplers", compositeLayers(separateSamplers = true))
+    @Test fun f_compositeLayersSeparateSamplers() =
+        compiles(
+            "F composite_layers separate samplers",
+            compositeLayers(separateSamplers = true),
+        )
 
     private fun compiles(
         name: String,
@@ -97,6 +115,7 @@ class SamplerArrayCompileProbeTest {
             } else {
                 "layout(binding = 1) uniform highp sampler2D pages[3];"
             }
+
         fun page(index: Int) = if (separateSamplers) "page$index" else "pages[$index]"
         return """
             |#version 310 es

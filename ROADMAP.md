@@ -146,9 +146,9 @@ Sobre e feedback
 | 2 | Relatar erro / sugerir (GitHub) | 1 | `feat/settings-feedback` | Feito |
 | 7 | Confirmar saída no voltar | 2 | `feat/exit-and-state` | Feito |
 | 8 | Preservar estado | 2 | `feat/exit-and-state` | Feito |
-| 9 | Anúncios só na Galeria | 3 | `feat/gallery-ads` | Feito · faltam os IDs do AdMob (`ads.properties`), o `app-ads.txt` e a ficha da Play |
+| 9 | Anúncios só na Galeria | 3 | `feat/gallery-ads` | Feito · faltam os IDs do AdMob (`admob.*` no `local.properties`), o `app-ads.txt` e a ficha da Play |
 | 1 | Onboarding | 4 | `feat/onboarding` | Feito |
 
-Versão **1.0.0** (`versionCode` 10000) em `chore/version-1.0.0`.
+Versão **1.1.0** (`versionCode` 4).
 
 Strings novas sempre em `values/strings.xml` **e** `values-pt-rBR/strings.xml`.

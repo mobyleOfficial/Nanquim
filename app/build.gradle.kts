@@ -33,15 +33,29 @@ val keystoreProperties =
     }
 val releaseKeystore = keystoreProperties.getProperty("storeFile")?.let(rootProject::file)?.takeIf { it.exists() }
 
-// AdMob IDs for the gallery banner live in ads.properties (ignored by git; see ads.properties.example). Debug builds
-// always use Google's test IDs; a release build without ads.properties shows no ads at all.
-val adsProperties =
+// AdMob settings live in local.properties (ignored by git; the repository is public):
+//   admob.appId=ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX            the app, from the AdMob console
+//   admob.galleryBannerId=ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX   the gallery's banner unit
+//   admob.testDeviceIds=<hashed id from Logcat>,<another>          debug only: devices the consent form treats as test devices
+//   admob.debugGeography=EEA                                       debug only: EEA, REGULATED_US_STATE or OTHER
+// Debug builds always use Google's test IDs; a release build without both IDs shows no ads at all. With
+// admob.debugGeography set, debug builds forget the consent on every launch so the form can be tested again and again.
+val localProperties =
     Properties().apply {
-        val adsPropertiesFile = rootProject.file("ads.properties")
-        if (adsPropertiesFile.exists()) adsPropertiesFile.inputStream().use(::load)
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) localPropertiesFile.inputStream().use(::load)
     }
-val admobAppId: String? = adsProperties.getProperty("admobAppId")?.takeIf { it.isNotBlank() }
-val galleryBannerId: String? = adsProperties.getProperty("galleryBannerId")?.takeIf { it.isNotBlank() }
+
+fun localProperty(name: String): String? = localProperties.getProperty(name)?.trim()?.takeIf { it.isNotEmpty() }
+
+val admobAppId: String? = localProperty("admob.appId")
+val galleryBannerId: String? = localProperty("admob.galleryBannerId")
+val adsTestDeviceIds: String = localProperty("admob.testDeviceIds").orEmpty()
+val adsDebugGeography: String = localProperty("admob.debugGeography").orEmpty().uppercase()
+
+require(adsDebugGeography in setOf("", "EEA", "REGULATED_US_STATE", "OTHER")) {
+    "admob.debugGeography must be EEA, REGULATED_US_STATE or OTHER, not $adsDebugGeography"
+}
 val testAdmobAppId = "ca-app-pub-3940256099942544~3347511713"
 val testBannerId = "ca-app-pub-3940256099942544/9214589741"
 
@@ -63,9 +77,12 @@ android {
                 .get()
                 .toInt()
         // Bumped by one for every Play upload.
-        versionCode = 3
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Consent testing is for debug builds only; see the AdMob settings above.
+        buildConfigField("String", "ADS_TEST_DEVICE_IDS", "\"\"")
+        buildConfigField("String", "ADS_DEBUG_GEOGRAPHY", "\"\"")
     }
 
     signingConfigs {
@@ -85,6 +102,8 @@ android {
             manifestPlaceholders["admobAppId"] = testAdmobAppId
             buildConfigField("boolean", "ADS_ENABLED", "true")
             buildConfigField("String", "ADS_GALLERY_BANNER_ID", "\"$testBannerId\"")
+            buildConfigField("String", "ADS_TEST_DEVICE_IDS", "\"$adsTestDeviceIds\"")
+            buildConfigField("String", "ADS_DEBUG_GEOGRAPHY", "\"$adsDebugGeography\"")
         }
         release {
             signingConfig = signingConfigs.findByName("release")
