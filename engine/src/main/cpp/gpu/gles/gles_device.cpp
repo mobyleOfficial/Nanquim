@@ -2,8 +2,10 @@
 
 #include <algorithm>
 #include <cstring>
+#include <utility>
 
 #include "core/log.h"
+#include "core/required.h"
 #include "gpu/embedded_shader_source.h"
 #include "gpu/gles/gles_info.h"
 
@@ -146,7 +148,7 @@ class GlesPipeline final : public rhi::Pipeline {
       : program_(program),
         blend_(blend),
         topology_(topology),
-        layout_(layout),
+        layout_(std::move(layout)),
         emptyVertexArray_(emptyVertexArray) {
     if (layout_) {
       vertexArray_ = createVertexArray();
@@ -184,11 +186,12 @@ class GlesPipeline final : public rhi::Pipeline {
   void setVertexBuffer(GLuint buffer, size_t offset) const {
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     size_t attributeOffset = offset;
-    for (GLuint location = 0; location < layout_->attributes; ++location) {
-      const GLint components =
-          location < layout_->components.size() ? layout_->components[location] : 4;
+    for (GLuint location = 0; location < core::required(layout_).attributes; ++location) {
+      const GLint components = location < core::required(layout_).components.size()
+                                   ? core::required(layout_).components[location]
+                                   : 4;
       glVertexAttribPointer(location, components, GL_FLOAT, GL_FALSE,
-                            static_cast<GLsizei>(layout_->stride),
+                            static_cast<GLsizei>(core::required(layout_).stride),
                             reinterpret_cast<const void*>(attributeOffset));
       attributeOffset += static_cast<size_t>(components) * sizeof(float);
     }
@@ -825,12 +828,13 @@ void GlesDevice::uploadPendingUniforms() {
       continue;
     }
     const GLsizei count = member.count == 0 ? 1 : member.count;
-    const auto elementBytes = static_cast<size_t>(4 * member.components);
+    const auto elementBytes = 4 * static_cast<size_t>(member.components);
     if (member.count != 0) {
       packed.resize(elementBytes * static_cast<size_t>(count));
       for (GLsizei element = 0; element < count; ++element) {
         std::memcpy(packed.data() + elementBytes * static_cast<size_t>(element),
-                    value + member.stride * static_cast<uint32_t>(element), elementBytes);
+                    value + static_cast<size_t>(member.stride) * static_cast<size_t>(element),
+                    elementBytes);
       }
       value = packed.data();
     }
@@ -932,7 +936,7 @@ void GlesDevice::draw(uint32_t vertexCount, uint32_t instanceCount) {
   const GLenum mode = boundPipeline_ != nullptr ? boundPipeline_->mode() : GL_TRIANGLES;
   const bool instanced =
       instanceCount != 1 || (boundPipeline_ != nullptr && boundPipeline_->layout() &&
-                             boundPipeline_->layout()->perInstance);
+                             core::required(boundPipeline_->layout()).perInstance);
   if (!instanced) {
     glDrawArrays(mode, 0, static_cast<GLsizei>(vertexCount));
   } else {

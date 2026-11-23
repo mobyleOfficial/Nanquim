@@ -42,8 +42,6 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.command.KeyboardCommandIds
 import com.mobyle.nanquim.keyboard.KeyChord
@@ -52,6 +50,8 @@ import com.mobyle.nanquim.keyboard.KeyboardShortcutSettings
 import com.mobyle.nanquim.keyboard.KeyboardShortcuts
 import com.mobyle.nanquim.keyboard.ShortcutAction
 import com.mobyle.nanquim.ui.common.ScreenHeader
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

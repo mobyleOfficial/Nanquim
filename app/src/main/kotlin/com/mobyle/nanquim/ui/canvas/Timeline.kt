@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.ui.canvas
 
-import com.mobyle.nanquim.ui.common.LabeledSwitch
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -64,6 +63,7 @@ import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.LayerGroup
 import com.mobyle.nanquim.document.layer.LayerNode
 import com.mobyle.nanquim.document.layer.RasterLayer
+import com.mobyle.nanquim.ui.common.LabeledSwitch
 import kotlin.math.roundToInt
 
 @Composable
@@ -76,7 +76,11 @@ fun TimelineBar(
     val currentFrameId = session.documentSession?.currentFrameId
     var settingsShown by remember { mutableStateOf(false) }
     Surface(modifier = modifier, shape = RoundedCornerShape(16.dp), tonalElevation = 3.dp) {
-        Row(Modifier.padding(8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            Modifier.padding(8.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             FilledTonalButton(onClick = { onCommand(AnimationCommandIds.TOGGLE_PLAYBACK, emptyMap()) }) {
                 Text(stringResource(if (session.playback.playing) R.string.animation_pause else R.string.animation_play))
             }
@@ -87,7 +91,9 @@ fun TimelineBar(
                         AnimationSettingsMenu(state.animation, onCommand)
                     }
                 }
-                TextButton(onClick = { onCommand(AnimationCommandIds.ADD_FRAME, emptyMap()) }) { Text(stringResource(R.string.animation_add_frame)) }
+                TextButton(
+                    onClick = { onCommand(AnimationCommandIds.ADD_FRAME, emptyMap()) },
+                ) { Text(stringResource(R.string.animation_add_frame)) }
             }
             FrameStrip(session, state, currentFrameId, onCommand, Modifier.weight(1f))
         }
@@ -140,7 +146,18 @@ private fun FrameStrip(
                             },
                             onDragEnd = {
                                 val target = (latestIndex + (dragOffset / stepPixels).roundToInt()).coerceIn(0, frames.lastIndex)
-                                if (target != latestIndex) onCommand(DocumentCommandIds.LAYER_MOVE, mapOf("layerId" to frame.id, "parentId" to null, "index" to target))
+                                if (target !=
+                                    latestIndex
+                                ) {
+                                    onCommand(
+                                        DocumentCommandIds.LAYER_MOVE,
+                                        mapOf(
+                                            "layerId" to frame.id,
+                                            "parentId" to null,
+                                            "index" to target,
+                                        ),
+                                    )
+                                }
                                 draggedId = null
                                 dragOffset = 0f
                             },
@@ -222,7 +239,16 @@ private fun FrameOptions(
                 hold = it
                 onCommand(AnimationCommandIds.SET_HOLD, mapOf("layerId" to frame.id, "holdFrames" to it.roundToInt(), "final" to false))
             },
-            onValueChangeFinished = { onCommand(AnimationCommandIds.SET_HOLD, mapOf("layerId" to frame.id, "holdFrames" to hold.roundToInt(), "final" to true)) },
+            onValueChangeFinished = {
+                onCommand(
+                    AnimationCommandIds.SET_HOLD,
+                    mapOf(
+                        "layerId" to frame.id,
+                        "holdFrames" to hold.roundToInt(),
+                        "final" to true,
+                    ),
+                )
+            },
             valueRange = 0f..MAXIMUM_HOLD_SHOWN.toFloat(),
             steps = MAXIMUM_HOLD_SHOWN - 1,
         )
@@ -264,8 +290,16 @@ private fun AnimationSettingsMenu(
     ) = onCommand(AnimationCommandIds.SET_SETTINGS, mapOf(name to value, "final" to final))
     Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp).width(SETTINGS_WIDTH), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            for ((mode, label) in listOf(PlaybackMode.Loop to R.string.animation_loop, PlaybackMode.PingPong to R.string.animation_ping_pong, PlaybackMode.OneShot to R.string.animation_one_shot)) {
-                FilterChip(selected = animation.playback == mode, onClick = { set("playback", mode.id) }, label = { Text(stringResource(label)) })
+            for ((mode, label) in listOf(
+                PlaybackMode.Loop to R.string.animation_loop,
+                PlaybackMode.PingPong to R.string.animation_ping_pong,
+                PlaybackMode.OneShot to R.string.animation_one_shot,
+            )) {
+                FilterChip(
+                    selected = animation.playback == mode,
+                    onClick = { set("playback", mode.id) },
+                    label = { Text(stringResource(label)) },
+                )
             }
         }
         Text(stringResource(R.string.animation_frames_per_second, framesPerSecond.roundToInt()))

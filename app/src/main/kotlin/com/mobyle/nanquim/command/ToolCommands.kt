@@ -1,5 +1,25 @@
 package com.mobyle.nanquim.command
 
+import com.mobyle.nanquim.R
+import com.mobyle.nanquim.canvas.CanvasSession
+import com.mobyle.nanquim.canvas.ColorPanelMode
+import com.mobyle.nanquim.canvas.input.CanvasTool
+import com.mobyle.nanquim.document.color.CmykConversion
+import com.mobyle.nanquim.document.color.CmykInks
+import com.mobyle.nanquim.document.color.ColorHarmony
+import com.mobyle.nanquim.document.color.ColorValue
+import com.mobyle.nanquim.document.color.InkChannel
+import com.mobyle.nanquim.document.command.AppState
+import com.mobyle.nanquim.document.command.Availability
+import com.mobyle.nanquim.document.command.CommandCategory
+import com.mobyle.nanquim.document.command.CommandErrorCode
+import com.mobyle.nanquim.document.command.CommandRegistry
+import com.mobyle.nanquim.document.command.CommandResult
+import com.mobyle.nanquim.document.command.CommandSpec
+import com.mobyle.nanquim.document.command.ParameterSpec
+import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.engine.StrokeSampleBuffer
+import com.mobyle.nanquim.engine.StrokeTool
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -13,26 +33,6 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
-import com.mobyle.nanquim.R
-import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.canvas.ColorPanelMode
-import com.mobyle.nanquim.canvas.input.CanvasTool
-import com.mobyle.nanquim.document.color.CmykConversion
-import com.mobyle.nanquim.document.color.CmykInks
-import com.mobyle.nanquim.document.color.InkChannel
-import com.mobyle.nanquim.document.color.ColorHarmony
-import com.mobyle.nanquim.document.color.ColorValue
-import com.mobyle.nanquim.document.command.AppState
-import com.mobyle.nanquim.document.command.Availability
-import com.mobyle.nanquim.document.command.CommandCategory
-import com.mobyle.nanquim.document.command.CommandErrorCode
-import com.mobyle.nanquim.document.command.CommandRegistry
-import com.mobyle.nanquim.document.command.CommandResult
-import com.mobyle.nanquim.document.command.CommandSpec
-import com.mobyle.nanquim.document.command.ParameterSpec
-import com.mobyle.nanquim.document.command.ParameterType
-import com.mobyle.nanquim.engine.StrokeSampleBuffer
-import com.mobyle.nanquim.engine.StrokeTool
 
 object ToolCommandIds {
     const val TOOL_SELECT = "tool.select"
@@ -69,7 +69,8 @@ private const val TOOL_CLONE = "clone"
 private const val TOOL_CROP = "crop"
 private const val TOOL_GUIDE = "guide"
 private const val TOOL_TEXT = "text"
-private val TOOLS = listOf(TOOL_BRUSH, TOOL_SMUDGE, TOOL_ERASER, TOOL_SELECTION, TOOL_TRANSFORM, TOOL_CLONE, TOOL_CROP, TOOL_GUIDE, TOOL_TEXT)
+private val TOOLS =
+    listOf(TOOL_BRUSH, TOOL_SMUDGE, TOOL_ERASER, TOOL_SELECTION, TOOL_TRANSFORM, TOOL_CLONE, TOOL_CROP, TOOL_GUIDE, TOOL_TEXT)
 private const val SAMPLE_FIELDS = 4
 private const val NANOS_PER_MILLI = 1_000_000.0
 private const val TOOL_TYPE_STYLUS = 2
@@ -183,7 +184,13 @@ fun registerToolCommands(
                     return@register CommandResult.Failure(
                         CommandErrorCode.InvalidArguments,
                         "Give red, green and blue; or hue, saturation and brightness; or hex (RRGGBB)" +
-                            if (conversion != null) "; or cyan, magenta, yellow and black" else " (cyan, magenta, yellow and black need a CMYK canvas)",
+                            if (conversion !=
+                                null
+                            ) {
+                                "; or cyan, magenta, yellow and black"
+                            } else {
+                                " (cyan, magenta, yellow and black need a CMYK canvas)"
+                            },
                     )
             }
             CommandResult.Success((if (secondary) session.colors.secondary else session.colors.primary).toJson(session::inksOf))
@@ -359,7 +366,18 @@ internal fun JsonObject.colorValue(
 private fun JsonObject.inks(): CmykInks? {
     val values = InkChannel.entries.map { (this[it.id] as? JsonPrimitive)?.doubleOrNull?.toFloat() }
     if (values.any { it == null }) return null
-    if (listOf("red", "green", "blue", "hue", "saturation", "brightness", "hex").any { this[it] != null && this[it] != JsonNull }) return null
+    if (listOf(
+            "red",
+            "green",
+            "blue",
+            "hue",
+            "saturation",
+            "brightness",
+            "hex",
+        ).any { this[it] != null && this[it] != JsonNull }
+    ) {
+        return null
+    }
     return CmykInks(values[0]!!, values[1]!!, values[2]!!, values[3]!!)
 }
 

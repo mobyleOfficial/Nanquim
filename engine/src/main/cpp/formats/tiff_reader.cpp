@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <utility>
 #include <vector>
 
 namespace nanquim::formats {
@@ -575,8 +576,8 @@ uint64_t typeSize(uint16_t type) {
 
 class TiffImporter {
  public:
-  TiffImporter(InputSource& source, std::string folder, const ImportLimits& limits)
-      : source_(source), folder_(std::move(folder)), limits_(limits) {}
+  TiffImporter(InputSource& source, std::string folder, ImportLimits limits)
+      : source_(source), folder_(std::move(folder)), limits_(std::move(limits)) {}
 
   ImportResult run();
 

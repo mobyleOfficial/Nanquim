@@ -1,11 +1,5 @@
 package com.mobyle.nanquim.formats.nanquim
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Test
 import com.mobyle.nanquim.document.guide.GridGuide
 import com.mobyle.nanquim.document.guide.GuideSettings
 import com.mobyle.nanquim.document.guide.GuideType
@@ -15,6 +9,12 @@ import com.mobyle.nanquim.document.guide.SymmetryKind
 import com.mobyle.nanquim.document.guide.VanishingPoint
 import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.addRasterLayer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class GuidesJsonTest {

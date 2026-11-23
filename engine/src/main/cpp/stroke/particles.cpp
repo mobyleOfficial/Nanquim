@@ -54,8 +54,8 @@ void ParticleSystem::emit(const std::vector<Dab>& dabs) {
           break;
         }
       }
-      const double speed =
-          parameters_.initialSpeed * (1.0 - std::clamp(parameters_.speedJitter, 0.0, 1.0) * speedDraw);
+      const double speed = parameters_.initialSpeed *
+                           (1.0 - std::clamp(parameters_.speedJitter, 0.0, 1.0) * speedDraw);
       Particle particle;
       particle.birth = dab;
       particle.bornMilliseconds = dab.timeMilliseconds;
@@ -71,7 +71,8 @@ void ParticleSystem::advance(double untilMilliseconds, std::vector<Dab>& dabs) {
     return;
   }
   if (!started_) {
-    nextStep_ = static_cast<int64_t>(std::ceil(particles_.front().bornMilliseconds / kStepMilliseconds));
+    nextStep_ =
+        static_cast<int64_t>(std::ceil(particles_.front().bornMilliseconds / kStepMilliseconds));
     started_ = true;
   }
   const double dt = kStepMilliseconds / 1000.0;
@@ -94,10 +95,11 @@ void ParticleSystem::advance(double untilMilliseconds, std::vector<Dab>& dabs) {
       Dab dab = particle.birth;
       dab.x = particle.position[0];
       dab.y = particle.position[1];
-      dab.diameter = particle.birth.diameter * lerp(parameters_.sizeStart, parameters_.sizeEnd, life);
+      dab.diameter =
+          particle.birth.diameter * lerp(parameters_.sizeStart, parameters_.sizeEnd, life);
       dab.opacity = std::clamp(
-          particle.birth.opacity * lerp(parameters_.opacityStart, parameters_.opacityEnd, life), 0.0,
-          1.0);
+          particle.birth.opacity * lerp(parameters_.opacityStart, parameters_.opacityEnd, life),
+          0.0, 1.0);
       dab.angle = particle.birth.angle + parameters_.rotationSpeed * age / 1000.0;
       if (dab.diameter > 0 && dab.opacity > 0) {
         dabs.push_back(dab);
@@ -119,7 +121,8 @@ bool ParticleSystem::active(double untilMilliseconds) const {
   for (size_t index = firstLive_; index < particles_.size(); ++index) {
     const Particle& particle = particles_[index];
     if (!particle.dead &&
-        particle.bornMilliseconds + lifetime >= static_cast<double>(nextStep_) * kStepMilliseconds &&
+        particle.bornMilliseconds + lifetime >=
+            static_cast<double>(nextStep_) * kStepMilliseconds &&
         static_cast<double>(nextStep_) * kStepMilliseconds <= untilMilliseconds) {
       return true;
     }

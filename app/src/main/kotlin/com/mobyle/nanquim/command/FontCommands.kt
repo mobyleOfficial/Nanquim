@@ -2,19 +2,7 @@ package com.mobyle.nanquim.command
 
 import android.content.ContentResolver
 import androidx.core.net.toUri
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.text.FontEntry
-import com.mobyle.nanquim.text.FontImportFailure
-import com.mobyle.nanquim.text.FontImportResult
-import com.mobyle.nanquim.text.FontLibrary
-import com.mobyle.nanquim.text.FontSource
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandRegistry
@@ -22,6 +10,18 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.text.FontEntry
+import com.mobyle.nanquim.text.FontImportFailure
+import com.mobyle.nanquim.text.FontImportResult
+import com.mobyle.nanquim.text.FontLibrary
+import com.mobyle.nanquim.text.FontSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import java.io.IOException
 
 object FontCommandIds {

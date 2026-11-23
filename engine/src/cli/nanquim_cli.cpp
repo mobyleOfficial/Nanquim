@@ -226,8 +226,7 @@ int main(int argumentCount, char** arguments) {
     return result;
   }
   if (!args.empty() && (args[0] == "run" || args[0] == "batch")) {
-    std::fprintf(stderr, "'%s' needs the document model on the host\n",
-                 args[0].c_str());
+    std::fprintf(stderr, "'%s' needs the document model on the host\n", args[0].c_str());
     return kExitUsage;
   }
   return printUsage();

@@ -46,8 +46,9 @@ Frame flatFrame(int32_t width, int32_t height, int32_t index) {
       const bool corner = x < 8 && y < 8;
       const std::array<uint8_t, 4> color =
           corner ? std::array<uint8_t, 4>{0, 0, 0, 0}
-          : square ? std::array<uint8_t, 4>{200, 40, 30, 255}
-                   : std::array<uint8_t, 4>{static_cast<uint8_t>(250 - (y / 8) * 10), 245, 230, 255};
+          : square
+              ? std::array<uint8_t, 4>{200, 40, 30, 255}
+              : std::array<uint8_t, 4>{static_cast<uint8_t>(250 - (y / 8) * 10), 245, 230, 255};
       std::copy(color.begin(), color.end(), pixel);
     }
   }
@@ -104,7 +105,8 @@ struct DecodedApng {
 };
 
 uint32_t bigEndian(const uint8_t* bytes) {
-  return (uint32_t{bytes[0]} << 24U) | (uint32_t{bytes[1]} << 16U) | (uint32_t{bytes[2]} << 8U) | bytes[3];
+  return (uint32_t{bytes[0]} << 24U) | (uint32_t{bytes[1]} << 16U) | (uint32_t{bytes[2]} << 8U) |
+         bytes[3];
 }
 
 Frame unfilter(const std::vector<uint8_t>& data, uint32_t width, uint32_t height) {
@@ -155,7 +157,8 @@ DecodedApng decodeApng(const std::vector<uint8_t>& bytes) {
     }
     std::vector<uint8_t> raw((size_t{width} * 4 + 1) * height);
     mz_ulong size = static_cast<mz_ulong>(raw.size());
-    if (mz_uncompress(raw.data(), &size, compressed.data(), static_cast<mz_ulong>(compressed.size())) != MZ_OK ||
+    if (mz_uncompress(raw.data(), &size, compressed.data(),
+                      static_cast<mz_ulong>(compressed.size())) != MZ_OK ||
         size != raw.size()) {
       return false;
     }
@@ -226,7 +229,8 @@ TEST(AnimationWriterTest, GifFlatArtDecodesExactlyWithDelaysAndTransparency) {
         const uint8_t* actual = &gif.frames[index][pixel * 4];
         ASSERT_EQ(actual[3], expected[3]) << "frame " << index << " pixel " << pixel;
         if (expected[3] == 255) {
-          ASSERT_EQ(std::vector<uint8_t>(actual, actual + 3), std::vector<uint8_t>(expected, expected + 3))
+          ASSERT_EQ(std::vector<uint8_t>(actual, actual + 3),
+                    std::vector<uint8_t>(expected, expected + 3))
               << "frame " << index << " pixel " << pixel;
         }
       }
@@ -249,12 +253,14 @@ TEST(AnimationWriterTest, GifLoopsAndPlaysOnce) {
   const std::vector<uint8_t> forever = write(0);
   EXPECT_TRUE(contains(forever, "NETSCAPE2.0"));
   const std::string netscape = "NETSCAPE2.0";
-  const auto at = std::search(forever.begin(), forever.end(), netscape.begin(), netscape.end()) - forever.begin();
+  const auto at = std::search(forever.begin(), forever.end(), netscape.begin(), netscape.end()) -
+                  forever.begin();
   EXPECT_EQ(forever[static_cast<size_t>(at) + 13], 0);
   EXPECT_EQ(forever[static_cast<size_t>(at) + 14], 0);
   EXPECT_FALSE(contains(write(1), "NETSCAPE2.0"));
   const std::vector<uint8_t> three = write(3);
-  const auto threeAt = std::search(three.begin(), three.end(), netscape.begin(), netscape.end()) - three.begin();
+  const auto threeAt =
+      std::search(three.begin(), three.end(), netscape.begin(), netscape.end()) - three.begin();
   EXPECT_EQ(three[static_cast<size_t>(threeAt) + 13], 2);
 }
 

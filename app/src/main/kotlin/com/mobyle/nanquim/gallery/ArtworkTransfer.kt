@@ -8,13 +8,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.graphics.createBitmap
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.color.ColorProfileLibrary
-import com.mobyle.nanquim.engine.CmykImportProfiles
 import com.mobyle.nanquim.brush.BrushFiles
 import com.mobyle.nanquim.canvas.CanvasSession
+import com.mobyle.nanquim.color.ColorProfileLibrary
+import com.mobyle.nanquim.color.PaletteFileFormat
 import com.mobyle.nanquim.command.MAXIMUM_CANVAS_SIDE_PX
 import com.mobyle.nanquim.command.MINIMUM_LAYERS_FOR_NEW_CANVAS
 import com.mobyle.nanquim.document.ArtworkFailure
@@ -32,18 +29,18 @@ import com.mobyle.nanquim.document.brush.BrushPackage
 import com.mobyle.nanquim.document.brush.BrushPackageIo
 import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.PixelFormat
-import com.mobyle.nanquim.document.layer.withoutPrivateLayers
 import com.mobyle.nanquim.document.layer.TextLayerContent
 import com.mobyle.nanquim.document.layer.maximumLayers
 import com.mobyle.nanquim.document.layer.textModels
 import com.mobyle.nanquim.document.layer.toEngineLayerTree
+import com.mobyle.nanquim.document.layer.withoutPrivateLayers
 import com.mobyle.nanquim.document.session.LayerNames
+import com.mobyle.nanquim.engine.CmykImportProfiles
 import com.mobyle.nanquim.engine.ColorProfiles
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.InterchangeFiles
 import com.mobyle.nanquim.engine.ProfileColorSpace
 import com.mobyle.nanquim.engine.SceneRender
-import com.mobyle.nanquim.color.PaletteFileFormat
 import com.mobyle.nanquim.formats.NanquimFileType
 import com.mobyle.nanquim.formats.interchange.ImportJson
 import com.mobyle.nanquim.formats.interchange.ImportJsonException
@@ -55,6 +52,9 @@ import com.mobyle.nanquim.formats.nanquim.DocumentColorProfile
 import com.mobyle.nanquim.formats.nanquim.DocumentInfo
 import com.mobyle.nanquim.formats.nanquim.NanquimManifest
 import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -179,7 +179,10 @@ class ArtworkTransfer(
     fun isDocumentPackage(uri: Uri): Boolean {
         val type = contentResolver.getType(uri)
         if (type == NanquimFileType.Document.mimeType) return true
-        val name = contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+        val name =
+            contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) cursor.getString(0) else null
+            }
         return name != null && NanquimFileType.fromFileName(name) == NanquimFileType.Document
     }
 
@@ -366,7 +369,9 @@ class ArtworkTransfer(
     }
 
     suspend fun importImageAsArtwork(uri: Uri): String {
-        val (width, height) = withContext(Dispatchers.IO) { images.size(uri) } ?: throw GalleryException(GalleryError.Unreadable, uri.toString())
+        val (width, height) =
+            withContext(Dispatchers.IO) { images.size(uri) }
+                ?: throw GalleryException(GalleryError.Unreadable, uri.toString())
         var scale = min(1.0, MAXIMUM_CANVAS_SIDE_PX.toDouble() / maxOf(width, height))
         while (maximumLayers(memoryBudgetBytes(), (width * scale).toInt(), (height * scale).toInt()) < MINIMUM_LAYERS_FOR_NEW_CANVAS) {
             scale *= sqrt(0.5)
@@ -382,7 +387,11 @@ class ArtworkTransfer(
                 CanvasUnit.Pixels,
                 show = false,
             )
-        val layerId = canvasSession.document?.layers?.firstOrNull()?.id ?: throw GalleryException(GalleryError.WriteFailed, id)
+        val layerId =
+            canvasSession.document
+                ?.layers
+                ?.firstOrNull()
+                ?.id ?: throw GalleryException(GalleryError.WriteFailed, id)
         val profile = bundledProfileOf(withContext(Dispatchers.IO) { images.colorSpace(uri) })
         if (profile != null) canvasSession.assignColorProfile(profile)
         val color = imageColorFor(profile)
@@ -397,7 +406,9 @@ class ArtworkTransfer(
     suspend fun importImageAsLayer(uri: Uri): Int {
         if (interchangeFormatOf(uri) == InterchangeFormat.Tiff) return importTiffAsLayer(uri)
         val session = canvasSession.documentSession ?: throw GalleryException(GalleryError.NotFound, "No open artwork")
-        val (width, height) = withContext(Dispatchers.IO) { images.size(uri) } ?: throw GalleryException(GalleryError.Unreadable, uri.toString())
+        val (width, height) =
+            withContext(Dispatchers.IO) { images.size(uri) }
+                ?: throw GalleryException(GalleryError.Unreadable, uri.toString())
         val canvasWidth = session.state.widthPx
         val canvasHeight = session.state.heightPx
         val scale = min(1f, min(canvasWidth.toFloat() / width, canvasHeight.toFloat() / height))
@@ -505,7 +516,11 @@ class ArtworkTransfer(
         output: OutputStream,
     ) {
         options.animationFormat?.let { format ->
-            if (canvasSession.artwork?.id != artworkId) throw GalleryException(GalleryError.WriteFailed, "Open the artwork to export its animation")
+            if (canvasSession.artwork?.id !=
+                artworkId
+            ) {
+                throw GalleryException(GalleryError.WriteFailed, "Open the artwork to export its animation")
+            }
             animationExport.export(format, options.animation, output)
             return
         }
@@ -806,7 +821,10 @@ class ArtworkTransfer(
         val folder = File(cacheDirectory, EXPORT_FOLDER).apply { mkdirs() }
         var file = File(folder, name)
         var copy = 2
-        while (file.exists()) file = File(folder, "${name.substringBeforeLast('.')} ($copy).${name.substringAfterLast('.')}").also { copy++ }
+        while (file.exists()) {
+            file =
+                File(folder, "${name.substringBeforeLast('.')} ($copy).${name.substringAfterLast('.')}").also { copy++ }
+        }
         return file
     }
 

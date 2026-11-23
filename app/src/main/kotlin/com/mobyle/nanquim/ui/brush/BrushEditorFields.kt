@@ -4,8 +4,8 @@ import androidx.annotation.StringRes
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.BrushEditorSection
 import com.mobyle.nanquim.brush.TextureSlot
-import com.mobyle.nanquim.ui.canvas.blendNameRes
 import com.mobyle.nanquim.document.layer.BlendMode
+import com.mobyle.nanquim.ui.canvas.blendNameRes
 
 enum class FieldUnit {
     Percent,
@@ -126,8 +126,8 @@ val BRUSH_EDITOR_FIELDS: Map<BrushEditorSection, List<EditorField>> =
             ),
         BrushEditorSection.Taper to
             listOf(Header(R.string.brush_header_pressure_taper)) + taperFields("taper.stylus") +
-                listOf(Header(R.string.brush_header_touch_taper)) + taperFields("taper.finger") +
-                listOf(ToggleField("taper.classic", R.string.brush_field_taper_classic, false)),
+            listOf(Header(R.string.brush_header_touch_taper)) + taperFields("taper.finger") +
+            listOf(ToggleField("taper.classic", R.string.brush_field_taper_classic, false)),
         BrushEditorSection.Shape to
             listOf(
                 TextureField(TextureSlot.Shape, R.string.brush_field_shape_source),

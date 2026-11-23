@@ -9,7 +9,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -20,6 +19,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -28,13 +28,13 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -60,18 +60,18 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.BrushEditorSection
 import com.mobyle.nanquim.brush.BrushEditorSession
 import com.mobyle.nanquim.canvas.input.StrokeInput
 import com.mobyle.nanquim.command.BrushCommandIds
-import com.mobyle.nanquim.ui.common.CurveEditor
 import com.mobyle.nanquim.document.brush.BrushCurve
 import com.mobyle.nanquim.document.brush.BrushDocument
 import com.mobyle.nanquim.engine.StrokeSampleBuffer
+import com.mobyle.nanquim.ui.common.CurveEditor
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.PI
 import kotlin.math.roundToInt
 
@@ -415,7 +415,17 @@ private fun TextureFieldRow(
                 TextButton(onClick = {
                     onCommand(BrushCommandIds.EDITOR_REMOVE_TEXTURE, JsonObject(mapOf("slot" to JsonPrimitive(slotName))))
                 }) {
-                    Text(stringResource(if (field.slot.name == "Shape") R.string.brush_texture_use_round else R.string.brush_texture_remove))
+                    Text(
+                        stringResource(
+                            if (field.slot.name ==
+                                "Shape"
+                            ) {
+                                R.string.brush_texture_use_round
+                            } else {
+                                R.string.brush_texture_remove
+                            },
+                        ),
+                    )
                 }
             }
         }
@@ -444,6 +454,7 @@ private fun DrawingPad(
                 samples.clear()
                 val pointer = 0
                 val tool = event.getToolType(pointer)
+
                 fun add(
                     x: Float,
                     y: Float,

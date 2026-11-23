@@ -78,7 +78,11 @@ class LayerOperationsTest {
         assertEquals(result.surfaceCopies[maskId], copiedMasked.mask!!.id)
         assertEquals(setOf(1, 2, maskId), result.surfaceCopies.keys)
         assertFalse(copiedMasked.isReference)
-        val allIds = result.state.allNodes().map { it.id }.toList()
+        val allIds =
+            result.state
+                .allNodes()
+                .map { it.id }
+                .toList()
         assertEquals(allIds.size, allIds.toSet().size)
     }
 

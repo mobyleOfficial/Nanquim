@@ -14,8 +14,7 @@ data class Rgba(
 ) {
     fun premultiplied(): Rgba = Rgba(red * alpha, green * alpha, blue * alpha, alpha)
 
-    fun unpremultiplied(): Rgba =
-        if (alpha <= 0.0) TRANSPARENT else Rgba(red / alpha, green / alpha, blue / alpha, alpha)
+    fun unpremultiplied(): Rgba = if (alpha <= 0.0) TRANSPARENT else Rgba(red / alpha, green / alpha, blue / alpha, alpha)
 
     companion object {
         val TRANSPARENT = Rgba(0.0, 0.0, 0.0, 0.0)
@@ -83,6 +82,7 @@ object BlendReference {
         val cs = source.unpremultiplied()
         val cb = backdrop.unpremultiplied()
         val blended = blendColor(mode, doubleArrayOf(cb.red, cb.green, cb.blue), doubleArrayOf(cs.red, cs.green, cs.blue))
+
         fun channel(
             index: Int,
             sourceColor: Double,
@@ -107,6 +107,7 @@ object BlendReference {
         val blended = blendColor(mode, doubleArrayOf(cb.red, cb.green, cb.blue), doubleArrayOf(cs.red, cs.green, cs.blue))
         val sourceAlpha = source.alpha
         val backdropAlpha = backdrop.alpha
+
         fun channel(
             index: Int,
             backdropColor: Double,

@@ -3,11 +3,11 @@ package com.mobyle.nanquim.brush
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.CoroutineScope
 import com.mobyle.nanquim.brush.library.BrushLibrary
 import com.mobyle.nanquim.brush.library.BrushTool
 import com.mobyle.nanquim.canvas.SrgbColor
 import com.mobyle.nanquim.settings.InputSettings
+import kotlinx.coroutines.CoroutineScope
 
 class BrushUiState(
     val library: BrushLibrary,

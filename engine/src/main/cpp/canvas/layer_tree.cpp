@@ -77,8 +77,7 @@ LayerTreeNode readNode(const Json& value, int32_t depth, std::unordered_set<Laye
   const std::string blend =
       value.value("blend", node.isGroup() ? std::string("passThrough") : std::string("normal"));
   const auto mode = blendModeFromId(blend);
-  if (!mode || *mode == BlendMode::Behind ||
-      (*mode == BlendMode::PassThrough && !node.isGroup())) {
+  if (!mode || *mode == BlendMode::Behind || (*mode == BlendMode::PassThrough && !node.isGroup())) {
     throw std::invalid_argument("invalid layer blend mode: " + blend);
   }
   node.blend = *mode;
@@ -174,9 +173,11 @@ std::optional<LayerTree> parseLayerTreeJson(const Json& value, std::string& erro
     LayerTree tree;
     if (value.contains("pixelFormat")) {
       const Json& format = value.at("pixelFormat");
-      const auto parsed = format.is_string() ? parsePixelFormat(format.get<std::string>()) : std::nullopt;
+      const auto parsed =
+          format.is_string() ? parsePixelFormat(format.get<std::string>()) : std::nullopt;
       if (!parsed) {
-        throw std::invalid_argument("pixelFormat must be rgba8_premul_srgb or rgba16f_premul_linear");
+        throw std::invalid_argument(
+            "pixelFormat must be rgba8_premul_srgb or rgba16f_premul_linear");
       }
       tree.pixelFormat = *parsed;
     }

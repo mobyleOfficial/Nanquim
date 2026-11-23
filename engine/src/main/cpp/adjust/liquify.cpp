@@ -197,6 +197,11 @@ void LiquifyField::endRecording() {
   recorded_.shrink_to_fit();
 }
 
+void LiquifyField::cancelRecording() noexcept {
+  recording_ = nullptr;
+  std::vector<uint8_t>().swap(recorded_);
+}
+
 void LiquifyField::clear() { scale(0); }
 
 void LiquifyField::scale(double factor) {
@@ -241,7 +246,7 @@ LiquifyStroke::LiquifyStroke(LiquifyField& field, LiquifyBrush brush)
 
 LiquifyStroke::~LiquifyStroke() {
   if (!finished_) {
-    field_.endRecording();
+    field_.cancelRecording();
   }
 }
 
@@ -344,7 +349,7 @@ void LiquifyStroke::dab(const std::array<double, 2>& center, double pressure,
     return;
   }
   const double reach = radius * 0.25 + std::hypot(delta[0], delta[1]) + 2 * spacing;
-  const int32_t margin = static_cast<int32_t>(std::ceil(reach / spacing));
+  const auto margin = static_cast<int32_t>(std::ceil(reach / spacing));
   const int32_t copyColumn = std::max(firstColumn - margin, 0);
   const int32_t copyRow = std::max(firstRow - margin, 0);
   const int32_t copyWidth = std::min(endColumn + margin, field_.width()) - copyColumn;

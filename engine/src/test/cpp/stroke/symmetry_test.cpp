@@ -16,8 +16,8 @@ constexpr double kPi = 3.14159265358979323846;
 core::AffineTransform reflection(double angle, double x, double y) {
   const double cosine = std::cos(2 * angle);
   const double sine = std::sin(2 * angle);
-  return core::AffineTransform{cosine, sine, sine, -cosine, x - cosine * x - sine * y,
-                               y - sine * x + cosine * y};
+  return core::AffineTransform{
+      cosine, sine, sine, -cosine, x - cosine * x - sine * y, y - sine * x + cosine * y};
 }
 
 core::AffineTransform rotation(double angle, double x, double y) {

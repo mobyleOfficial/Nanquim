@@ -5,11 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import com.mobyle.nanquim.brush.library.BrushLibrary
 import com.mobyle.nanquim.brush.library.BrushTool
 import com.mobyle.nanquim.brush.library.SliderState
@@ -18,6 +13,11 @@ import com.mobyle.nanquim.document.brush.BrushPackage
 import com.mobyle.nanquim.engine.BrushData
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.StrokeTool
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.sqrt
 
 data class BrushLimits(

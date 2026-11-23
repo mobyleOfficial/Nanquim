@@ -9,15 +9,15 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.VideoLayerContent
+import com.mobyle.nanquim.document.layer.videoLayers
+import com.mobyle.nanquim.engine.Engine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.VideoLayerContent
-import com.mobyle.nanquim.document.layer.videoLayers
-import com.mobyle.nanquim.engine.Engine
 import java.io.File
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -74,8 +74,11 @@ class VideoLayers(
                 val duration =
                     try {
                         retriever.setDataSource(file.path)
-                        if (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO) != "yes") null
-                        else retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
+                        if (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO) != "yes") {
+                            null
+                        } else {
+                            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
+                        }
                     } finally {
                         retriever.release()
                     }
@@ -138,7 +141,14 @@ class VideoLayers(
             val pixels = ByteBuffer.allocate(target.width * TILE_SIZE * 4)
             for (row in 0 until (target.height + TILE_SIZE - 1) / TILE_SIZE) {
                 band.eraseColor(0)
-                canvas.drawBitmap(frame, Matrix().apply { setScale(scale, scale); postTranslate(left, top - row * TILE_SIZE) }, paint)
+                canvas.drawBitmap(
+                    frame,
+                    Matrix().apply {
+                        setScale(scale, scale)
+                        postTranslate(left, top - row * TILE_SIZE)
+                    },
+                    paint,
+                )
                 pixels.clear()
                 band.copyPixelsToBuffer(pixels)
                 val rows = min(TILE_SIZE, target.height - row * TILE_SIZE)
@@ -154,8 +164,12 @@ class VideoLayers(
         val extractor = MediaExtractor()
         try {
             extractor.setDataSource(file.path)
-            val track = (0 until extractor.trackCount).firstOrNull { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
-                ?: return LongArray(0)
+            val track =
+                (0 until extractor.trackCount).firstOrNull {
+                    extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") ==
+                        true
+                }
+                    ?: return LongArray(0)
             extractor.selectTrack(track)
             val times = ArrayList<Long>()
             while (extractor.sampleTime >= 0) {

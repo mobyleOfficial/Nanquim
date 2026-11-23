@@ -1,10 +1,32 @@
 package com.mobyle.nanquim.formats.nanquim
 
-import kotlinx.serialization.json.JsonObject
+import com.mobyle.nanquim.document.layer.BlendMode
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.LayerGroup
+import com.mobyle.nanquim.document.layer.LayerNode
 import com.mobyle.nanquim.document.layer.PixelFormat
+import com.mobyle.nanquim.document.layer.RasterLayer
+import com.mobyle.nanquim.document.layer.SavedSelection
+import com.mobyle.nanquim.document.layer.TextLayerContent
+import com.mobyle.nanquim.document.layer.VideoLayerContent
+import com.mobyle.nanquim.document.layer.addMask
+import com.mobyle.nanquim.document.layer.addRasterLayer
+import com.mobyle.nanquim.document.layer.addTextLayer
+import com.mobyle.nanquim.document.layer.addVideoLayer
+import com.mobyle.nanquim.document.layer.groupLayers
+import com.mobyle.nanquim.document.layer.rasterizeVideo
+import com.mobyle.nanquim.document.layer.setAssisted
+import com.mobyle.nanquim.document.layer.setBlend
+import com.mobyle.nanquim.document.layer.setClipping
+import com.mobyle.nanquim.document.layer.setOpacity
+import com.mobyle.nanquim.document.layer.setPrivate
+import com.mobyle.nanquim.document.layer.setReference
+import com.mobyle.nanquim.document.layer.withTextModels
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -15,28 +37,6 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.document.layer.BlendMode
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.LayerGroup
-import com.mobyle.nanquim.document.layer.LayerNode
-import com.mobyle.nanquim.document.layer.RasterLayer
-import com.mobyle.nanquim.document.layer.TextLayerContent
-import kotlinx.serialization.json.boolean
-import com.mobyle.nanquim.document.layer.setPrivate
-import com.mobyle.nanquim.document.layer.rasterizeVideo
-import com.mobyle.nanquim.document.layer.addVideoLayer
-import com.mobyle.nanquim.document.layer.VideoLayerContent
-import com.mobyle.nanquim.document.layer.addTextLayer
-import com.mobyle.nanquim.document.layer.withTextModels
-import com.mobyle.nanquim.document.layer.SavedSelection
-import com.mobyle.nanquim.document.layer.addMask
-import com.mobyle.nanquim.document.layer.addRasterLayer
-import com.mobyle.nanquim.document.layer.groupLayers
-import com.mobyle.nanquim.document.layer.setAssisted
-import com.mobyle.nanquim.document.layer.setBlend
-import com.mobyle.nanquim.document.layer.setClipping
-import com.mobyle.nanquim.document.layer.setOpacity
-import com.mobyle.nanquim.document.layer.setReference
 import java.io.File
 import java.time.Instant
 
@@ -64,14 +64,22 @@ class NanquimManifestTest {
         val result = success(File(fixtures, "v1-layer-tree/manifest.json").readText())
         assertEquals(512, result.state.widthPx)
         assertEquals(256, result.state.heightPx)
-        val groups = result.state.allNodes().filterIsInstance<LayerGroup>().toList()
+        val groups =
+            result.state
+                .allNodes()
+                .filterIsInstance<LayerGroup>()
+                .toList()
         assertTrue(groups.any { it.blend == BlendMode.PassThrough })
         assertTrue(groups.any { it.blend != BlendMode.PassThrough })
         assertTrue(result.state.rasterLayers().any { it.mask != null })
         assertTrue(result.state.rasterLayers().any { it.clipping })
         val masks = NanquimManifest.surfaces(result.state, result.uuids).filter { it.format == SurfaceFormat.R8 }
         assertTrue(masks.all { it.folder.startsWith("masks/") })
-        val ids = result.state.allNodes().flatMap { node -> sequenceOf(node.id) + listOfNotNull((node as? RasterLayer)?.mask?.id) }.toList()
+        val ids =
+            result.state
+                .allNodes()
+                .flatMap { node -> sequenceOf(node.id) + listOfNotNull((node as? RasterLayer)?.mask?.id) }
+                .toList()
         assertEquals((1..ids.size).toList(), ids.sorted())
         assertEquals(ids.size + 1, result.state.nextId)
     }
@@ -113,8 +121,20 @@ class NanquimManifestTest {
         for (key in listOf("selection", "guides", "author", "animation", "extensions")) {
             assertEquals(result.manifest[key], written[key], key)
         }
-        assertEquals(3, written["canvas"]!!.jsonObject["bleed"]!!.jsonPrimitive.content.toInt())
-        assertEquals(7, written["stats"]!!.jsonObject["undoCount"]!!.jsonPrimitive.content.toInt())
+        assertEquals(
+            3,
+            written["canvas"]!!
+                .jsonObject["bleed"]!!
+                .jsonPrimitive.content
+                .toInt(),
+        )
+        assertEquals(
+            7,
+            written["stats"]!!
+                .jsonObject["undoCount"]!!
+                .jsonPrimitive.content
+                .toInt(),
+        )
         assertEquals(1, written["version"]!!.jsonPrimitive.content.toInt())
         val layers = written["layers"]!!.jsonArray
         val sketch = layers[0].jsonObject
@@ -143,7 +163,13 @@ class NanquimManifestTest {
         val file = NanquimManifest.textModelFile(uuids.uuidOf(textId)!!)
         assertEquals("text", node["type"]!!.jsonPrimitive.content)
         assertEquals(file, node["textModel"]!!.jsonPrimitive.content)
-        assertEquals("raster", written["layers"]!!.jsonArray[0].jsonObject["type"]!!.jsonPrimitive.content)
+        assertEquals(
+            "raster",
+            written["layers"]!!
+                .jsonArray[0]
+                .jsonObject["type"]!!
+                .jsonPrimitive.content,
+        )
         val reread = success(String(NanquimManifest.encode(written)))
         assertEquals(mapOf(textId to file), reread.textModelFiles)
         val restored = reread.state.withTextModels(mapOf(textId to model))
@@ -158,9 +184,22 @@ class NanquimManifestTest {
         val marked = state.setPrivate(id, true)
         val uuids = LayerUuids.EMPTY.assignedFor(marked)
         val written = NanquimManifest.write(marked, DocumentInfo.new("Private", Instant.EPOCH), uuids, "0.3.0")
-        assertEquals(true, written["layers"]!!.jsonArray[0].jsonObject["private"]!!.jsonPrimitive.boolean)
+        assertEquals(
+            true,
+            written["layers"]!!
+                .jsonArray[0]
+                .jsonObject["private"]!!
+                .jsonPrimitive.boolean,
+        )
         assertTrue(success(String(NanquimManifest.encode(written))).state.raster(id)!!.isPrivate)
-        val cleared = NanquimManifest.write(marked.setPrivate(id, false), DocumentInfo.new("Private", Instant.EPOCH), uuids, "0.3.0", written)
+        val cleared =
+            NanquimManifest.write(
+                marked.setPrivate(id, false),
+                DocumentInfo.new("Private", Instant.EPOCH),
+                uuids,
+                "0.3.0",
+                written,
+            )
         assertEquals(null, cleared["layers"]!!.jsonArray[0].jsonObject["private"])
     }
 
@@ -175,7 +214,14 @@ class NanquimManifestTest {
         assertEquals("videos/clip.mp4", node["video"]!!.jsonObject["file"]!!.jsonPrimitive.content)
         val reread = success(String(NanquimManifest.encode(written)))
         assertEquals(content, reread.state.raster(videoId)!!.video)
-        val rasterized = NanquimManifest.write(state.rasterizeVideo(videoId), DocumentInfo.new("Video", Instant.EPOCH), uuids, "0.3.0", written)
+        val rasterized =
+            NanquimManifest.write(
+                state.rasterizeVideo(videoId),
+                DocumentInfo.new("Video", Instant.EPOCH),
+                uuids,
+                "0.3.0",
+                written,
+            )
         assertEquals(null, rasterized["layers"]!!.jsonArray[0].jsonObject["video"])
         for (path in listOf("../clip.mp4", "videos/../clip.mp4", "videos/a/clip.mp4", "videos/")) {
             val hostile = written.toString().replace("videos/clip.mp4", path)
@@ -183,7 +229,7 @@ class NanquimManifestTest {
         }
     }
 
-        @Test
+    @Test
     fun newDocumentRoundTrip() {
         var state = DocumentState(1600, 900)
         state = state.addRasterLayer("One").first
@@ -191,7 +237,12 @@ class NanquimManifestTest {
         state = withTwo.setBlend(two, BlendMode.Overlay).setClipping(two, true)
         state = state.addMask(two).first
         val (withThree, three) = state.addRasterLayer("Three")
-        state = withThree.groupLayers(listOf(two, three), "Group").first.setReference(three, true).setAssisted(three, true)
+        state =
+            withThree
+                .groupLayers(listOf(two, three), "Group")
+                .first
+                .setReference(three, true)
+                .setAssisted(three, true)
         val uuids = LayerUuids.EMPTY.assignedFor(state)
         val info = DocumentInfo.new("Round trip", Instant.parse("2026-10-14T10:00:00Z"))
         val written = NanquimManifest.write(state, info, uuids, "0.3.0")
@@ -212,7 +263,12 @@ class NanquimManifestTest {
         val uuids = LayerUuids.EMPTY.assignedFor(state)
         val info = DocumentInfo.new("Profiles", Instant.parse("2026-10-20T10:00:00Z"))
         val srgb = NanquimManifest.write(state, info, uuids, "0.3.0")
-        val srgbProfile = srgb.getValue("canvas").jsonObject.getValue("colorProfile").jsonObject
+        val srgbProfile =
+            srgb
+                .getValue("canvas")
+                .jsonObject
+                .getValue("colorProfile")
+                .jsonObject
         assertEquals(NanquimManifest.SRGB_PROFILE_NAME, srgbProfile.getValue("name").jsonPrimitive.content)
         assertEquals(JsonNull, srgbProfile["icc"])
         assertNull(success(String(NanquimManifest.encode(srgb))).colorProfile)
@@ -317,8 +373,14 @@ class NanquimManifestTest {
         assertInstanceOf(ManifestReadResult.Invalid::class.java, NanquimManifest.parse(manifest("duplicate-ids.json")))
         assertInstanceOf(ManifestReadResult.Invalid::class.java, NanquimManifest.parse("[1, 2]"))
         assertInstanceOf(ManifestReadResult.Invalid::class.java, NanquimManifest.parse("{not json"))
-        assertInstanceOf(ManifestReadResult.Invalid::class.java, NanquimManifest.parse("""{"format":"nanquim","canvas":{"width":0,"height":5}}"""))
-        val deep = (1..40).fold("""{"type":"raster","id":"leaf"}""") { inner, level -> """{"type":"group","id":"g$level","children":[$inner]}""" }
+        assertInstanceOf(
+            ManifestReadResult.Invalid::class.java,
+            NanquimManifest.parse("""{"format":"nanquim","canvas":{"width":0,"height":5}}"""),
+        )
+        val deep =
+            (1..40).fold(
+                """{"type":"raster","id":"leaf"}""",
+            ) { inner, level -> """{"type":"group","id":"g$level","children":[$inner]}""" }
         assertInstanceOf(
             ManifestReadResult.Invalid::class.java,
             NanquimManifest.parse("""{"format":"nanquim","canvas":{"width":5,"height":5},"layers":[$deep]}"""),
@@ -338,9 +400,30 @@ class NanquimManifestTest {
         nodes.map { node ->
             when (node) {
                 is RasterLayer ->
-                    listOf("raster", node.name, node.opacity, node.blend, node.hidden, node.locked, node.alphaLock, node.clipping, node.isReference, node.assisted) +
+                    listOf(
+                        "raster",
+                        node.name,
+                        node.opacity,
+                        node.blend,
+                        node.hidden,
+                        node.locked,
+                        node.alphaLock,
+                        node.clipping,
+                        node.isReference,
+                        node.assisted,
+                    ) +
                         listOfNotNull(node.mask?.let { listOf(it.enabled, it.inverted) })
-                is LayerGroup -> listOf("group", node.name, node.opacity, node.blend, node.hidden, node.locked, node.collapsed, structure(node.children))
+                is LayerGroup ->
+                    listOf(
+                        "group",
+                        node.name,
+                        node.opacity,
+                        node.blend,
+                        node.hidden,
+                        node.locked,
+                        node.collapsed,
+                        structure(node.children),
+                    )
             }
         }
 }

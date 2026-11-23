@@ -89,7 +89,9 @@ TEST(StrokeStatisticsTest, FindsTheTextureFrequencyAndDirection) {
 TEST(BrushTuningTest, NelderMeadFindsTheMinimumOfABowl) {
   int32_t evaluations = 0;
   const auto best = minimizeNelderMead(
-      [](const std::vector<double>& p) { return std::pow(p[0] - 0.3, 2) + std::pow(p[1] - 0.7, 2); },
+      [](const std::vector<double>& p) {
+        return std::pow(p[0] - 0.3, 2) + std::pow(p[1] - 0.7, 2);
+      },
       {0.9, 0.1}, 400, 0.2, &evaluations);
   EXPECT_NEAR(best[0], 0.3, 1e-3);
   EXPECT_NEAR(best[1], 0.7, 1e-3);
@@ -99,16 +101,21 @@ TEST(BrushTuningTest, NelderMeadFindsTheMinimumOfABowl) {
 TEST(BrushTuningTest, SameBrushMatchesAndADifferentOneDoesNot) {
   const stroke::LoadedBrush noTextures;
   const auto target = measureSheet(renderTestSheet(roundBrushDocument(0.6), noTextures, 0.25));
-  EXPECT_NEAR(compareStatistics(target, measureSheet(renderTestSheet(roundBrushDocument(0.6), noTextures, 0.25))).distance,
+  EXPECT_NEAR(compareStatistics(
+                  target, measureSheet(renderTestSheet(roundBrushDocument(0.6), noTextures, 0.25)))
+                  .distance,
               0, 1e-12);
-  EXPECT_GT(compareStatistics(target, measureSheet(renderTestSheet(roundBrushDocument(0.1), noTextures, 0.25))).distance,
+  EXPECT_GT(compareStatistics(
+                target, measureSheet(renderTestSheet(roundBrushDocument(0.1), noTextures, 0.25)))
+                .distance,
             kAcceptanceDistance);
 }
 
 TEST(BrushTuningTest, RecoversAPressureResponse) {
   const stroke::LoadedBrush noTextures;
   const auto target = measureSheet(renderTestSheet(roundBrushDocument(0.6), noTextures, 0.25));
-  const auto result = tuneBrush(roundBrushDocument(0.1), noTextures, target, {{"dynamics.size.min", 0, 1}}, 40, 0.25);
+  const auto result = tuneBrush(roundBrushDocument(0.1), noTextures, target,
+                                {{"dynamics.size.min", 0, 1}}, 40, 0.25);
   EXPECT_LT(result.distance, result.initialDistance);
   EXPECT_LT(result.distance, kAcceptanceDistance);
   EXPECT_NEAR(result.brush["dynamics"]["size"]["min"].get<double>(), 0.6, 0.08);

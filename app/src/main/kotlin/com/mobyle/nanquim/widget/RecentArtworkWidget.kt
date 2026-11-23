@@ -40,12 +40,12 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.mobyle.nanquim.MainActivity
 import com.mobyle.nanquim.NanquimApplication
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.gallery.ArtworkEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class RecentArtworkWidget : GlanceAppWidget() {

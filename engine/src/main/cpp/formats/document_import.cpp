@@ -8,6 +8,7 @@
 
 #include "canvas/layer_tree.h"
 #include "color/color_profile.h"
+#include "core/required.h"
 #include "io/file_system.h"
 
 namespace nanquim::formats {
@@ -387,8 +388,9 @@ std::unique_ptr<color::CmykImageTransform> adoptCmykCanvas(ImportedDocument& doc
   if (sourceProofs || fallbackProofs) {
     const auto& proofInfo = sourceProofs ? sourceInfo : fallbackInfo;
     document.cmykProfile = sourceProofs ? source : limits.cmykFallbackProfile;
-    document.cmykProfileName =
-        proofInfo->description.empty() ? "Embedded CMYK profile" : proofInfo->description;
+    document.cmykProfileName = core::required(proofInfo).description.empty()
+                                   ? "Embedded CMYK profile"
+                                   : core::required(proofInfo).description;
   }
   if (!limits.cmykWorkingProfile.empty()) {
     const auto working = color::readProfile(limits.cmykWorkingProfile.data(),

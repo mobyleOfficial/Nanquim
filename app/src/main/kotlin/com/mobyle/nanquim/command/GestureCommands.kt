@@ -1,16 +1,9 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.intOrNull
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.input.Gesture
 import com.mobyle.nanquim.canvas.input.GestureAction
 import com.mobyle.nanquim.canvas.input.GestureConfiguration
-import com.mobyle.nanquim.settings.InputSettings
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandRegistry
@@ -18,6 +11,13 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.settings.InputSettings
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.intOrNull
 
 object GestureCommandIds {
     const val OPEN = "settings.gestures.open"

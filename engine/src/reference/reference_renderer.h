@@ -6,8 +6,8 @@
 #include "canvas/blend_mode.h"
 #include "reference_image.h"
 #include "stroke/brush_parameters.h"
-#include "stroke/paint_mixing.h"
 #include "stroke/dab.h"
+#include "stroke/paint_mixing.h"
 #include "stroke/tip_coverage.h"
 
 namespace nanquim::reference {

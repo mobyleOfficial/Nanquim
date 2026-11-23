@@ -224,7 +224,8 @@ std::shared_ptr<const std::vector<uint8_t>> LayerTileStore::validCompressedCopy(
 
 std::vector<TileCoordinate> LayerTileStore::tilesOf(LayerId layer) const {
   std::vector<TileCoordinate> coordinates;
-  forEachTile(layer, [&coordinates](TileCoordinate coordinate) { coordinates.push_back(coordinate); });
+  forEachTile(layer,
+              [&coordinates](TileCoordinate coordinate) { coordinates.push_back(coordinate); });
   return coordinates;
 }
 
@@ -574,7 +575,8 @@ void LayerTileStore::markSavedToFile(const LayerTileKey& key, uint64_t version) 
   }
 }
 
-std::optional<LayerTileStore::SaveSource> LayerTileStore::saveSource(const LayerTileKey& key) const {
+std::optional<LayerTileStore::SaveSource> LayerTileStore::saveSource(
+    const LayerTileKey& key) const {
   auto layer = tilesByLayer_.find(key.layer);
   if (layer == tilesByLayer_.end()) {
     return std::nullopt;

@@ -2,14 +2,6 @@ package com.mobyle.nanquim.engine
 
 import android.view.MotionEvent
 import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.After
-import org.junit.Assert.assertArrayEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 import com.mobyle.nanquim.document.layer.BlendMode
 import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.LayerNode
@@ -22,6 +14,14 @@ import com.mobyle.nanquim.document.layer.nodeBelow
 import com.mobyle.nanquim.document.layer.setBlend
 import com.mobyle.nanquim.document.layer.setOpacity
 import com.mobyle.nanquim.document.layer.toEngineLayerTree
+import org.junit.After
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -125,7 +125,15 @@ class HistoryPropertyTest(
                 val entry = nextEntry()
                 val layer = layers.random(random)
                 val mask = layer.mask != null && random.nextBoolean()
-                engine.fillSurface(if (mask) layer.mask!!.id else layer.id, random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat(), mask, entry)
+                engine.fillSurface(
+                    if (mask) layer.mask!!.id else layer.id,
+                    random.nextFloat(),
+                    random.nextFloat(),
+                    random.nextFloat(),
+                    random.nextFloat(),
+                    mask,
+                    entry,
+                )
                 return Step(listOf(entry))
             }
             4 -> {
@@ -154,7 +162,8 @@ class HistoryPropertyTest(
                 val lower = state.nodeBelow(upper.id) as RasterLayer
                 val entry = nextEntry()
                 val result = state.mergeDown(upper.id)
-                val merged = DocumentState(state.widthPx, state.heightPx, layers = listOf<LayerNode>(lower.copy(blend = BlendMode.Normal), upper))
+                val merged =
+                    DocumentState(state.widthPx, state.heightPx, layers = listOf<LayerNode>(lower.copy(blend = BlendMode.Normal), upper))
                 assertNull(engine.composeIntoSurface(lower.id, merged.tree(), entry))
                 assertNull(engine.setLayerTree(result.state.tree()))
                 return Step(listOf(entry), before = state, after = result.state)

@@ -4,6 +4,7 @@
 
 #include "core/json_writer.h"
 #include "core/log.h"
+#include "core/required.h"
 #include "engine_context.h"
 #include "engine_programs.h"
 
@@ -70,7 +71,7 @@ void EngineContext::endTransform(bool commit, int64_t historyEntry) {
 }
 
 canvas::TileRange EngineContext::transformMeshTiles() const {
-  const auto& triangles = transformSession_->triangles;
+  const auto& triangles = core::required(transformSession_).triangles;
   if (triangles.empty()) {
     return {};
   }
@@ -98,7 +99,7 @@ void EngineContext::processTransform() {
 }
 
 bool EngineContext::liftTransformContent() {
-  TransformSession& session = *transformSession_;
+  TransformSession& session = core::required(transformSession_);
   const std::vector<canvas::TileCoordinate> tiles = tileStore_->tilesOf(session.layer);
   bool resident = true;
   for (const canvas::TileCoordinate coordinate : tiles) {
@@ -129,10 +130,12 @@ bool EngineContext::liftTransformContent() {
   if (!covered.isEmpty()) {
     const int32_t left = covered.firstColumn * canvas::kTileSizePixels;
     const int32_t top = covered.firstRow * canvas::kTileSizePixels;
-    const int32_t width =
-        std::min(covered.endColumn * canvas::kTileSizePixels, document_->widthPixels) - left;
+    const int32_t width = std::min(covered.endColumn * canvas::kTileSizePixels,
+                                   core::required(document_).widthPixels) -
+                          left;
     const int32_t height =
-        std::min(covered.endRow * canvas::kTileSizePixels, document_->heightPixels) - top;
+        std::min(covered.endRow * canvas::kTileSizePixels, core::required(document_).heightPixels) -
+        top;
     session.floatingOrigin = {left - kFloatingMargin, top - kFloatingMargin};
     session.floatingSize = {width + 2 * kFloatingMargin, height + 2 * kFloatingMargin};
     session.floating = createSurfaceTexture(session.floatingSize[0], session.floatingSize[1]);
@@ -168,10 +171,10 @@ bool EngineContext::liftTransformContent() {
             gpu::rhi::Rect{x, y, canvas::kTileSizePixels, canvas::kTileSizePixels});
         commands.setScissor(gpu::rhi::Rect{
             x, y,
-            std::min(canvas::kTileSizePixels,
-                     document_->widthPixels - coordinate.column * canvas::kTileSizePixels),
-            std::min(canvas::kTileSizePixels,
-                     document_->heightPixels - coordinate.row * canvas::kTileSizePixels)});
+            std::min(canvas::kTileSizePixels, core::required(document_).widthPixels -
+                                                  coordinate.column * canvas::kTileSizePixels),
+            std::min(canvas::kTileSizePixels, core::required(document_).heightPixels -
+                                                  coordinate.row * canvas::kTileSizePixels)});
         commands.bindTexture(kMaskedCopySourceBinding, &tileStore_->pageTexture(source->page));
         commands.bindTexture(kMaskedCopySelectionBinding,
                              selected ? &tileStore_->pageTexture(selected->page) : nullptr);
@@ -243,7 +246,7 @@ bool EngineContext::liftTransformContent() {
 
 void EngineContext::renderTransformTile(canvas::TileCoordinate coordinate,
                                         const gpu::rhi::Texture& target) {
-  TransformSession& session = *transformSession_;
+  TransformSession& session = core::required(transformSession_);
   const canvas::LayerTileKey key{session.layer, coordinate};
   const bool mesh =
       !session.triangles.empty() && session.floating && session.shownTiles.contains(coordinate);
@@ -294,8 +297,8 @@ void EngineContext::prepareCloneSource(const StrokeStyle::Clone& clone) {
 }
 
 void EngineContext::snapshotSource(bool composite, canvas::LayerId layer) {
-  const int32_t width = document_->widthPixels;
-  const int32_t height = document_->heightPixels;
+  const int32_t width = core::required(document_).widthPixels;
+  const int32_t height = core::required(document_).heightPixels;
   if (!cloneSnapshot_ || cloneSnapshotSize_ != std::array<int32_t, 2>{width, height}) {
     cloneSnapshot_ = createSurfaceTexture(width, height);
     cloneSnapshotSize_ = {width, height};
@@ -337,8 +340,8 @@ bool EngineContext::snapshotForRemap(DocumentOperation& operation) {
   if (!resident) {
     return false;
   }
-  const int32_t width = document_->widthPixels;
-  const int32_t height = document_->heightPixels;
+  const int32_t width = core::required(document_).widthPixels;
+  const int32_t height = core::required(document_).heightPixels;
   operation.snapshot = createSurfaceTexture(width, height);
   if (!operation.snapshot) {
     return false;
@@ -449,7 +452,7 @@ void EngineContext::drawMesh(const gpu::rhi::Buffer& vertices, uint32_t vertexCo
 }
 
 bool EngineContext::finishTransform() {
-  TransformSession& session = *transformSession_;
+  TransformSession& session = core::required(transformSession_);
   std::vector<canvas::TileCoordinate> positions;
   const canvas::TileRange canvasTiles = compositor_->canvasTiles();
   std::unordered_set<canvas::TileCoordinate, canvas::TileCoordinateHash> unique;

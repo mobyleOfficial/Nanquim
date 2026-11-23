@@ -17,8 +17,15 @@ class PrivateLayerTest {
         val (withSecret, secret) = withPaint.addRasterLayer("Secret")
         state = withSecret.setPrivate(secret, true)
         assertEquals(listOf(paint), state.withoutPrivateLayers().rasterLayers().map { it.id })
-        fun hidden(tree: JsonObject, id: Int) =
-            (tree["layers"] as JsonArray).map { it as JsonObject }.first { (it["id"] as JsonPrimitive).content.toInt() == id }["hidden"]!!.let { (it as JsonPrimitive).boolean }
+
+        fun hidden(
+            tree: JsonObject,
+            id: Int,
+        ) = (tree["layers"] as JsonArray)
+            .map {
+                it as JsonObject
+            }.first { (it["id"] as JsonPrimitive).content.toInt() == id }["hidden"]!!
+            .let { (it as JsonPrimitive).boolean }
         assertFalse(hidden(state.toEngineLayerTree(), secret))
         assertTrue(hidden(state.toEngineLayerTree(hidePrivate = true), secret))
         assertFalse(hidden(state.toEngineLayerTree(hidePrivate = true), paint))

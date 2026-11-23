@@ -1,13 +1,13 @@
 package com.mobyle.nanquim.document.history
 
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.addRasterLayer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.addRasterLayer
 import kotlin.random.Random
 
 class UndoHistoryTest {
@@ -43,7 +43,13 @@ class UndoHistoryTest {
     @Test
     fun oldestEntriesGoBeyondTheStepAndSizeLimits() {
         val dropped = mutableListOf<Long>()
-        val history = UndoHistory(maximumSteps = 10, maximumPixelBytes = 1000, onDropped = { entries -> entries.forEach { dropped += it.pixelEntryIds } })
+        val history =
+            UndoHistory(maximumSteps = 10, maximumPixelBytes = 1000, onDropped = { entries ->
+                entries.forEach {
+                    dropped +=
+                        it.pixelEntryIds
+                }
+            })
         for (id in 1L..12L) history.record(pixels(id))
         assertEquals(listOf(1L, 2L), dropped)
         assertEquals(10, history.undoCount)

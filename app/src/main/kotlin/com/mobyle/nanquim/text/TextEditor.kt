@@ -4,16 +4,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.contentOrNull
 import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.document.layer.TextLayerContent
 import com.mobyle.nanquim.document.layer.TextModelEditing
 import com.mobyle.nanquim.document.session.DocumentSession
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.TextGeometry
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 import kotlin.coroutines.resume
 
 class TextEditor(

@@ -95,7 +95,6 @@ class LayerUuids private constructor(
             return LayerUuids(uuidById)
         }
 
-        private fun maskIdOf(node: LayerNode): Sequence<Int> =
-            (node as? RasterLayer)?.mask?.let { sequenceOf(it.id) } ?: emptySequence()
+        private fun maskIdOf(node: LayerNode): Sequence<Int> = (node as? RasterLayer)?.mask?.let { sequenceOf(it.id) } ?: emptySequence()
     }
 }

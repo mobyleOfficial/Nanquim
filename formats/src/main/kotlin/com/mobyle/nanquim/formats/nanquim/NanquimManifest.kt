@@ -1,5 +1,16 @@
 package com.mobyle.nanquim.formats.nanquim
 
+import com.mobyle.nanquim.document.layer.Background
+import com.mobyle.nanquim.document.layer.BlendMode
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.LayerGroup
+import com.mobyle.nanquim.document.layer.LayerMask
+import com.mobyle.nanquim.document.layer.LayerNode
+import com.mobyle.nanquim.document.layer.PixelFormat
+import com.mobyle.nanquim.document.layer.RasterLayer
+import com.mobyle.nanquim.document.layer.RgbaColor
+import com.mobyle.nanquim.document.layer.SavedSelection
+import com.mobyle.nanquim.document.layer.VideoLayerContent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -15,17 +26,6 @@ import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
-import com.mobyle.nanquim.document.layer.Background
-import com.mobyle.nanquim.document.layer.BlendMode
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.LayerGroup
-import com.mobyle.nanquim.document.layer.LayerMask
-import com.mobyle.nanquim.document.layer.LayerNode
-import com.mobyle.nanquim.document.layer.PixelFormat
-import com.mobyle.nanquim.document.layer.RasterLayer
-import com.mobyle.nanquim.document.layer.VideoLayerContent
-import com.mobyle.nanquim.document.layer.RgbaColor
-import com.mobyle.nanquim.document.layer.SavedSelection
 import java.time.Instant
 import java.time.format.DateTimeParseException
 
@@ -71,7 +71,7 @@ object NanquimManifest {
         val width = canvas.int("width") ?: 0
         val height = canvas.int("height") ?: 0
         if (width !in 1..MAXIMUM_CANVAS_SIDE || height !in 1..MAXIMUM_CANVAS_SIDE) {
-            return ManifestReadResult.Invalid("Invalid canvas size ${width}×$height")
+            return ManifestReadResult.Invalid("Invalid canvas size $width×$height")
         }
         val pixelFormat = PixelFormat.fromId(canvas.string("pixelFormat") ?: PIXEL_FORMAT)
         if ((canvas.int("tileSize") ?: TILE_SIZE) != TILE_SIZE || pixelFormat == null) {
@@ -109,7 +109,14 @@ object NanquimManifest {
                 heightPx = height,
                 background =
                     Background(
-                        color = if (color != null && color.size == 4) RgbaColor(color[0], color[1], color[2], color[3]) else RgbaColor.WHITE,
+                        color =
+                            if (color != null &&
+                                color.size == 4
+                            ) {
+                                RgbaColor(color[0], color[1], color[2], color[3])
+                            } else {
+                                RgbaColor.WHITE
+                            },
                         hidden = background?.boolean("hidden") ?: false,
                     ),
                 layers = layers,
@@ -141,6 +148,7 @@ object NanquimManifest {
                 timelapse = TimelapseSettings.read(root["timelapse"]),
                 artist = ArtistInfo.read(root["author"]),
             )
+
         fun profileFile(key: String) =
             (canvas[key] as? JsonObject)?.let { profile ->
                 profile.string("icc")?.takeIf { it.isNotEmpty() }?.let { path ->
@@ -167,6 +175,7 @@ object NanquimManifest {
     ): JsonObject {
         val previousNodes = mutableMapOf<String, JsonObject>()
         (previous?.get("layers") as? JsonArray)?.let { collectNodes(it, previousNodes) }
+
         fun uuid(id: Int) = requireNotNull(uuids.uuidOf(id)) { "No UUID for node $id" }
 
         fun node(layer: LayerNode): JsonObject {
@@ -346,7 +355,7 @@ object NanquimManifest {
         path.startsWith(TEXT_FOLDER) && path.length > TEXT_FOLDER.length && !path.contains("..") &&
             !path.substring(TEXT_FOLDER.length).contains('/') && !path.contains('\\')
 
-        fun encode(manifest: JsonObject): ByteArray = json.encodeToString(JsonObject.serializer(), manifest).toByteArray(Charsets.UTF_8)
+    fun encode(manifest: JsonObject): ByteArray = json.encodeToString(JsonObject.serializer(), manifest).toByteArray(Charsets.UTF_8)
 
     fun surfaces(
         state: DocumentState,
@@ -357,14 +366,14 @@ object NanquimManifest {
             DocumentSurface(id, SELECTIONS_FOLDER + uuid, SurfaceFormat.SelectionR8)
         } +
             state.rasterLayers().flatMap { layer ->
-            val layerUuid = requireNotNull(uuids.uuidOf(layer.id)) { "No UUID for layer ${layer.id}" }
-            listOf(DocumentSurface(layer.id, "layers/$layerUuid", SurfaceFormat.Rgba8)) +
-                listOfNotNull(
-                    layer.mask?.let { mask ->
-                        DocumentSurface(mask.id, "masks/${requireNotNull(uuids.uuidOf(mask.id))}", SurfaceFormat.R8)
-                    },
-                )
-        }
+                val layerUuid = requireNotNull(uuids.uuidOf(layer.id)) { "No UUID for layer ${layer.id}" }
+                listOf(DocumentSurface(layer.id, "layers/$layerUuid", SurfaceFormat.Rgba8)) +
+                    listOfNotNull(
+                        layer.mask?.let { mask ->
+                            DocumentSurface(mask.id, "masks/${requireNotNull(uuids.uuidOf(mask.id))}", SurfaceFormat.R8)
+                        },
+                    )
+            }
 
     private fun collectNodes(
         nodes: JsonArray,

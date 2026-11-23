@@ -1,5 +1,10 @@
 package com.mobyle.nanquim.formats.nanquim
 
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.reference.ReferenceCorner
+import com.mobyle.nanquim.document.reference.ReferenceMode
+import com.mobyle.nanquim.document.reference.ReferenceSettings
+import com.mobyle.nanquim.document.reference.ReferenceView
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -9,11 +14,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.reference.ReferenceCorner
-import com.mobyle.nanquim.document.reference.ReferenceMode
-import com.mobyle.nanquim.document.reference.ReferenceSettings
-import com.mobyle.nanquim.document.reference.ReferenceView
 import java.time.Instant
 
 class ReferenceJsonTest {

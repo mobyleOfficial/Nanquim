@@ -24,14 +24,14 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.R
+import com.mobyle.nanquim.document.color.ColorComponent
+import com.mobyle.nanquim.document.color.ColorValue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.mobyle.nanquim.R
-import com.mobyle.nanquim.document.color.ColorComponent
-import com.mobyle.nanquim.document.color.ColorValue
 import kotlin.math.abs
 import kotlin.math.roundToInt
 

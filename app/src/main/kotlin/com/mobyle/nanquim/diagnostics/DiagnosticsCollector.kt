@@ -8,11 +8,11 @@ import android.os.Build
 import android.util.DisplayMetrics
 import android.view.InputDevice
 import android.view.MotionEvent
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeoutOrNull
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.GpuInfo
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import java.time.Instant
 import kotlin.coroutines.resume
 

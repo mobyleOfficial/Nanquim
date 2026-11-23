@@ -18,6 +18,19 @@ private val NeutralGray80 = Color(0xFFCCCCCC)
 private val NeutralGray90 = Color(0xFFE6E6E6)
 private val NeutralGray95 = Color(0xFFF2F2F2)
 
+// Light mode sits on a soft, slightly warm paper tone instead of near-white, which is
+// tiring to look at for long drawing sessions. Every surface container is set explicitly
+// so Material's default (near-white, purple-tinted) containers never show through on
+// sheets, dialogs, menus and cards.
+private val Paper = Color(0xFFE9E5DE)
+private val PaperSurface = Color(0xFFE2DED6)
+private val PaperVariant = Color(0xFFCFC9BF)
+private val PaperLowest = Color(0xFFEFECE6)
+private val PaperLow = Color(0xFFE6E2DB)
+private val PaperContainer = Color(0xFFDFDAD2)
+private val PaperHigh = Color(0xFFD9D4CB)
+private val PaperHighest = Color(0xFFD3CEC4)
+
 internal val DarkColors =
     darkColorScheme(
         primary = NeutralGray90,
@@ -47,12 +60,19 @@ internal val LightColors =
         onSecondary = NeutralGray95,
         secondaryContainer = NeutralGray30,
         onSecondaryContainer = NeutralGray95,
-        background = NeutralGray95,
+        background = Paper,
         onBackground = NeutralGray10,
-        surface = NeutralGray90,
+        surface = PaperSurface,
         onSurface = NeutralGray10,
-        surfaceVariant = NeutralGray80,
+        surfaceVariant = PaperVariant,
         onSurfaceVariant = NeutralGray20,
+        surfaceBright = PaperLowest,
+        surfaceDim = PaperHighest,
+        surfaceContainerLowest = PaperLowest,
+        surfaceContainerLow = PaperLow,
+        surfaceContainer = PaperContainer,
+        surfaceContainerHigh = PaperHigh,
+        surfaceContainerHighest = PaperHighest,
         outline = NeutralGray30,
     )
 

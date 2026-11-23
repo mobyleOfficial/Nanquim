@@ -24,7 +24,7 @@ struct DocumentManifest {
   std::vector<DocumentSurface> surfaces;
 };
 
-inline constexpr int64_t kMaximumManifestBytes = 64 * 1024 * 1024;
+inline constexpr int64_t kMaximumManifestBytes = int64_t{64} * 1024 * 1024;
 inline constexpr int32_t kSupportedManifestVersion = 1;
 
 std::optional<DocumentManifest> parseDocumentManifest(std::string_view jsonText,

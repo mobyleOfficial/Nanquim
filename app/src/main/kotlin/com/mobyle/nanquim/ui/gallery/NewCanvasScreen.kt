@@ -1,11 +1,5 @@
 package com.mobyle.nanquim.ui.gallery
 
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.Role
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,12 +13,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -47,6 +44,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.R
@@ -56,15 +56,15 @@ import com.mobyle.nanquim.color.isPrintProfile
 import com.mobyle.nanquim.command.GalleryCommandIds
 import com.mobyle.nanquim.command.MAXIMUM_CANVAS_SIDE_PX
 import com.mobyle.nanquim.command.MINIMUM_LAYERS_FOR_NEW_CANVAS
+import com.mobyle.nanquim.document.layer.PixelFormat
+import com.mobyle.nanquim.document.layer.maximumLayers
+import com.mobyle.nanquim.formats.nanquim.CanvasUnit
 import com.mobyle.nanquim.gallery.BuiltInCanvasPresets
 import com.mobyle.nanquim.gallery.CanvasPreset
 import com.mobyle.nanquim.gallery.CanvasSize
 import com.mobyle.nanquim.gallery.Gallery
 import com.mobyle.nanquim.ui.common.LocalWindowLayout
 import com.mobyle.nanquim.ui.common.ScreenHeader
-import com.mobyle.nanquim.document.layer.PixelFormat
-import com.mobyle.nanquim.document.layer.maximumLayers
-import com.mobyle.nanquim.formats.nanquim.CanvasUnit
 import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -89,27 +89,32 @@ fun NewCanvasScreen(
     var profileId by remember { mutableStateOf(ColorProfileLibrary.SRGB_ID) }
 
     val size =
-        width.toDecimal()?.let { w -> height.toDecimal()?.let { h -> dpi.toDecimal()?.let { d -> CanvasSize(w, h, unit, d) } } }
+        width
+            .toDecimal()
+            ?.let { w -> height.toDecimal()?.let { h -> dpi.toDecimal()?.let { d -> CanvasSize(w, h, unit, d) } } }
             ?.takeIf { it.width > 0 && it.height > 0 && it.dpi > 0 }
     val layerLimit = size?.let { maximumLayers(memoryBudgetBytes, it.widthPx, it.heightPx, pixelFormat.bytesPerPixel) }
-    val fits = size != null && layerLimit != null && layerLimit >= MINIMUM_LAYERS_FOR_NEW_CANVAS &&
-        size.widthPx <= MAXIMUM_CANVAS_SIDE_PX && size.heightPx <= MAXIMUM_CANVAS_SIDE_PX
+    val fits =
+        size != null && layerLimit != null && layerLimit >= MINIMUM_LAYERS_FOR_NEW_CANVAS &&
+            size.widthPx <= MAXIMUM_CANVAS_SIDE_PX && size.heightPx <= MAXIMUM_CANVAS_SIDE_PX
 
-    fun create(canvas: CanvasSize, canvasName: String?) =
-        onCommand(
-            GalleryCommandIds.NEW_CANVAS,
-            mapOf(
-                "width" to canvas.width,
-                "height" to canvas.height,
-                "unit" to canvas.unit.id,
-                "dpi" to canvas.dpi,
-                "name" to canvasName?.takeIf { it.isNotBlank() },
-                "background" to background.color,
-                "backgroundHidden" to backgroundHidden,
-                "bitsPerChannel" to pixelFormat.bitsPerChannel,
-                "profileId" to profileId,
-            ),
-        )
+    fun create(
+        canvas: CanvasSize,
+        canvasName: String?,
+    ) = onCommand(
+        GalleryCommandIds.NEW_CANVAS,
+        mapOf(
+            "width" to canvas.width,
+            "height" to canvas.height,
+            "unit" to canvas.unit.id,
+            "dpi" to canvas.dpi,
+            "name" to canvasName?.takeIf { it.isNotBlank() },
+            "background" to background.color,
+            "backgroundHidden" to backgroundHidden,
+            "bitsPerChannel" to pixelFormat.bitsPerChannel,
+            "profileId" to profileId,
+        ),
+    )
 
     val customCanvas: @Composable () -> Unit = {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -168,7 +173,12 @@ fun NewCanvasScreen(
             if (size != null) {
                 Text(stringResource(R.string.new_canvas_pixels, size.widthPx, size.heightPx), style = MaterialTheme.typography.bodyLarge)
                 layerLimit?.let { Text(stringResource(R.string.new_canvas_max_layers, it)) }
-                if (!fits) Text(stringResource(R.string.new_canvas_too_large, MINIMUM_LAYERS_FOR_NEW_CANVAS), color = MaterialTheme.colorScheme.error)
+                if (!fits) {
+                    Text(
+                        stringResource(R.string.new_canvas_too_large, MINIMUM_LAYERS_FOR_NEW_CANVAS),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
             } else {
                 Text(stringResource(R.string.new_canvas_invalid), color = MaterialTheme.colorScheme.error)
             }
@@ -203,7 +213,10 @@ fun NewCanvasScreen(
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                TextButton(enabled = fits, onClick = { size?.let { create(it, name) } }) { Text(stringResource(R.string.new_canvas_create)) }
+                TextButton(
+                    enabled = fits,
+                    onClick = { size?.let { create(it, name) } },
+                ) { Text(stringResource(R.string.new_canvas_create)) }
                 TextButton(enabled = size != null, onClick = {
                     size?.let { current ->
                         onCommand(
@@ -219,7 +232,19 @@ fun NewCanvasScreen(
                         )
                         editingPresetId = null
                     }
-                }) { Text(stringResource(if (editingPresetId != null) R.string.new_canvas_update_preset else R.string.new_canvas_save_preset)) }
+                }) {
+                    Text(
+                        stringResource(
+                            if (editingPresetId !=
+                                null
+                            ) {
+                                R.string.new_canvas_update_preset
+                            } else {
+                                R.string.new_canvas_save_preset
+                            },
+                        ),
+                    )
+                }
             }
         }
     }
@@ -250,7 +275,10 @@ fun NewCanvasScreen(
         Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
             ScreenHeader(stringResource(R.string.new_canvas_title), onBack)
             if (LocalWindowLayout.current.compact) {
-                Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                Column(
+                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                ) {
                     customCanvas()
                     presetList()
                 }
@@ -295,7 +323,10 @@ private fun PresetRow(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    Row(Modifier.fillMaxWidth().clickable(enabled = fits, onClick = onCreate).padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        Modifier.fillMaxWidth().clickable(enabled = fits, onClick = onCreate).padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Column(Modifier.weight(1f)) {
             Text(preset.name ?: presetName(preset.builtInKey), style = MaterialTheme.typography.bodyLarge)
             val size = preset.size

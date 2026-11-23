@@ -7,9 +7,10 @@
 
 extern "C" {
 
-JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_VulkanProbe_nativeRun(JNIEnv* environment, jclass,
-                                                                        jobject surface,
-                                                                        jint switchCycles) {
+JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_VulkanProbe_nativeRun(JNIEnv* environment,
+                                                                               jclass,
+                                                                               jobject surface,
+                                                                               jint switchCycles) {
   ANativeWindow* window = ANativeWindow_fromSurface(environment, surface);
   if (window == nullptr) {
     return environment->NewStringUTF(R"({"error":"no native window"})");
@@ -18,5 +19,4 @@ JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_VulkanProbe_nativeRun(J
   ANativeWindow_release(window);
   return environment->NewStringUTF(report.c_str());
 }
-
 }

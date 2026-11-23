@@ -25,7 +25,7 @@ class Section {
 
   [[nodiscard]] Section child(const char* name) const {
     const Json* value = field(name);
-    return Section(value, path_ + "." + name);
+    return {value, path_ + "." + name};
   }
 
   [[nodiscard]] double number(const char* name, double fallback, double minimum,
@@ -334,8 +334,7 @@ BrushParameters readBrush(const Json& document) {
   colorParameters.secondaryColorByPressure = color.number("secondaryColorByPressure", 0, 0, 1);
   colorParameters.tiltSecondaryColor = color.number("tiltSecondaryColor", 0, 0, 1);
   colorParameters.secondaryColorJitter = color.number("secondaryColorJitter", 0, 0, 1);
-  colorParameters.strokeSecondaryColorJitter =
-      color.number("strokeSecondaryColorJitter", 0, 0, 1);
+  colorParameters.strokeSecondaryColorJitter = color.number("strokeSecondaryColorJitter", 0, 0, 1);
   colorParameters.pressureCurve = curves.reference(color, "pressureColorCurve");
 
   const Section limits = root.child("limits");

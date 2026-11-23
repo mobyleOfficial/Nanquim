@@ -52,19 +52,19 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.mobyle.nanquim.R
+import com.mobyle.nanquim.canvas.CanvasSession
+import com.mobyle.nanquim.command.TextCommandIds
+import com.mobyle.nanquim.engine.Point
+import com.mobyle.nanquim.engine.TextGeometry
+import com.mobyle.nanquim.text.FontEntry
+import com.mobyle.nanquim.text.TextEditor
+import com.mobyle.nanquim.text.TextInputView
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
-import com.mobyle.nanquim.R
-import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.command.TextCommandIds
-import com.mobyle.nanquim.text.FontEntry
-import com.mobyle.nanquim.text.TextEditor
-import com.mobyle.nanquim.text.TextInputView
-import com.mobyle.nanquim.engine.Point
-import com.mobyle.nanquim.engine.TextGeometry
 import kotlin.math.roundToInt
 
 private fun textToScreen(

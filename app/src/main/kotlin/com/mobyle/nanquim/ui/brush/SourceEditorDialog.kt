@@ -50,13 +50,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.BrushEditorSession
 import com.mobyle.nanquim.brush.TextureSlot
 import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.document.brush.BrushDocument
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.roundToInt
 
 private val PREVIEW_SIZE = 280.dp

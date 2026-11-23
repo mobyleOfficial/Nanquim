@@ -3,6 +3,8 @@ package com.mobyle.nanquim.brush.library
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.document.brush.BrushDocument
+import com.mobyle.nanquim.document.brush.BrushPackage
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -16,8 +18,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.mobyle.nanquim.document.brush.BrushDocument
-import com.mobyle.nanquim.document.brush.BrushPackage
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)
@@ -41,7 +41,9 @@ class BrushLibraryTest {
         name: String,
         spacing: Double = 0.1,
     ) = BrushPackage(
-        BrushDocument.parse("""{ "format": 1, "id": "$id", "name": "$name", "path": { "spacing": $spacing }, "defaults": { "size": 0.5 } }"""),
+        BrushDocument.parse(
+            """{ "format": 1, "id": "$id", "name": "$name", "path": { "spacing": $spacing }, "defaults": { "size": 0.5 } }""",
+        ),
         mapOf("shape.png" to byteArrayOf(1, 2, 3)),
     )
 
@@ -101,7 +103,13 @@ class BrushLibraryTest {
             source.packages["brushes/inking/fine"] = brush("fine", "Fine")
             source.library = source.library.copy(version = 2, groups = listOf(BuiltInGroup("inking", listOf("pen", "marker", "fine"))))
             library.initialize()
-            assertEquals(listOf("Pen", "Fine"), library.groups.first()[0].brushes.map { it.name })
+            assertEquals(
+                listOf("Pen", "Fine"),
+                library.groups
+                    .first()[0]
+                    .brushes
+                    .map { it.name },
+            )
         }
 
     @Test

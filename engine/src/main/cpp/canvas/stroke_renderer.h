@@ -137,6 +137,7 @@ class StrokeRenderer {
   [[nodiscard]] bool linearDocument() const;
   [[nodiscard]] std::vector<std::string> mixingDefines() const;
   [[nodiscard]] std::vector<std::string> workingDefines() const;
+
  public:
   struct TipUniforms {
     float hardness;

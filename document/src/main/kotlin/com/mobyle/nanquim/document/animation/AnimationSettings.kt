@@ -1,9 +1,9 @@
 package com.mobyle.nanquim.document.animation
 
-import kotlinx.serialization.json.JsonObject
 import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.LayerNode
 import com.mobyle.nanquim.document.layer.RgbaColor
+import kotlinx.serialization.json.JsonObject
 
 enum class PlaybackMode(
     val id: String,
@@ -74,7 +74,13 @@ val DocumentState.playedFrames: List<LayerNode>
 fun DocumentState.playbackSequence(): List<Int> {
     val forward = playedFrames.flatMap { frame -> List(1 + (animation.holdFrames[frame.id] ?: 0)) { frame.id } }
     return when (animation.playback) {
-        PlaybackMode.PingPong -> forward + forward.dropLast(1).drop(1).reversed().let { back -> if (forward.size > 1) back else emptyList() }
+        PlaybackMode.PingPong ->
+            forward +
+                forward
+                    .dropLast(1)
+                    .drop(1)
+                    .reversed()
+                    .let { back -> if (forward.size > 1) back else emptyList() }
         else -> forward
     }
 }

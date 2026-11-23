@@ -1,7 +1,7 @@
 package com.mobyle.nanquim.diagnostics
 
-import kotlinx.serialization.Serializable
 import com.mobyle.nanquim.engine.GpuInfo
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class DiagnosticsReport(

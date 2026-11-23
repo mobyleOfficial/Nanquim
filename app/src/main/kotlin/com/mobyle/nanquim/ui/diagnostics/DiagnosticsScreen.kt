@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.ui.diagnostics
 
-import androidx.compose.foundation.layout.heightIn
 import android.net.Uri
 import android.text.format.Formatter
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -50,8 +50,8 @@ import com.mobyle.nanquim.diagnostics.StylusObservation
 import com.mobyle.nanquim.diagnostics.StylusObservationRecorder
 import com.mobyle.nanquim.diagnostics.StylusProbeView
 import com.mobyle.nanquim.diagnostics.StylusSample
-import com.mobyle.nanquim.ui.common.ScreenHeader
 import com.mobyle.nanquim.engine.Renderer
+import com.mobyle.nanquim.ui.common.ScreenHeader
 import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)

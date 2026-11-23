@@ -1,23 +1,23 @@
 package com.mobyle.nanquim.document
 
 import android.util.Log
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.document.animation.AnimationSettings
 import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.withTextModels
 import com.mobyle.nanquim.engine.ColorProfiles
 import com.mobyle.nanquim.engine.DocumentFolder
 import com.mobyle.nanquim.engine.SurfaceFolder
+import com.mobyle.nanquim.formats.nanquim.AnimationJson
 import com.mobyle.nanquim.formats.nanquim.DocumentColorProfile
 import com.mobyle.nanquim.formats.nanquim.DocumentInfo
-import com.mobyle.nanquim.formats.nanquim.AnimationJson
 import com.mobyle.nanquim.formats.nanquim.LayerUuids
 import com.mobyle.nanquim.formats.nanquim.ManifestColorProfile
 import com.mobyle.nanquim.formats.nanquim.ManifestReadResult
 import com.mobyle.nanquim.formats.nanquim.NanquimManifest
 import com.mobyle.nanquim.formats.nanquim.SurfaceFormat
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -62,12 +62,12 @@ class ArtworkStorage(
     fun newId(): String = UUID.randomUUID().toString()
 
     fun ids(): List<String> =
-        root.listFiles { file -> file.isDirectory && !file.name.endsWith(STAGING_SUFFIX) && isArtworkFolder(file) }
+        root
+            .listFiles { file -> file.isDirectory && !file.name.endsWith(STAGING_SUFFIX) && isArtworkFolder(file) }
             ?.map { it.name }
             .orEmpty()
 
-    private fun isArtworkFolder(folder: File) =
-        File(folder, NanquimManifest.MANIFEST_FILE).isFile || File(folder, "save.journal").isFile
+    private fun isArtworkFolder(folder: File) = File(folder, NanquimManifest.MANIFEST_FILE).isFile || File(folder, "save.journal").isFile
 
     fun read(id: String): ArtworkReadResult {
         val folder = folderOf(id)
@@ -82,12 +82,17 @@ class ArtworkStorage(
                 val profile = result.colorProfile?.let { readProfile(folder, it) }
                 val cmykProfile = result.cmykProfile?.let { readProfile(folder, it) }
                 val info = result.info.copy(id = id, colorProfile = profile, cmykProfile = cmykProfile)
-                val state = result.state.withTextModels(readTextModels(folder, result.textModelFiles)).let { read ->
-                    readAnimation(folder, result.uuids)?.let { read.copy(animation = it) } ?: read
-                }
+                val state =
+                    result.state.withTextModels(readTextModels(folder, result.textModelFiles)).let { read ->
+                        readAnimation(folder, result.uuids)?.let { read.copy(animation = it) } ?: read
+                    }
                 ArtworkReadResult.Success(LoadedArtwork(id, folder, state, info, result.uuids, result.manifest))
             }
-            is ManifestReadResult.NeedsNewerApp -> ArtworkReadResult.Failure(ArtworkFailure.NeedsNewerApp, "minReaderVersion ${result.minReaderVersion}")
+            is ManifestReadResult.NeedsNewerApp ->
+                ArtworkReadResult.Failure(
+                    ArtworkFailure.NeedsNewerApp,
+                    "minReaderVersion ${result.minReaderVersion}",
+                )
             is ManifestReadResult.Unsupported -> ArtworkReadResult.Failure(ArtworkFailure.Unsupported, result.reason)
             is ManifestReadResult.Invalid -> ArtworkReadResult.Failure(ArtworkFailure.Invalid, result.reason)
         }

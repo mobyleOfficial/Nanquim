@@ -11,6 +11,7 @@
 #include "color/display_lut.h"
 #include "core/json_writer.h"
 #include "core/log.h"
+#include "core/required.h"
 #include "engine_context.h"
 #include "io/document_tile.h"
 #include "io/document_transaction.h"
@@ -169,10 +170,10 @@ using nanquim::jni::JniEngineCallbacks;
 extern "C" {
 
 JNIEXPORT jlong JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeCreate(JNIEnv* environment,
-                                                                    jobject engineObject,
-                                                                    jlong memoryBudgetBytes,
-                                                                    jstring scratchDirectory,
-                                                                    jint renderer) {
+                                                                           jobject engineObject,
+                                                                           jlong memoryBudgetBytes,
+                                                                           jstring scratchDirectory,
+                                                                           jint renderer) {
   JavaVM* javaVm = nullptr;
   if (environment->GetJavaVM(&javaVm) != JNI_OK) {
     return 0;
@@ -206,15 +207,13 @@ JNIEXPORT jlong JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeCreate(JNIEn
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeDestroy(JNIEnv*, jobject,
-                                                                    jlong handle) {
+                                                                           jlong handle) {
   delete fromHandle(handle);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeAttachSurface(JNIEnv* environment,
-                                                                          jobject, jlong handle,
-                                                                          jobject surface,
-                                                                          jint widthPixels,
-                                                                          jint heightPixels) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeAttachSurface(
+    JNIEnv* environment, jobject, jlong handle, jobject surface, jint widthPixels,
+    jint heightPixels) {
   ANativeWindow* window = ANativeWindow_fromSurface(environment, surface);
   if (window == nullptr) {
     NANQUIM_LOG_ERROR("ANativeWindow_fromSurface returned null");
@@ -224,14 +223,12 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeAttachSurface
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeDetachSurface(JNIEnv*, jobject,
-                                                                          jlong handle) {
+                                                                                 jlong handle) {
   fromHandle(handle)->detachWindowAndWait();
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetClearColor(JNIEnv*, jobject,
-                                                                          jlong handle, jfloat red,
-                                                                          jfloat green, jfloat blue,
-                                                                          jfloat alpha) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetClearColor(
+    JNIEnv*, jobject, jlong handle, jfloat red, jfloat green, jfloat blue, jfloat alpha) {
   fromHandle(handle)->setClearColor(red, green, blue, alpha);
 }
 
@@ -241,8 +238,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetLatencyTes
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeRequestGpuInfo(JNIEnv*, jobject,
-                                                                           jlong handle,
-                                                                           jint requestId) {
+                                                                                  jlong handle,
+                                                                                  jint requestId) {
   fromHandle(handle)->requestGpuInfo(requestId);
 }
 
@@ -257,8 +254,8 @@ JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeOpenDocume
     JNIEnv* environment, jobject, jlong handle, jint widthPixels, jint heightPixels,
     jstring layerTreeJson) {
   std::string error;
-  auto tree = nanquim::canvas::parseLayerTree(
-      nanquim::jni::toStdString(environment, layerTreeJson), error);
+  auto tree =
+      nanquim::canvas::parseLayerTree(nanquim::jni::toStdString(environment, layerTreeJson), error);
   if (!tree) {
     return environment->NewStringUTF(error.c_str());
   }
@@ -269,8 +266,8 @@ JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeOpenDocume
 JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetLayerTree(
     JNIEnv* environment, jobject, jlong handle, jstring layerTreeJson) {
   std::string error;
-  auto tree = nanquim::canvas::parseLayerTree(
-      nanquim::jni::toStdString(environment, layerTreeJson), error);
+  auto tree =
+      nanquim::canvas::parseLayerTree(nanquim::jni::toStdString(environment, layerTreeJson), error);
   if (!tree) {
     return environment->NewStringUTF(error.c_str());
   }
@@ -316,8 +313,8 @@ JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeOpenDocume
     jstring layerTreeJson, jstring documentId, jstring folder, jintArray surfaceIds,
     jobjectArray surfaceFolders, jintArray surfaceFormats) {
   std::string error;
-  auto tree = nanquim::canvas::parseLayerTree(
-      nanquim::jni::toStdString(environment, layerTreeJson), error);
+  auto tree =
+      nanquim::canvas::parseLayerTree(nanquim::jni::toStdString(environment, layerTreeJson), error);
   if (!tree) {
     return environment->NewStringUTF(error.c_str());
   }
@@ -350,8 +347,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSaveDocument(
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeWriteSurfaceTileRow(
     JNIEnv* environment, jobject, jlong handle, jint surfaceId, jint tileRow, jbyteArray pixels) {
-  fromHandle(handle)->writeSurfaceTileRow(static_cast<nanquim::canvas::LayerId>(surfaceId),
-                                          tileRow, toBytes(environment, pixels));
+  fromHandle(handle)->writeSurfaceTileRow(static_cast<nanquim::canvas::LayerId>(surfaceId), tileRow,
+                                          toBytes(environment, pixels));
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeRequestCompositeThumbnail(
@@ -364,9 +361,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeRequestCompos
   fromHandle(handle)->requestCompositePreview(requestId, maxSide);
 }
 
-JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_DocumentFolder_nativeRecover(JNIEnv* environment,
-                                                                              jclass,
-                                                                              jstring folder) {
+JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_DocumentFolder_nativeRecover(
+    JNIEnv* environment, jclass, jstring folder) {
   std::string error;
   if (nanquim::io::recoverDocumentFolder(nanquim::jni::toStdString(environment, folder), error)) {
     return nullptr;
@@ -501,10 +497,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeFillSurface(
                                   {red, green, blue, alpha}, mask == JNI_TRUE, historyEntry);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeClearSurface(JNIEnv*, jobject,
-                                                                         jlong handle,
-                                                                         jint surface,
-                                                                         jlong historyEntry) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeClearSurface(
+    JNIEnv*, jobject, jlong handle, jint surface, jlong historyEntry) {
   fromHandle(handle)->clearSurface(static_cast<nanquim::canvas::LayerId>(surface), historyEntry);
 }
 
@@ -559,22 +553,20 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeBeginFill(
   fromHandle(handle)->beginFill(request);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetFillThreshold(JNIEnv*, jobject,
-                                                                             jlong handle,
-                                                                             jdouble threshold) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetFillThreshold(
+    JNIEnv*, jobject, jlong handle, jdouble threshold) {
   fromHandle(handle)->setFillThreshold(threshold);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndFill(JNIEnv*, jobject, jlong handle,
-                                                                    jboolean commit,
-                                                                    jlong historyEntry) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndFill(JNIEnv*, jobject,
+                                                                           jlong handle,
+                                                                           jboolean commit,
+                                                                           jlong historyEntry) {
   fromHandle(handle)->endFill(commit == JNI_TRUE, historyEntry);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeCopyMasked(JNIEnv*, jobject,
-                                                                       jlong handle, jint source,
-                                                                       jint destination,
-                                                                       jint selection) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeCopyMasked(
+    JNIEnv*, jobject, jlong handle, jint source, jint destination, jint selection) {
   fromHandle(handle)->copyMasked(static_cast<nanquim::canvas::LayerId>(source),
                                  static_cast<nanquim::canvas::LayerId>(destination),
                                  static_cast<nanquim::canvas::LayerId>(selection));
@@ -606,10 +598,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetTransformM
       static_cast<nanquim::canvas::TransformFilter>(std::clamp<jint>(filter, 0, 2)));
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndTransform(JNIEnv*, jobject,
-                                                                         jlong handle,
-                                                                         jboolean commit,
-                                                                         jlong historyEntry) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndTransform(
+    JNIEnv*, jobject, jlong handle, jboolean commit, jlong historyEntry) {
   fromHandle(handle)->endTransform(commit == JNI_TRUE, historyEntry);
 }
 
@@ -630,7 +620,8 @@ nanquim::adjust::Parameters adjustmentParameters(JNIEnv* environment, jint filte
       table = nanquim::adjust::bakeTable(parameters.filter,
                                          nanquim::adjust::defaultTableData(parameters.filter));
     }
-    parameters.table = std::make_shared<const nanquim::adjust::Table>(std::move(*table));
+    parameters.table =
+        std::make_shared<const nanquim::adjust::Table>(std::move(nanquim::core::required(table)));
   }
   return parameters;
 }
@@ -655,10 +646,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetAdjustment
                                     amount);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndAdjustment(JNIEnv*, jobject,
-                                                                          jlong handle,
-                                                                          jboolean commit,
-                                                                          jlong historyEntry) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndAdjustment(
+    JNIEnv*, jobject, jlong handle, jboolean commit, jlong historyEntry) {
   fromHandle(handle)->endAdjustment(commit == JNI_TRUE, historyEntry);
 }
 
@@ -677,9 +666,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeBeginLiquifyS
   fromHandle(handle)->beginLiquifyStroke(brush);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeAddLiquifySamples(JNIEnv* environment,
-                                                                              jobject, jlong handle,
-                                                                              jfloatArray samples) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeAddLiquifySamples(
+    JNIEnv* environment, jobject, jlong handle, jfloatArray samples) {
   const jsize count = environment->GetArrayLength(samples);
   std::vector<float> values(static_cast<size_t>(count));
   environment->GetFloatArrayRegion(samples, 0, count, values.data());
@@ -690,9 +678,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeAddLiquifySam
   fromHandle(handle)->addLiquifySamples(std::move(decoded));
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndLiquifyStroke(JNIEnv*, jobject,
-                                                                             jlong handle,
-                                                                             jboolean cancel) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndLiquifyStroke(
+    JNIEnv*, jobject, jlong handle, jboolean cancel) {
   if (cancel == JNI_TRUE) {
     fromHandle(handle)->cancelLiquifyStroke();
   } else {
@@ -701,14 +688,14 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndLiquifyStr
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeLiquifyStep(JNIEnv*, jobject,
-                                                                        jlong handle,
-                                                                        jboolean undo) {
+                                                                               jlong handle,
+                                                                               jboolean undo) {
   fromHandle(handle)->liquifyStep(undo == JNI_TRUE);
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeScaleLiquify(JNIEnv*, jobject,
-                                                                         jlong handle,
-                                                                         jfloat factor) {
+                                                                                jlong handle,
+                                                                                jfloat factor) {
   fromHandle(handle)->scaleLiquify(factor);
 }
 
@@ -732,8 +719,9 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeRemapSurface(
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetCanvasSize(JNIEnv*, jobject,
-                                                                          jlong handle, jint width,
-                                                                          jint height) {
+                                                                                 jlong handle,
+                                                                                 jint width,
+                                                                                 jint height) {
   fromHandle(handle)->setCanvasSize(width, height);
 }
 
@@ -745,10 +733,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetSelectionD
       dimOutside == JNI_TRUE);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeInvertSelection(JNIEnv*, jobject,
-                                                                            jlong handle,
-                                                                            jint selection,
-                                                                            jlong historyEntry) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeInvertSelection(
+    JNIEnv*, jobject, jlong handle, jint selection, jlong historyEntry) {
   fromHandle(handle)->invertSelection(static_cast<nanquim::canvas::LayerId>(selection),
                                       historyEntry);
 }
@@ -760,9 +746,9 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSelectContent
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeCopySurface(JNIEnv*, jobject,
-                                                                        jlong handle,
-                                                                        jint source,
-                                                                        jint destination) {
+                                                                               jlong handle,
+                                                                               jint source,
+                                                                               jint destination) {
   fromHandle(handle)->copySurface(static_cast<nanquim::canvas::LayerId>(source),
                                   static_cast<nanquim::canvas::LayerId>(destination));
 }
@@ -771,8 +757,8 @@ JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeComposeInt
     JNIEnv* environment, jobject, jlong handle, jint target, jstring layerTreeJson,
     jlong historyEntry) {
   std::string error;
-  auto tree = nanquim::canvas::parseLayerTree(
-      nanquim::jni::toStdString(environment, layerTreeJson), error);
+  auto tree =
+      nanquim::canvas::parseLayerTree(nanquim::jni::toStdString(environment, layerTreeJson), error);
   if (!tree) {
     return environment->NewStringUTF(error.c_str());
   }
@@ -781,18 +767,16 @@ JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeComposeInt
   return nullptr;
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeDiscardSurfaces(JNIEnv* environment,
-                                                                            jobject, jlong handle,
-                                                                            jintArray surfaces) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeDiscardSurfaces(
+    JNIEnv* environment, jobject, jlong handle, jintArray surfaces) {
   std::vector<jint> values(static_cast<size_t>(environment->GetArrayLength(surfaces)));
   environment->GetIntArrayRegion(surfaces, 0, static_cast<jsize>(values.size()), values.data());
   std::vector<nanquim::canvas::LayerId> ids(values.begin(), values.end());
   fromHandle(handle)->discardSurfaces(std::move(ids));
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativePrefetchSurfaces(JNIEnv* environment,
-                                                                             jobject, jlong handle,
-                                                                             jintArray surfaces) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativePrefetchSurfaces(
+    JNIEnv* environment, jobject, jlong handle, jintArray surfaces) {
   std::vector<jint> values(static_cast<size_t>(environment->GetArrayLength(surfaces)));
   environment->GetIntArrayRegion(surfaces, 0, static_cast<jsize>(values.size()), values.data());
   std::vector<nanquim::canvas::LayerId> ids(values.begin(), values.end());
@@ -800,57 +784,51 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativePrefetchSurfa
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeApplyHistory(JNIEnv*, jobject,
-                                                                         jlong handle,
-                                                                         jlong historyEntry,
-                                                                         jboolean undo) {
+                                                                                jlong handle,
+                                                                                jlong historyEntry,
+                                                                                jboolean undo) {
   fromHandle(handle)->applyHistory(historyEntry, undo == JNI_TRUE);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeReleaseHistory(JNIEnv* environment,
-                                                                           jobject, jlong handle,
-                                                                           jlongArray entries) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeReleaseHistory(
+    JNIEnv* environment, jobject, jlong handle, jlongArray entries) {
   std::vector<jlong> values(static_cast<size_t>(environment->GetArrayLength(entries)));
   environment->GetLongArrayRegion(entries, 0, static_cast<jsize>(values.size()), values.data());
   fromHandle(handle)->releaseHistory(std::vector<int64_t>(values.begin(), values.end()));
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetHistoryRamBudget(JNIEnv*, jobject,
-                                                                                jlong handle,
-                                                                                jlong bytes) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetHistoryRamBudget(
+    JNIEnv*, jobject, jlong handle, jlong bytes) {
   fromHandle(handle)->setHistoryRamBudget(bytes);
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeCloseDocument(JNIEnv*, jobject,
-                                                                          jlong handle) {
+                                                                                 jlong handle) {
   fromHandle(handle)->closeDocument();
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetLayerVisible(JNIEnv*, jobject,
-                                                                            jlong handle,
-                                                                            jint layerId,
-                                                                            jboolean visible) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetLayerVisible(
+    JNIEnv*, jobject, jlong handle, jint layerId, jboolean visible) {
   fromHandle(handle)->setLayerVisible(static_cast<nanquim::canvas::LayerId>(layerId),
                                       visible == JNI_TRUE);
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetLayerOpacity(JNIEnv*, jobject,
-                                                                            jlong handle,
-                                                                            jint layerId,
-                                                                            jfloat opacity) {
+                                                                                   jlong handle,
+                                                                                   jint layerId,
+                                                                                   jfloat opacity) {
   fromHandle(handle)->setLayerOpacity(static_cast<nanquim::canvas::LayerId>(layerId), opacity);
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetActiveLayer(JNIEnv*, jobject,
-                                                                           jlong handle,
-                                                                           jint layerId) {
+                                                                                  jlong handle,
+                                                                                  jint layerId) {
   fromHandle(handle)->setActiveLayer(static_cast<nanquim::canvas::LayerId>(layerId));
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetBackground(JNIEnv*, jobject,
-                                                                          jlong handle, jfloat red,
-                                                                          jfloat green, jfloat blue,
-                                                                          jfloat alpha,
-                                                                          jboolean hidden) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetBackground(
+    JNIEnv*, jobject, jlong handle, jfloat red, jfloat green, jfloat blue, jfloat alpha,
+    jboolean hidden) {
   fromHandle(handle)->setBackground({red, green, blue, alpha}, hidden == JNI_TRUE);
 }
 
@@ -860,11 +838,9 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeFillRandomTil
                                       static_cast<uint32_t>(seed));
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetCamera(JNIEnv*, jobject,
-                                                                      jlong handle, jdouble a,
-                                                                      jdouble b, jdouble c,
-                                                                      jdouble d, jdouble tx,
-                                                                      jdouble ty) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetCamera(
+    JNIEnv*, jobject, jlong handle, jdouble a, jdouble b, jdouble c, jdouble d, jdouble tx,
+    jdouble ty) {
   fromHandle(handle)->setCamera(nanquim::core::AffineTransform{a, b, c, d, tx, ty});
 }
 
@@ -896,9 +872,8 @@ JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetDisplay
   return error.empty() ? nullptr : environment->NewStringUTF(error.c_str());
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetDirtyTileOverlay(JNIEnv*, jobject,
-                                                                                jlong handle,
-                                                                                jboolean enabled) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetDirtyTileOverlay(
+    JNIEnv*, jobject, jlong handle, jboolean enabled) {
   fromHandle(handle)->setDirtyTileOverlay(enabled == JNI_TRUE);
 }
 
@@ -909,14 +884,14 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeKeepGpuAwake(
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetMemoryBudget(JNIEnv*, jobject,
-                                                                            jlong handle,
-                                                                            jlong bytes) {
+                                                                                   jlong handle,
+                                                                                   jlong bytes) {
   fromHandle(handle)->setMemoryBudget(bytes);
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeRequestStats(JNIEnv*, jobject,
-                                                                         jlong handle,
-                                                                         jint requestId) {
+                                                                                jlong handle,
+                                                                                jint requestId) {
   fromHandle(handle)->requestStats(requestId);
 }
 
@@ -974,15 +949,13 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetPressureCu
   fromHandle(handle)->setPressureCurve(std::move(curve));
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetStylusRoll(JNIEnv*, jobject,
-                                                                          jlong handle,
-                                                                          jboolean reported) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetStylusRoll(
+    JNIEnv*, jobject, jlong handle, jboolean reported) {
   fromHandle(handle)->setStylusRoll(reported == JNI_TRUE);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetGlobalSmoothing(JNIEnv*, jobject,
-                                                                               jlong handle,
-                                                                               jfloat amount) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetGlobalSmoothing(
+    JNIEnv*, jobject, jlong handle, jfloat amount) {
   fromHandle(handle)->setGlobalSmoothing(amount);
 }
 
@@ -1019,9 +992,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeRegisterFont(
       data != nullptr ? toBytes(environment, data) : std::vector<uint8_t>(), faceIndex);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetFontFallbacks(JNIEnv* environment,
-                                                                             jobject, jlong handle,
-                                                                             jobjectArray fontIds) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetFontFallbacks(
+    JNIEnv* environment, jobject, jlong handle, jobjectArray fontIds) {
   std::vector<std::string> ids;
   const jsize count = environment->GetArrayLength(fontIds);
   for (jsize index = 0; index < count; ++index) {
@@ -1094,10 +1066,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeAddStrokeSamp
   fromHandle(handle)->addStrokeSamples(std::vector<uint8_t>(data, data + byteCount));
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeReplaceStroke(JNIEnv* environment,
-                                                                          jobject, jlong handle,
-                                                                          jobject samples,
-                                                                          jint byteCount) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeReplaceStroke(
+    JNIEnv* environment, jobject, jlong handle, jobject samples, jint byteCount) {
   const auto* data = static_cast<const uint8_t*>(environment->GetDirectBufferAddress(samples));
   const jlong capacity = environment->GetDirectBufferCapacity(samples);
   if (data == nullptr || byteCount < 0 || byteCount > capacity) {
@@ -1108,12 +1078,12 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeReplaceStroke
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeEndStroke(JNIEnv*, jobject,
-                                                                      jlong handle) {
+                                                                             jlong handle) {
   fromHandle(handle)->endStroke();
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeCancelStroke(JNIEnv*, jobject,
-                                                                         jlong handle) {
+                                                                                jlong handle) {
   fromHandle(handle)->cancelStroke();
 }
 
@@ -1122,8 +1092,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetFrontBuffe
   fromHandle(handle)->setFrontBufferEnabled(enabled == JNI_TRUE);
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeResetFrameStatistics(JNIEnv*, jobject,
-                                                                                 jlong handle) {
+JNIEXPORT void JNICALL
+Java_com_mobyle_nanquim_engine_Engine_nativeResetFrameStatistics(JNIEnv*, jobject, jlong handle) {
   fromHandle(handle)->resetFrameStatistics();
 }
 
@@ -1164,9 +1134,9 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeRenderViewpor
 }
 
 JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeReadComposite(JNIEnv*, jobject,
-                                                                          jlong handle,
-                                                                          jint requestId,
-                                                                          jboolean deep) {
+                                                                                 jlong handle,
+                                                                                 jint requestId,
+                                                                                 jboolean deep) {
   fromHandle(handle)->readComposite(requestId, deep == JNI_TRUE);
 }
 
@@ -1204,12 +1174,8 @@ JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSampleLayerAl
   fromHandle(handle)->sampleLayerAlphas(requestId, canvasX, canvasY, std::move(ids));
 }
 
-JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSampleColor(JNIEnv*, jobject,
-                                                                        jlong handle,
-                                                                        jint requestId,
-                                                                        jdouble canvasX,
-                                                                        jdouble canvasY,
-                                                                        jint size) {
+JNIEXPORT void JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSampleColor(
+    JNIEnv*, jobject, jlong handle, jint requestId, jdouble canvasX, jdouble canvasY, jint size) {
   fromHandle(handle)->sampleColor(requestId, canvasX, canvasY, size);
 }
 }

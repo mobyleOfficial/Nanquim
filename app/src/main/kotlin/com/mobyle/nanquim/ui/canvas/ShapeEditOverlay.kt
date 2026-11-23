@@ -13,12 +13,12 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.command.QuickShapeCommandIds
 import com.mobyle.nanquim.document.shape.ShapeHandleKind
 import com.mobyle.nanquim.engine.Point
+import kotlinx.coroutines.delay
 
 @Composable
 fun ShapeEditOverlay(session: CanvasSession) {

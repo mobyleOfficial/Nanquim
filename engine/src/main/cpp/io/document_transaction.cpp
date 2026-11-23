@@ -16,7 +16,7 @@ using Json = nlohmann::json;
 
 constexpr const char* kManifestName = "manifest.json";
 constexpr int32_t kJournalVersion = 1;
-constexpr int64_t kMaximumJournalBytes = 64 * 1024 * 1024;
+constexpr int64_t kMaximumJournalBytes = int64_t{64} * 1024 * 1024;
 
 std::string parentOf(const std::string& path) {
   const size_t separator = path.find_last_of('/');
@@ -34,10 +34,11 @@ struct Journal {
 };
 
 std::vector<uint8_t> journalBytes(const Journal& journal) {
-  const std::string text = Json{{"version", kJournalVersion},
-                                {"renames", journal.renames},
-                                {"removals", journal.removals}}
-                               .dump();
+  const std::string text = Json{
+      {"version", kJournalVersion},
+      {"renames", journal.renames},
+      {"removals",
+       journal.removals}}.dump();
   return {text.begin(), text.end()};
 }
 

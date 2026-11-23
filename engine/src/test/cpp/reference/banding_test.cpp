@@ -23,8 +23,8 @@ double largestError(const std::string& sceneName, bool linear) {
   std::ifstream input(path, std::ios::binary);
   const std::string text{std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
   std::string error;
-  const auto scene = scene::parseScene(
-      text, [](const std::string&) { return std::nullopt; }, error);
+  const auto scene =
+      scene::parseScene(text, [](const std::string&) { return std::nullopt; }, error);
   EXPECT_TRUE(scene.has_value()) << error;
   if (!scene) {
     return 255;

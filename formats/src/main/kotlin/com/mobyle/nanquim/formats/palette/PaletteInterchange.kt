@@ -1,5 +1,7 @@
 package com.mobyle.nanquim.formats.palette
 
+import com.mobyle.nanquim.document.layer.RgbaColor
+import com.mobyle.nanquim.formats.interchange.ImportWarning
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -7,8 +9,6 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.intOrNull
-import com.mobyle.nanquim.document.layer.RgbaColor
-import com.mobyle.nanquim.formats.interchange.ImportWarning
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import kotlin.math.roundToInt

@@ -1,5 +1,10 @@
 package com.mobyle.nanquim.brush.library
 
+import com.mobyle.nanquim.document.brush.BrushDocument
+import com.mobyle.nanquim.document.brush.BrushPackage
+import com.mobyle.nanquim.document.brush.BrushPackageIo
+import com.mobyle.nanquim.document.brush.BrushResetPoints
+import com.mobyle.nanquim.document.brush.InvalidBrushException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -8,11 +13,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.document.brush.BrushDocument
-import com.mobyle.nanquim.document.brush.BrushPackage
-import com.mobyle.nanquim.document.brush.BrushPackageIo
-import com.mobyle.nanquim.document.brush.BrushResetPoints
-import com.mobyle.nanquim.document.brush.InvalidBrushException
 import java.io.File
 import java.time.Instant
 import java.util.UUID
@@ -98,9 +98,10 @@ class BrushLibrary(
 
     val toolBrushes: Flow<Map<BrushTool, String>> =
         combine(dao.observeToolBrushes(), dao.observeEntries()) { selections, _ ->
-            selections.mapNotNull { selection ->
-                BrushTool.entries.firstOrNull { it.key == selection.tool }?.let { it to selection.brushId }
-            }.toMap()
+            selections
+                .mapNotNull { selection ->
+                    BrushTool.entries.firstOrNull { it.key == selection.tool }?.let { it to selection.brushId }
+                }.toMap()
         }
 
     suspend fun select(

@@ -388,7 +388,8 @@ void commitMask(Image& mask, const Image& strokeBuffer, double strokeOpacity, do
   for (size_t offset = 0; offset < mask.rgba.size(); offset += 4) {
     const double coverage = strokeBuffer.rgba[offset + 3] * strokeOpacity;
     for (size_t channel = 0; channel < 3; ++channel) {
-      mask.rgba[offset + channel] = mask.rgba[offset + channel] * (1 - coverage) + luminance * coverage;
+      mask.rgba[offset + channel] =
+          mask.rgba[offset + channel] * (1 - coverage) + luminance * coverage;
     }
     mask.rgba[offset + 3] = 1;
   }

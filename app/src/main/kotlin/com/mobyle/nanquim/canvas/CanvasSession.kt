@@ -7,20 +7,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withTimeoutOrNull
 import androidx.compose.runtime.snapshotFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import com.mobyle.nanquim.brush.ActiveBrushes
 import com.mobyle.nanquim.brush.BrushLimits
 import com.mobyle.nanquim.brush.library.BrushLibrary
@@ -30,9 +17,9 @@ import com.mobyle.nanquim.canvas.adjust.AdjustmentEditor
 import com.mobyle.nanquim.canvas.adjust.AdjustmentMode
 import com.mobyle.nanquim.canvas.adjust.GradientLibrary
 import com.mobyle.nanquim.canvas.adjust.Histogram
+import com.mobyle.nanquim.canvas.input.CanvasTool
 import com.mobyle.nanquim.canvas.input.GestureBindings
 import com.mobyle.nanquim.canvas.input.GestureConfiguration
-import com.mobyle.nanquim.canvas.input.CanvasTool
 import com.mobyle.nanquim.canvas.input.PalmSupport
 import com.mobyle.nanquim.canvas.input.QuickShapeSnap
 import com.mobyle.nanquim.canvas.input.StylusRollDetector
@@ -44,18 +31,15 @@ import com.mobyle.nanquim.canvas.selection.SelectionGeometry
 import com.mobyle.nanquim.canvas.selection.SelectionMode
 import com.mobyle.nanquim.canvas.transform.LiftedContent
 import com.mobyle.nanquim.canvas.transform.TransformEditor
-import com.mobyle.nanquim.color.ProfileCmykConversion
-import com.mobyle.nanquim.document.color.CmykConversion
-import com.mobyle.nanquim.document.color.CmykInks
-import com.mobyle.nanquim.engine.CmykColors
 import com.mobyle.nanquim.color.ColorProfileLibrary
 import com.mobyle.nanquim.color.PaletteLibrary
+import com.mobyle.nanquim.color.ProfileCmykConversion
 import com.mobyle.nanquim.document.ArtworkStorage
 import com.mobyle.nanquim.document.DocumentPersistence
 import com.mobyle.nanquim.document.LoadedArtwork
 import com.mobyle.nanquim.document.OpenArtwork
-import com.mobyle.nanquim.text.FontLibrary
-import com.mobyle.nanquim.text.TextEditor
+import com.mobyle.nanquim.document.color.CmykConversion
+import com.mobyle.nanquim.document.color.CmykInks
 import com.mobyle.nanquim.document.color.ColorHarmony
 import com.mobyle.nanquim.document.color.ColorState
 import com.mobyle.nanquim.document.color.ColorValue
@@ -89,12 +73,12 @@ import com.mobyle.nanquim.document.shape.ShapePoint
 import com.mobyle.nanquim.engine.AdjustmentFilter
 import com.mobyle.nanquim.engine.AffineTransform
 import com.mobyle.nanquim.engine.CloneSource
+import com.mobyle.nanquim.engine.CmykColors
 import com.mobyle.nanquim.engine.DocumentFolder
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.EngineEvent
 import com.mobyle.nanquim.engine.FrameStats
 import com.mobyle.nanquim.engine.LatencyStats
-import com.mobyle.nanquim.engine.TextStats
 import com.mobyle.nanquim.engine.LiquifyMode
 import com.mobyle.nanquim.engine.Point
 import com.mobyle.nanquim.engine.SceneRender
@@ -104,11 +88,27 @@ import com.mobyle.nanquim.engine.StrokeSampleFlags
 import com.mobyle.nanquim.engine.StrokeStyle
 import com.mobyle.nanquim.engine.StrokeTool
 import com.mobyle.nanquim.engine.TextGeometry
-import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
+import com.mobyle.nanquim.engine.TextStats
 import com.mobyle.nanquim.formats.nanquim.ArtistInfo
 import com.mobyle.nanquim.formats.nanquim.DocumentColorProfile
 import com.mobyle.nanquim.formats.nanquim.DocumentInfo
 import com.mobyle.nanquim.formats.nanquim.LayerUuids
+import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
+import com.mobyle.nanquim.text.FontLibrary
+import com.mobyle.nanquim.text.TextEditor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.math.roundToInt
@@ -295,7 +295,9 @@ class CanvasSession(
                 loadedConversion?.second?.close()
                 loadedConversion = if (conversion != null && cmyk != null) (rgb to cmyk) to conversion else null
                 if (conversion != null) {
-                    changeColors(colors.withPrimary(conversion.printable(colors.primary)).withSecondary(conversion.printable(colors.secondary)))
+                    changeColors(
+                        colors.withPrimary(conversion.printable(colors.primary)).withSecondary(conversion.printable(colors.secondary)),
+                    )
                 }
             }
         }
@@ -332,7 +334,8 @@ class CanvasSession(
         scope.launch {
             val error = withContext(displayColorDispatcher) { engine.setDisplayColor(icc, cmykIcc, displayP3) }
             if (request == displayColorRequest) {
-                displayColor = DisplayColor(displayP3, converted = error == null && (icc != null || cmykIcc != null || displayP3), error = error)
+                displayColor =
+                    DisplayColor(displayP3, converted = error == null && (icc != null || cmykIcc != null || displayP3), error = error)
             }
         }
     }
@@ -516,7 +519,11 @@ class CanvasSession(
             session.endTransform(commit = false)
             val model = textLayer.text!!.model
             val moved = composeAffine(affine, TextModelEditing.transform(model))
-            session.setTextContent(textLayer.id, TextLayerContent(TextModelEditing.setTransform(model, moved)), label = HistoryLabel.Transform)
+            session.setTextContent(
+                textLayer.id,
+                TextLayerContent(TextModelEditing.setTransform(model, moved)),
+                label = HistoryLabel.Transform,
+            )
             transformVersion++
             return
         }

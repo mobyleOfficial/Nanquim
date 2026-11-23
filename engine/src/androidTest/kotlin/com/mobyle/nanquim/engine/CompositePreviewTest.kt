@@ -2,6 +2,10 @@ package com.mobyle.nanquim.engine
 
 import android.view.MotionEvent
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.document.layer.Background
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.addRasterLayer
+import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -10,10 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import com.mobyle.nanquim.document.layer.Background
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.addRasterLayer
-import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit

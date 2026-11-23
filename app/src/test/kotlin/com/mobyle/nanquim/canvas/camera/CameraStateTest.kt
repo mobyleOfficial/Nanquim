@@ -1,8 +1,8 @@
 package com.mobyle.nanquim.canvas.camera
 
+import com.mobyle.nanquim.engine.Point
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.engine.Point
 import kotlin.math.PI
 
 class CameraStateTest {

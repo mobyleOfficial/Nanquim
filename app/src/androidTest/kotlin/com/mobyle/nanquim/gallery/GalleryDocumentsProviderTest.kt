@@ -8,6 +8,7 @@ import android.provider.DocumentsContract.Document
 import android.provider.DocumentsContract.Root
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.NanquimApplication
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -15,7 +16,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.mobyle.nanquim.NanquimApplication
 import java.util.zip.ZipInputStream
 
 @RunWith(AndroidJUnit4::class)

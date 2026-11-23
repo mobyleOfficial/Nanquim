@@ -8,12 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.JsonElement
 import com.mobyle.nanquim.brush.library.BrushLibrary
 import com.mobyle.nanquim.brush.library.BrushTool
 import com.mobyle.nanquim.canvas.SrgbColor
@@ -22,6 +16,12 @@ import com.mobyle.nanquim.document.brush.BrushPackage
 import com.mobyle.nanquim.document.brush.BrushResetPoints
 import com.mobyle.nanquim.engine.BrushPad
 import com.mobyle.nanquim.engine.StrokeSampleBuffer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonElement
 import java.util.concurrent.atomic.AtomicReference
 
 enum class BrushEditorSection {

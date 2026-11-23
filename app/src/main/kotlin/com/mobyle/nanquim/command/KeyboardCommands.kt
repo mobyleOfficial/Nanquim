@@ -1,12 +1,6 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.keyboard.KeyChord
-import com.mobyle.nanquim.keyboard.KeyboardShortcutSettings
-import com.mobyle.nanquim.keyboard.ShortcutAction
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandRegistry
@@ -14,6 +8,12 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.keyboard.KeyChord
+import com.mobyle.nanquim.keyboard.KeyboardShortcutSettings
+import com.mobyle.nanquim.keyboard.ShortcutAction
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 object KeyboardCommandIds {
     const val OPEN = "settings.keyboardShortcuts.open"
