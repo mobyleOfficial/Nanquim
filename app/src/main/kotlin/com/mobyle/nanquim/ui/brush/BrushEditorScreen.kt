@@ -41,6 +41,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +61,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.BrushEditorSection
 import com.mobyle.nanquim.brush.BrushEditorSession
@@ -74,6 +76,16 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.PI
 import kotlin.math.roundToInt
+
+@Composable
+fun BrushEditorRoute(viewModel: BrushEditorViewModel = hiltViewModel()) {
+    val editor = viewModel.editor
+    if (editor == null) {
+        LaunchedEffect(Unit) { viewModel.leave() }
+    } else {
+        BrushEditorScreen(editor = editor, onCommand = viewModel::command, stylusRollReported = viewModel.stylusRollReported)
+    }
+}
 
 @Composable
 fun BrushEditorScreen(

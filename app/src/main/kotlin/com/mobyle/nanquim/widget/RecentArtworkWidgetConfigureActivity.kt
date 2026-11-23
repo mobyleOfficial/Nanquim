@@ -39,16 +39,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.lifecycle.lifecycleScope
-import com.mobyle.nanquim.NanquimApplication
 import com.mobyle.nanquim.R
+import com.mobyle.nanquim.document.ArtworkStorage
 import com.mobyle.nanquim.gallery.ArtworkEntity
+import com.mobyle.nanquim.gallery.GalleryDatabase
 import com.mobyle.nanquim.ui.theme.NanquimTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RecentArtworkWidgetConfigureActivity : ComponentActivity() {
+    @Inject
+    lateinit var galleryDatabase: GalleryDatabase
+
+    @Inject
+    lateinit var artworkStorage: ArtworkStorage
+
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,14 +71,13 @@ class RecentArtworkWidgetConfigureActivity : ComponentActivity() {
             finish()
             return
         }
-        val application = application as NanquimApplication
         val current = WidgetChoices.chosen(this, appWidgetId)
         setContent {
             NanquimTheme {
                 var artworks by remember { mutableStateOf<List<ArtworkEntity>>(emptyList()) }
                 LaunchedEffect(Unit) {
                     artworks =
-                        application.galleryDatabase
+                        galleryDatabase
                             .dao()
                             .artworks()
                             .sortedByDescending { it.modifiedAt }
@@ -81,7 +90,7 @@ class RecentArtworkWidgetConfigureActivity : ComponentActivity() {
                                 Choice(stringResource(R.string.widget_most_recent), null, selected = current == null) { choose(null) }
                             }
                             items(artworks, key = { it.id }) { artwork ->
-                                val folder = application.artworkStorage.folderOf(artwork.id)
+                                val folder = artworkStorage.folderOf(artwork.id)
                                 Choice(artwork.name, File(folder, "thumbnail.png"), selected = current == artwork.id) { choose(artwork.id) }
                             }
                         }

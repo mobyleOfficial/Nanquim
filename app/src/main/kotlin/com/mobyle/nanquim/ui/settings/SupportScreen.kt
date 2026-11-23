@@ -24,10 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.feedback.FeedbackChannel
 import com.mobyle.nanquim.feedback.FeedbackKind
 import com.mobyle.nanquim.ui.common.ScreenHeader
+import com.mobyle.nanquim.ui.common.rememberOpenFailedNotice
 
 data class SupportLink(
     val label: String,
@@ -40,6 +42,18 @@ fun parseSupportLinks(items: List<String>): List<SupportLink> =
         val url = item.substringAfter('|', "").trim()
         if (label.isEmpty() || !url.startsWith("https://") || url.any { it.isWhitespace() }) null else SupportLink(label, url)
     }
+
+@Composable
+fun SupportRoute(viewModel: SupportViewModel = hiltViewModel()) {
+    val openFailed = rememberOpenFailedNotice()
+    SupportScreen(
+        links = viewModel.links,
+        onOpenLink = viewModel::openLink,
+        onShareApp = { viewModel.shareApp(openFailed) },
+        onReport = { channel -> viewModel.report(channel, openFailed) },
+        onBack = viewModel::back,
+    )
+}
 
 @Composable
 fun SupportScreen(

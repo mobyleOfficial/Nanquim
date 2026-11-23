@@ -41,7 +41,9 @@ import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.command.KeyboardCommandIds
 import com.mobyle.nanquim.keyboard.KeyChord
@@ -52,6 +54,17 @@ import com.mobyle.nanquim.keyboard.ShortcutAction
 import com.mobyle.nanquim.ui.common.ScreenHeader
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+
+@Composable
+fun KeyboardShortcutsRoute(viewModel: KeyboardShortcutsViewModel = hiltViewModel()) {
+    val resources = LocalResources.current
+    KeyboardShortcutsScreen(
+        settings = viewModel.settings,
+        describe = { action -> viewModel.describe(action, resources) },
+        onCommand = viewModel::command,
+        onBack = viewModel::back,
+    )
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

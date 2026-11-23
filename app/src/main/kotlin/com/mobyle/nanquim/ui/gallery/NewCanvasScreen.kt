@@ -49,6 +49,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.color.ColorProfileEntry
 import com.mobyle.nanquim.color.ColorProfileLibrary
@@ -66,6 +67,18 @@ import com.mobyle.nanquim.gallery.Gallery
 import com.mobyle.nanquim.ui.common.LocalWindowLayout
 import com.mobyle.nanquim.ui.common.ScreenHeader
 import java.util.Locale
+
+@Composable
+fun NewCanvasRoute(viewModel: NewCanvasViewModel = hiltViewModel()) {
+    val failed = rememberGalleryFailureNotice()
+    NewCanvasScreen(
+        gallery = viewModel.gallery,
+        colorProfiles = viewModel.colorProfiles,
+        memoryBudgetBytes = viewModel.memoryBudgetBytes,
+        onCommand = { commandId, arguments -> viewModel.command(commandId, arguments, failed) },
+        onBack = viewModel::back,
+    )
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

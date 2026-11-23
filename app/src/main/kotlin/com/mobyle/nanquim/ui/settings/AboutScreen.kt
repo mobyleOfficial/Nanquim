@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.ui.settings
 
-import android.content.res.AssetManager
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,16 +14,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.ui.common.ScreenHeader
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.mobyle.nanquim.ui.common.rememberOpenFailedNotice
 import kotlinx.serialization.json.JsonObject
 
 data class CreditEntry(
@@ -72,17 +69,21 @@ fun parseCredits(markdown: String): List<CreditEntry> {
 }
 
 @Composable
+fun AboutRoute(viewModel: AboutViewModel = hiltViewModel()) {
+    val openFailed = rememberOpenFailedNotice()
+    AboutScreen(
+        credits = viewModel.credits,
+        onCommand = { commandId, arguments -> viewModel.command(commandId, arguments, openFailed) },
+        onBack = viewModel::back,
+    )
+}
+
+@Composable
 fun AboutScreen(
-    assets: AssetManager,
+    credits: List<CreditEntry>,
     onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,
 ) {
-    val credits by produceState(emptyList<CreditEntry>()) {
-        value =
-            withContext(Dispatchers.IO) {
-                runCatching { assets.open(CREDITS_ASSET).bufferedReader().readText() }.getOrNull()?.let(::parseCredits).orEmpty()
-            }
-    }
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.windowInsetsPadding(WindowInsets.safeDrawing)) {
             ScreenHeader(title = stringResource(R.string.about_title), onBack = onBack)
@@ -120,5 +121,3 @@ fun AboutScreen(
         }
     }
 }
-
-private const val CREDITS_ASSET = "about/CREDITS.md"

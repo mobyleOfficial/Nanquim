@@ -24,7 +24,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.mobyle.nanquim.NanquimApplication
+import com.mobyle.nanquim.di.AppEntryPoint
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.automation.ControlChannel
 import com.mobyle.nanquim.canvas.CanvasSession
@@ -106,7 +106,7 @@ fun DebugPanel(
                 OutlinedButton(
                     onClick = { onCommand(CanvasCommandIds.VIEW_FLIP, emptyMap()) },
                 ) { Text(stringResource(R.string.command_view_flip)) }
-                (LocalContext.current.applicationContext as? NanquimApplication)?.controlChannel?.let { channel ->
+                AppEntryPoint.from(LocalContext.current).controlChannelHost().channel?.let { channel ->
                     Text(stringResource(R.string.debug_control_channel, ControlChannel.SOCKET_NAME, channel.token))
                 }
                 OutlinedButton(onClick = { onCommand(CanvasCommandIds.DEBUG_CAMERA_TOUR, emptyMap()) }) {

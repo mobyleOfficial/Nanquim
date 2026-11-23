@@ -1,6 +1,7 @@
 package com.mobyle.nanquim.navigation
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.Snapshot
 
 enum class AppDestination {
     Gallery,
@@ -18,27 +19,31 @@ enum class AppDestination {
     BrushEditor,
 }
 
+/**
+ * The app's back stack. It lives in the application, not in the UI: commands, the gallery and automation navigate
+ * through it with no screen open, and Navigation 3's NavDisplay shows whatever it holds.
+ */
 class AppNavigator {
-    private val backStack = mutableStateListOf(AppDestination.Gallery)
+    private val destinations = mutableStateListOf(AppDestination.Gallery)
 
-    val current: AppDestination get() = backStack.last()
+    /** Read by NavDisplay; change it only through the functions below. */
+    val backStack: List<AppDestination> get() = destinations
 
-    val canGoBack: Boolean get() = backStack.size > 1
+    val current: AppDestination get() = destinations.last()
+
+    val canGoBack: Boolean get() = destinations.size > 1
 
     fun open(destination: AppDestination) {
-        if (current != destination) backStack.add(destination)
+        if (current != destination) destinations.add(destination)
     }
 
     fun back() {
-        if (canGoBack) backStack.removeAt(backStack.lastIndex)
+        if (canGoBack) destinations.removeAt(destinations.lastIndex)
     }
 
-    fun showGallery() {
-        backStack.clear()
-        backStack.add(AppDestination.Gallery)
-    }
+    fun showGallery() = replaceWith(listOf(AppDestination.Gallery))
 
-    fun snapshot(): List<String> = backStack.map { it.name }
+    fun snapshot(): List<String> = destinations.map { it.name }
 
     /**
      * Brings back the screens of an activity the system recreated after ending the process. The canvas only comes back
@@ -48,17 +53,21 @@ class AppNavigator {
         saved: List<String>,
         artworkOpen: Boolean,
     ) {
-        val destinations =
+        val restored =
             saved
                 .mapNotNull { name -> AppDestination.entries.firstOrNull { it.name == name } }
                 .filter { it != AppDestination.BrushEditor && (artworkOpen || it != AppDestination.Canvas) }
-        if (destinations.firstOrNull() != AppDestination.Gallery) return
-        backStack.clear()
-        backStack.addAll(destinations)
+        if (restored.firstOrNull() != AppDestination.Gallery) return
+        replaceWith(restored)
     }
 
-    fun showCanvas() {
-        showGallery()
-        backStack.add(AppDestination.Canvas)
+    fun showCanvas() = replaceWith(listOf(AppDestination.Gallery, AppDestination.Canvas))
+
+    /** In one snapshot, so NavDisplay never sees the stack empty or half replaced. */
+    private fun replaceWith(stack: List<AppDestination>) {
+        Snapshot.withMutableSnapshot {
+            destinations.clear()
+            destinations.addAll(stack)
+        }
     }
 }

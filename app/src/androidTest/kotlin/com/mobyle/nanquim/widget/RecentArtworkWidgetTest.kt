@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.glance.appwidget.updateAll
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.mobyle.nanquim.NanquimApplication
+import com.mobyle.nanquim.di.AppEntryPoint
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
@@ -30,7 +30,7 @@ import java.io.File
 class RecentArtworkWidgetTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context = instrumentation.targetContext
-    private val application = context.applicationContext as NanquimApplication
+    private val app = AppEntryPoint.from(context)
     private val manager = AppWidgetManager.getInstance(context)
     private lateinit var host: AppWidgetHost
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
@@ -87,19 +87,19 @@ class RecentArtworkWidgetTest {
 
     @Test
     fun showsTheLatestArtworkFollowsChangesAndOpensIt() {
-        val latest = runBlocking { application.galleryDatabase.dao().artworks() }.maxByOrNull { it.modifiedAt }
+        val latest = runBlocking { app.galleryDatabase().dao().artworks() }.maxByOrNull { it.modifiedAt }
         assumeTrue("no artwork in the gallery", latest != null)
         assertTrue("widget shows ${texts()}", waitFor(10_000) { latest!!.name in texts() })
         savePicture()
 
         val renamed = latest!!.name + " (widget)"
-        instrumentation.runOnMainSync { runBlocking { application.gallery.rename(latest.id, renamed) } }
+        instrumentation.runOnMainSync { runBlocking { app.gallery().rename(latest.id, renamed) } }
         assertTrue("widget shows ${texts()} after the rename", waitFor(WidgetUpdates.MINIMUM_INTERVAL_MS + 15_000) { renamed in texts() })
 
-        instrumentation.runOnMainSync { runBlocking { application.gallery.rename(latest.id, latest.name) } }
+        instrumentation.runOnMainSync { runBlocking { app.gallery().rename(latest.id, latest.name) } }
 
         instrumentation.runOnMainSync { clickFirstClickable(view) }
-        assertTrue("the canvas did not open the artwork", waitFor(20_000) { application.canvasSession.artwork?.id == latest.id })
+        assertTrue("the canvas did not open the artwork", waitFor(20_000) { app.canvasSession().artwork?.id == latest.id })
 
         val updatesBefore = updates
         val stroke =
@@ -159,7 +159,7 @@ class RecentArtworkWidgetTest {
         arguments: kotlinx.serialization.json.JsonObject,
     ) {
         val done = java.util.concurrent.CountDownLatch(1)
-        instrumentation.runOnMainSync { application.commandDispatcher.dispatch(commandId, arguments) { done.countDown() } }
+        instrumentation.runOnMainSync { app.commandDispatcher().dispatch(commandId, arguments) { done.countDown() } }
         assertTrue("$commandId did not finish", done.await(20, java.util.concurrent.TimeUnit.SECONDS))
     }
 

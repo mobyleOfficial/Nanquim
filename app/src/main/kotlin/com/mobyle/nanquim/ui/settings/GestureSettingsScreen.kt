@@ -34,6 +34,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.input.Gesture
 import com.mobyle.nanquim.canvas.input.GestureAction
@@ -48,6 +49,11 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.roundToInt
+
+@Composable
+fun GestureSettingsRoute(viewModel: GestureSettingsViewModel = hiltViewModel()) {
+    GestureSettingsScreen(inputSettings = viewModel.inputSettings, onCommand = viewModel::command, onBack = viewModel::back)
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

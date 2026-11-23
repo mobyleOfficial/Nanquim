@@ -63,6 +63,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.command.GalleryCommandIds
 import com.mobyle.nanquim.gallery.ArtworkEntity
@@ -74,6 +75,26 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.hypot
+
+/** The import pickers and the export sheet belong to the activity's shell, which the canvas shares; it passes them in. */
+@Composable
+fun GalleryRoute(
+    onImport: () -> Unit,
+    onPhoto: () -> Unit,
+    onShare: (List<String>) -> Unit,
+    viewModel: GalleryViewModel = hiltViewModel(),
+) {
+    val failed = rememberGalleryFailureNotice()
+    GalleryScreen(
+        gallery = viewModel.gallery,
+        onCommand = { commandId, arguments -> viewModel.command(commandId, arguments, failed) },
+        onImport = onImport,
+        onPhoto = onPhoto,
+        onShare = onShare,
+        onOpenSettings = viewModel::openSettings,
+        banner = viewModel.bannerUnitId?.let { unitId -> { modifier -> GalleryBanner(unitId, modifier) } },
+    )
+}
 
 @Composable
 fun GalleryScreen(

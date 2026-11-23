@@ -41,8 +41,8 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.mobyle.nanquim.MainActivity
-import com.mobyle.nanquim.NanquimApplication
 import com.mobyle.nanquim.R
+import com.mobyle.nanquim.di.AppEntryPoint
 import com.mobyle.nanquim.gallery.ArtworkEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -148,11 +148,11 @@ class WidgetArtwork(
             context: Context,
             appWidgetId: Int,
         ): WidgetArtwork? {
-            val application = context.applicationContext as NanquimApplication
-            val artworks = application.galleryDatabase.dao().artworks()
+            val app = AppEntryPoint.from(context)
+            val artworks = app.galleryDatabase().dao().artworks()
             val chosen = WidgetChoices.chosen(context, appWidgetId)
             val artwork = artworks.firstOrNull { it.id == chosen } ?: artworks.maxByOrNull { it.modifiedAt } ?: return null
-            val file = File(application.artworkStorage.folderOf(artwork.id), "thumbnail.png")
+            val file = File(app.artworkStorage().folderOf(artwork.id), "thumbnail.png")
             return WidgetArtwork(artwork, decodeSmall(file))
         }
 

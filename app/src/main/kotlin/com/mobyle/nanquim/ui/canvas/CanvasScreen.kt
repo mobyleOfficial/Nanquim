@@ -63,6 +63,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -73,6 +74,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.ui.viewinterop.AndroidView
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
@@ -87,9 +89,11 @@ import com.mobyle.nanquim.command.CanvasCommandIds
 import com.mobyle.nanquim.command.DocumentCommandIds
 import com.mobyle.nanquim.command.ReferenceCommandIds
 import com.mobyle.nanquim.command.SliderNames
+import com.mobyle.nanquim.command.TimelapseCommandIds
 import com.mobyle.nanquim.command.ToolCommandIds
 import com.mobyle.nanquim.document.DocumentPersistence
 import com.mobyle.nanquim.document.SaveStatus
+import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.EngineEvent
 import com.mobyle.nanquim.engine.GpuInfo
@@ -99,7 +103,49 @@ import com.mobyle.nanquim.settings.QuickMenuSettings
 import com.mobyle.nanquim.ui.brush.BrushLibraryPanel
 import com.mobyle.nanquim.ui.color.ColorPanel
 import com.mobyle.nanquim.ui.common.LocalWindowLayout
+import com.mobyle.nanquim.ui.common.rememberToast
+import com.mobyle.nanquim.ui.gallery.rememberGalleryFailureNotice
 import com.mobyle.nanquim.ui.theme.LocalDarkTheme
+
+/** The export sheet and the image picker belong to the activity's shell, which the gallery shares; it passes them in. */
+@Composable
+fun CanvasRoute(
+    onShare: () -> Unit,
+    onAddImage: () -> Unit,
+    viewModel: CanvasViewModel = hiltViewModel(),
+) {
+    val resources = LocalResources.current
+    val toast = rememberToast()
+    val closeFailed = rememberGalleryFailureNotice()
+    CanvasScreen(
+        engine = viewModel.engine,
+        session = viewModel.session,
+        brushUi = viewModel.brushUi,
+        quickMenu = viewModel.quickMenu,
+        macros = viewModel.macros,
+        onOpenSettings = viewModel::openSettings,
+        onToggleDebugPanel = viewModel::toggleDebugPanel,
+        onOpenGallery = { viewModel.closeArtwork(closeFailed) },
+        onShare = onShare,
+        onAddImage = onAddImage,
+        onCommand = { commandId, arguments ->
+            viewModel.command(commandId, arguments) { result ->
+                timelapseNotice(commandId, result)?.let { toast(resources.getString(it), true) }
+            }
+        },
+    )
+}
+
+private fun timelapseNotice(
+    commandId: String,
+    result: CommandResult,
+): Int? =
+    when {
+        commandId != TimelapseCommandIds.REPLAY && commandId != TimelapseCommandIds.EXPORT -> null
+        result !is CommandResult.Failure -> null
+        result.message.startsWith("No timelapse") -> R.string.timelapse_none
+        else -> R.string.timelapse_export_failed
+    }
 
 @Composable
 fun CanvasScreen(

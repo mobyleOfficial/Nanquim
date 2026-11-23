@@ -8,7 +8,7 @@ import android.provider.DocumentsContract.Document
 import android.provider.DocumentsContract.Root
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.mobyle.nanquim.NanquimApplication
+import com.mobyle.nanquim.di.AppEntryPoint
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -21,11 +21,11 @@ import java.util.zip.ZipInputStream
 @RunWith(AndroidJUnit4::class)
 class GalleryDocumentsProviderTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val application = context.applicationContext as NanquimApplication
+    private val app = AppEntryPoint.from(context)
     private val authority = GalleryDocumentsProvider.authorityOf(context)
     private val resolver = context.contentResolver
 
-    private fun artworks(): List<ArtworkEntity> = runBlocking { application.galleryDatabase.dao().artworks() }
+    private fun artworks(): List<ArtworkEntity> = runBlocking { app.galleryDatabase().dao().artworks() }
 
     @Test
     fun rootIsTheGallery() {
@@ -40,7 +40,7 @@ class GalleryDocumentsProviderTest {
     @Test
     fun childrenListEveryArtworkOutsideStacksAndEveryStack() {
         val artworks = artworks()
-        val stacks = runBlocking { application.galleryDatabase.dao().stacks() }
+        val stacks = runBlocking { app.galleryDatabase().dao().stacks() }
         val uri = DocumentsContract.buildChildDocumentsUri(authority, GalleryDocumentsProvider.ROOT_DOCUMENT_ID)
         val ids = mutableListOf<String>()
         resolver.query(uri, null, null, null, null)!!.use { cursor ->
@@ -82,7 +82,7 @@ class GalleryDocumentsProviderTest {
         resolver.openAssetFileDescriptor(uri, "r")!!.close()
         assertNotNull(
             BitmapFactory.decodeFile(
-                application.artworkStorage
+                app.artworkStorage()
                     .folderOf(artwork.id)
                     .resolve("thumbnail.png")
                     .path,

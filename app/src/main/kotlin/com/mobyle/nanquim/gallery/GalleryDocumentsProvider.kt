@@ -12,8 +12,8 @@ import android.provider.DocumentsContract.Document
 import android.provider.DocumentsContract.Root
 import android.provider.DocumentsProvider
 import android.util.Log
-import com.mobyle.nanquim.NanquimApplication
 import com.mobyle.nanquim.R
+import com.mobyle.nanquim.di.AppEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +23,8 @@ import kotlinx.coroutines.runBlocking
 import java.io.FileNotFoundException
 
 class GalleryDocumentsProvider : DocumentsProvider() {
-    private val application get() = context!!.applicationContext as NanquimApplication
+    // Not @AndroidEntryPoint: the system creates providers before Application.onCreate, so look the graph up on use.
+    private val app get() = AppEntryPoint.from(context!!)
 
     override fun onCreate(): Boolean = true
 
@@ -140,10 +141,10 @@ class GalleryDocumentsProvider : DocumentsProvider() {
         val artworkId = artworkIdOf(documentId)
         if (artworkId !in index().artworks) throw FileNotFoundException(documentId)
         val (read, write) = ParcelFileDescriptor.createReliablePipe()
-        application.applicationScope.launch {
+        app.applicationScope().launch {
             try {
                 ParcelFileDescriptor.AutoCloseOutputStream(write).use { output ->
-                    application.transfer.exportPackage(artworkId, output)
+                    app.transfer().exportPackage(artworkId, output)
                 }
             } catch (failure: Exception) {
                 Log.w(TAG, "writing $artworkId failed", failure)
@@ -158,7 +159,7 @@ class GalleryDocumentsProvider : DocumentsProvider() {
         sizeHint: Point?,
         signal: CancellationSignal?,
     ): AssetFileDescriptor {
-        val file = application.artworkStorage.folderOf(artworkIdOf(documentId)).resolve(THUMBNAIL)
+        val file = app.artworkStorage().folderOf(artworkIdOf(documentId)).resolve(THUMBNAIL)
         if (!file.isFile) throw FileNotFoundException(documentId)
         val descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
         return AssetFileDescriptor(descriptor, 0, AssetFileDescriptor.UNKNOWN_LENGTH)
@@ -182,7 +183,7 @@ class GalleryDocumentsProvider : DocumentsProvider() {
 
     private fun index(): Index =
         runBlocking(Dispatchers.IO) {
-            val dao = application.galleryDatabase.dao()
+            val dao = app.galleryDatabase().dao()
             Index(dao.artworks().associateBy { it.id }, dao.stacks().associateBy { it.id })
         }
 
@@ -207,7 +208,7 @@ class GalleryDocumentsProvider : DocumentsProvider() {
         artwork: ArtworkEntity,
     ) {
         val hasThumbnail =
-            application.artworkStorage
+            app.artworkStorage()
                 .folderOf(artwork.id)
                 .resolve(THUMBNAIL)
                 .isFile

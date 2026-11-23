@@ -1,5 +1,6 @@
 package com.mobyle.nanquim.ui.settings
 
+import android.app.Activity
 import android.text.format.Formatter
 import android.view.MotionEvent
 import androidx.compose.foundation.background
@@ -31,9 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,6 +45,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.command.AppCommandIds
@@ -56,32 +56,46 @@ import com.mobyle.nanquim.command.KeyboardCommandIds
 import com.mobyle.nanquim.command.QuickShapeCommandIds
 import com.mobyle.nanquim.settings.AppSettings
 import com.mobyle.nanquim.settings.InputSettings
-import com.mobyle.nanquim.settings.StorageCleaner
 import com.mobyle.nanquim.settings.StorageUsage
 import com.mobyle.nanquim.settings.ThemeMode
 import com.mobyle.nanquim.ui.common.CurveEditor
 import com.mobyle.nanquim.ui.common.ScreenHeader
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.mobyle.nanquim.ui.common.rememberOpenFailedNotice
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.roundToInt
+
+@Composable
+fun SettingsRoute(viewModel: SettingsViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    val openFailed = rememberOpenFailedNotice()
+    SettingsScreen(
+        inputSettings = viewModel.inputSettings,
+        appSettings = viewModel.appSettings,
+        storageUsage = viewModel.storageUsage,
+        onClearCache = viewModel::clearCache,
+        onCommand = { commandId, arguments -> viewModel.command(commandId, arguments, openFailed) },
+        onBack = viewModel::back,
+        onOpenDiagnostics = viewModel::openDiagnostics,
+        onOpenAdChoices = if (viewModel.adChoicesAvailable) ({ (context as? Activity)?.let(viewModel::showAdChoices) }) else null,
+        adsAvailable = viewModel.adsAvailable,
+    )
+}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SettingsScreen(
     inputSettings: InputSettings,
     appSettings: AppSettings,
-    storage: StorageCleaner,
+    storageUsage: StorageUsage?,
+    onClearCache: () -> Unit,
     onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,
     onOpenDiagnostics: () -> Unit,
     onOpenAdChoices: (() -> Unit)? = null,
     adsAvailable: Boolean = false,
 ) {
-    var storageRefresh by remember { mutableIntStateOf(0) }
-    val usage by produceState<StorageUsage?>(null, storageRefresh) { value = withContext(Dispatchers.IO) { storage.usage() } }
     var testPressure by remember { mutableStateOf<Float?>(null) }
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.windowInsetsPadding(WindowInsets.safeDrawing)) {
@@ -206,7 +220,7 @@ fun SettingsScreen(
                 }
                 HorizontalDivider()
                 Text(stringResource(R.string.settings_storage_title), style = MaterialTheme.typography.titleMedium)
-                usage?.let { current ->
+                storageUsage?.let { current ->
                     Text(
                         stringResource(
                             R.string.settings_storage_artworks,
@@ -221,10 +235,7 @@ fun SettingsScreen(
                         ),
                     )
                 }
-                TextButton(onClick = {
-                    onCommand(AppCommandIds.SETTINGS_CLEAR_CACHE, JsonObject(emptyMap()))
-                    storageRefresh++
-                }) { Text(stringResource(R.string.settings_storage_clear)) }
+                TextButton(onClick = onClearCache) { Text(stringResource(R.string.settings_storage_clear)) }
                 HorizontalDivider()
                 Text(stringResource(R.string.settings_help_title), style = MaterialTheme.typography.titleMedium)
                 TextButton(onClick = { onCommand(HelpCommandIds.WELCOME_SHOW, JsonObject(emptyMap())) }) {
