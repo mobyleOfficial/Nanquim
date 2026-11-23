@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -78,8 +77,8 @@ fun SettingsScreen(
     onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,
     onOpenDiagnostics: () -> Unit,
-    adsAvailable: Boolean = false,
     onOpenAdChoices: (() -> Unit)? = null,
+    adsAvailable: Boolean = false,
 ) {
     var storageRefresh by remember { mutableIntStateOf(0) }
     val usage by produceState<StorageUsage?>(null, storageRefresh) { value = withContext(Dispatchers.IO) { storage.usage() } }
@@ -251,19 +250,20 @@ fun SettingsScreen(
                 TextButton(
                     onClick = { onCommand(AppCommandIds.ABOUT_OPEN, JsonObject(emptyMap())) },
                 ) { Text(stringResource(R.string.settings_about)) }
-                Box(Modifier.height(8.dp))
+                HorizontalDivider()
+                // The last item of the list; a long press opens Diagnostics.
+                Text(
+                    text = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .combinedClickable(onClick = {}, onLongClick = onOpenDiagnostics)
+                            .padding(vertical = 14.dp),
+                )
             }
-            HorizontalDivider()
-            Text(
-                text = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 48.dp)
-                        .combinedClickable(onClick = {}, onLongClick = onOpenDiagnostics)
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
-            )
         }
     }
 }
