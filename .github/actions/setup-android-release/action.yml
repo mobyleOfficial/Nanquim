@@ -109,10 +109,13 @@ runs:
         fi
         echo "FIREBASE_APP_ID=$app_id" >> "$GITHUB_ENV"
 
-        # Without ads.properties a release build ships with ads turned off.
+        # app/build.gradle.kts reads the AdMob ids from local.properties (git-ignored); without both of them a
+        # release build ships with ads turned off.
         if [ -n "$ADMOB_APP_ID" ] && [ -n "$ADMOB_GALLERY_BANNER_ID" ]; then
           {
-            echo "admobAppId=$ADMOB_APP_ID"
-            echo "galleryBannerId=$ADMOB_GALLERY_BANNER_ID"
-          } > ads.properties
+            echo "admob.appId=$ADMOB_APP_ID"
+            echo "admob.galleryBannerId=$ADMOB_GALLERY_BANNER_ID"
+          } >> local.properties
+        elif [ -n "$ADMOB_APP_ID" ] || [ -n "$ADMOB_GALLERY_BANNER_ID" ]; then
+          echo "::warning::Only one of the AdMob ids is set - this build ships with ads turned off"
         fi
