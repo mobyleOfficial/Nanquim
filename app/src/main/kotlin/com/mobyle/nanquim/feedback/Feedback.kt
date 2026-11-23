@@ -10,7 +10,7 @@ object AppLinks {
     const val PRIVACY_POLICY = "https://mobyleapps.com/nanquim/privacy-policy/"
     const val TERMS = "https://mobyleapps.com/nanquim/terms/"
     const val REPOSITORY = "https://github.com/mobyleOfficial/Nanquim"
-    const val SUPPORT_EMAIL = "support@mobyleapps.com"
+    const val SUPPORT_EMAIL = "officialmobyleapps@gmail.com"
 }
 
 enum class FeedbackKind(

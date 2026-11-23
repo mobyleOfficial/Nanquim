@@ -27,7 +27,7 @@ class FeedbackTest {
     @Test
     fun theEmailKeepsLineBreaksAndAccents() {
         val uri = FeedbackLinks.emailUri("Nanquim: sugestão", "a\nb")
-        assertEquals("mailto:support@mobyleapps.com?subject=Nanquim%3A%20sugest%C3%A3o&body=a%0Ab", uri)
+        assertEquals("mailto:officialmobyleapps@gmail.com?subject=Nanquim%3A%20sugest%C3%A3o&body=a%0Ab", uri)
     }
 
     @Test

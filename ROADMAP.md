@@ -61,7 +61,7 @@ Sobre e feedback
 
 - **No repo:** criar `.github/ISSUE_TEMPLATE/bug_report.yml` e `feature_request.yml` (formulários do GitHub com campos: o que aconteceu, passos, aparelho, versão) e `config.yml` com link para o e-mail como alternativa.
 - **No app:** "Relatar um erro" abre `https://github.com/mobyleOfficial/Nanquim/issues/new?template=bug_report.yml&version=…&device=…` com versão do app, modelo, Android e renderizador **pré-preenchidos** (dados que o `DiagnosticsCollector` já reúne). "Sugerir um recurso" abre o template de sugestão.
-- **Sem conta no GitHub:** um diálogo antes oferece "Abrir no GitHub (precisa de conta)" ou "Enviar por e-mail" (`ACTION_SENDTO mailto:support@mobyleapps.com` com o mesmo texto e, opcionalmente, o JSON de diagnóstico anexado).
+- **Sem conta no GitHub:** um diálogo antes oferece "Abrir no GitHub (precisa de conta)" ou "Enviar por e-mail" (`ACTION_SENDTO mailto:officialmobyleapps@gmail.com` com o mesmo texto e, opcionalmente, o JSON de diagnóstico anexado).
 - Aviso no diálogo: "O relato no GitHub fica público" (a política já diz isso).
 - **Pronto quando:** a issue chega com os campos preenchidos e com o label certo (`bug` / `enhancement`).
 

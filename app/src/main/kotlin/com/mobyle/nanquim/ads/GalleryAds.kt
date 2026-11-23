@@ -23,13 +23,17 @@ import kotlin.concurrent.thread
  */
 class GalleryAds(
     context: Context,
+    allowedByUser: Boolean,
 ) {
     private val consent: ConsentInformation = UserMessagingPlatform.getConsentInformation(context)
     private val initializing = AtomicBoolean(false)
     private val mainThread = Handler(Looper.getMainLooper())
 
-    /** True when this build has a banner to show at all (see `app/build.gradle.kts`). */
-    val enabled: Boolean = BuildConfig.ADS_ENABLED
+    /**
+     * True when this build has a banner to show at all (see `app/build.gradle.kts`) and the user has not turned it off
+     * in Settings (read once per launch).
+     */
+    val enabled: Boolean = BuildConfig.ADS_ENABLED && allowedByUser
 
     var ready: Boolean by mutableStateOf(false)
         private set

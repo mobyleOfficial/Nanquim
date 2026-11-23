@@ -27,6 +27,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -89,6 +90,7 @@ import com.mobyle.nanquim.settings.ThemeMode
 import com.mobyle.nanquim.ui.brush.BrushEditorScreen
 import com.mobyle.nanquim.ui.canvas.CanvasScreen
 import com.mobyle.nanquim.ui.canvas.canvasSurroundColor
+import com.mobyle.nanquim.ui.common.AdsNoticeDialog
 import com.mobyle.nanquim.ui.common.ExitDialog
 import com.mobyle.nanquim.ui.common.ProvideWindowLayout
 import com.mobyle.nanquim.ui.diagnostics.DiagnosticsScreen
@@ -224,7 +226,10 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             // Consent and ads wait for the introduction to end and the gallery to show, so nothing interrupts a first launch.
             snapshotFlow { !application.help.welcomeVisible && application.navigator.current == AppDestination.Gallery }.first { it }
-            if (application.help.automatic) application.galleryAds.start(this@MainActivity)
+            if (!application.help.automatic) return@launch
+            // The one-time note on ads (shown by NanquimApp) comes before any consent form or banner.
+            if (application.galleryAds.enabled) snapshotFlow { application.appSettings.adsNoticeSeen }.first { it }
+            application.galleryAds.start(this@MainActivity)
         }
     }
 
@@ -525,6 +530,11 @@ private fun NanquimApp(application: NanquimApplication) {
             else -> confirmingExit = true
         }
     }
+    if (atGallery && application.galleryAds.enabled && application.help.automatic && !application.help.welcomeVisible &&
+        !application.appSettings.adsNoticeSeen
+    ) {
+        AdsNoticeDialog(onDismiss = application.appSettings::markAdsNoticeSeen)
+    }
     if (confirmingExit) {
         ExitDialog(
             onExit = { dontAskAgain ->
@@ -561,6 +571,8 @@ private fun NanquimApp(application: NanquimApplication) {
                     fadeOut(tween(SCREEN_FADE_OUT_MILLIS))
             }
         },
+        // The fade passes through transparency between screens; without this the black window background flashes through.
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         label = "screen",
     ) { destination ->
         when (destination) {
@@ -620,6 +632,7 @@ private fun NanquimApp(application: NanquimApplication) {
                         } else {
                             null
                         },
+                    adsAvailable = BuildConfig.ADS_ENABLED,
                 )
             AppDestination.Diagnostics ->
                 DiagnosticsScreen(

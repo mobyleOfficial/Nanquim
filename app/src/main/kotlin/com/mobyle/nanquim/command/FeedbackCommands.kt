@@ -27,6 +27,7 @@ object FeedbackCommandIds {
     const val PRIVACY_POLICY_OPEN = "settings.privacyPolicy.open"
     const val TERMS_OPEN = "settings.terms.open"
     const val USAGE_STATISTICS = "settings.usageStatistics.set"
+    const val GALLERY_ADS = "settings.galleryAds.set"
 }
 
 /** Texts the commands need from the app's resources, so the commands stay free of Android contexts. */
@@ -95,6 +96,18 @@ fun registerFeedbackCommands(
         val enabled = arguments.getValue("enabled").jsonPrimitive.boolean
         appSettings.changeUsageStatistics(enabled)
         onUsageStatisticsChanged(enabled)
+        CommandResult.Success(buildJsonObject { put("enabled", enabled) })
+    }
+    registry.register(
+        spec(
+            FeedbackCommandIds.GALLERY_ADS,
+            R.string.command_settings_gallery_ads,
+            listOf(ParameterSpec("enabled", ParameterType.Boolean)),
+        ),
+    ) { _, arguments ->
+        // Applies from the next launch: the banner already showing stays until then.
+        val enabled = arguments.getValue("enabled").jsonPrimitive.boolean
+        appSettings.changeGalleryAds(enabled)
         CommandResult.Success(buildJsonObject { put("enabled", enabled) })
     }
 }
