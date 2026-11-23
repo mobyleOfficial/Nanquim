@@ -54,6 +54,13 @@ val galleryBannerId: String? = localProperty("admob.galleryBannerId")
 val adsTestDeviceIds: String = localProperty("admob.testDeviceIds").orEmpty()
 val adsDebugGeography: String = localProperty("admob.debugGeography").orEmpty().uppercase()
 
+// A malformed id still builds and ships, but every ad request fails and the gallery shows an empty banner slot.
+require(admobAppId == null || admobAppId.matches(Regex("""ca-app-pub-\d+~\d+"""))) {
+    "admob.appId must look like ca-app-pub-0000000000000000~0000000000, not $admobAppId"
+}
+require(galleryBannerId == null || galleryBannerId.matches(Regex("""ca-app-pub-\d+/\d+"""))) {
+    "admob.galleryBannerId must look like ca-app-pub-0000000000000000/0000000000, not $galleryBannerId"
+}
 require(adsDebugGeography in setOf("", "EEA", "REGULATED_US_STATE", "OTHER")) {
     "admob.debugGeography must be EEA, REGULATED_US_STATE or OTHER, not $adsDebugGeography"
 }
