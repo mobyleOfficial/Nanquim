@@ -48,16 +48,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.settings.AppSettings
-import com.mobyle.nanquim.data.settings.InputSettings
-import com.mobyle.nanquim.data.settings.StorageUsage
-import com.mobyle.nanquim.data.settings.ThemeMode
 import com.mobyle.nanquim.domain.command.AppCommandIds
 import com.mobyle.nanquim.domain.command.BrushCommandIds
 import com.mobyle.nanquim.domain.command.GestureCommandIds
 import com.mobyle.nanquim.domain.command.HelpCommandIds
 import com.mobyle.nanquim.domain.command.KeyboardCommandIds
 import com.mobyle.nanquim.domain.command.QuickShapeCommandIds
+import com.mobyle.nanquim.domain.settings.models.StorageUsage
+import com.mobyle.nanquim.domain.settings.models.ThemeMode
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
 import com.mobyle.nanquim.presentation.common.CurveEditor
 import com.mobyle.nanquim.presentation.common.ScreenHeader
 import com.mobyle.nanquim.presentation.common.rememberOpenFailedNotice
@@ -86,8 +86,8 @@ fun SettingsRoute(viewModel: SettingsViewModel = hiltViewModel()) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SettingsScreen(
-    inputSettings: InputSettings,
-    appSettings: AppSettings,
+    inputSettings: InputSettingsRepository,
+    appSettings: AppSettingsRepository,
     storageUsage: StorageUsage?,
     onClearCache: () -> Unit,
     onCommand: (String, JsonObject) -> Unit,
@@ -158,7 +158,12 @@ fun SettingsScreen(
                 }
                 TextButton(
                     onClick = {
-                        val linear = JsonArray(InputSettings.LINEAR.map { (x, y) -> JsonArray(listOf(JsonPrimitive(x), JsonPrimitive(y))) })
+                        val linear =
+                            JsonArray(
+                                InputSettingsRepository.LINEAR.map { (x, y) ->
+                                    JsonArray(listOf(JsonPrimitive(x), JsonPrimitive(y)))
+                                },
+                            )
                         onCommand(BrushCommandIds.SETTINGS_PRESSURE_CURVE, JsonObject(mapOf("points" to linear)))
                     },
                     enabled = !inputSettings.isLinear,
@@ -281,7 +286,7 @@ fun SettingsScreen(
 
 @Composable
 private fun QuickShapeSettings(
-    inputSettings: InputSettings,
+    inputSettings: InputSettingsRepository,
     onCommand: (String, JsonObject) -> Unit,
 ) {
     Row(
@@ -318,7 +323,7 @@ private fun QuickShapeSettings(
         Text(delayLabel, modifier = Modifier.weight(1f))
         Text(stringResource(R.string.settings_quick_shape_delay_value, inputSettings.quickShapeDelayMillis))
     }
-    val delays = InputSettings.QUICK_SHAPE_DELAYS
+    val delays = InputSettingsRepository.QUICK_SHAPE_DELAYS
     Slider(
         value = inputSettings.quickShapeDelayMillis.toFloat(),
         onValueChange = { onCommand(QuickShapeCommandIds.SETTINGS, JsonObject(mapOf("delay" to JsonPrimitive(it.roundToInt())))) },

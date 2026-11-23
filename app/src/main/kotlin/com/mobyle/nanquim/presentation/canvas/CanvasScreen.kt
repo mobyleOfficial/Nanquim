@@ -82,7 +82,6 @@ import com.mobyle.nanquim.data.brush.library.BrushTool
 import com.mobyle.nanquim.data.document.DocumentPersistence
 import com.mobyle.nanquim.data.document.SaveStatus
 import com.mobyle.nanquim.data.macro.Macros
-import com.mobyle.nanquim.data.settings.QuickMenuSettings
 import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.canvas.input.CanvasTool
@@ -94,6 +93,7 @@ import com.mobyle.nanquim.domain.command.ReferenceCommandIds
 import com.mobyle.nanquim.domain.command.SliderNames
 import com.mobyle.nanquim.domain.command.TimelapseCommandIds
 import com.mobyle.nanquim.domain.command.ToolCommandIds
+import com.mobyle.nanquim.domain.settings.repositories.QuickMenuRepository
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.EngineEvent
 import com.mobyle.nanquim.engine.GpuInfo
@@ -151,7 +151,7 @@ fun CanvasScreen(
     engine: Engine,
     session: CanvasSession,
     brushUi: BrushUiState,
-    quickMenu: QuickMenuSettings,
+    quickMenu: QuickMenuRepository,
     macros: Macros,
     onOpenSettings: () -> Unit,
     onToggleDebugPanel: () -> Unit,
@@ -224,7 +224,7 @@ private fun CanvasScreenContent(
     engine: Engine,
     session: CanvasSession,
     brushUi: BrushUiState,
-    quickMenu: QuickMenuSettings,
+    quickMenu: QuickMenuRepository,
     macros: Macros,
     onOpenSettings: () -> Unit,
     onToggleDebugPanel: () -> Unit,

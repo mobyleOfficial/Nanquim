@@ -7,13 +7,13 @@ import com.mobyle.nanquim.core.navigation.AppNavigator
 import com.mobyle.nanquim.data.diagnostics.DiagnosticsCollector
 import com.mobyle.nanquim.data.diagnostics.ShapeTraceRecorder
 import com.mobyle.nanquim.data.diagnostics.TouchSessionRecorder
-import com.mobyle.nanquim.data.settings.AppSettings
 import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.domain.command.AppCommandIds
 import com.mobyle.nanquim.domain.command.CommandDispatcher
 import com.mobyle.nanquim.domain.diagnostics.StylusObservationRecorder
+import com.mobyle.nanquim.domain.settings.models.Renderer
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.engine.Engine
-import com.mobyle.nanquim.engine.Renderer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.buildJsonObject
@@ -26,7 +26,7 @@ class DiagnosticsViewModel
     constructor(
         val collector: DiagnosticsCollector,
         val recorder: StylusObservationRecorder,
-        private val appSettings: AppSettings,
+        private val appSettings: AppSettingsRepository,
         private val dispatcher: CommandDispatcher,
         private val navigator: AppNavigator,
     ) : ViewModel() {
@@ -35,7 +35,7 @@ class DiagnosticsViewModel
         val rendererFellBack: Boolean get() = appSettings.rendererFellBack
 
         fun selectRenderer(renderer: Renderer) =
-            dispatcher.dispatch(AppCommandIds.SETTINGS_RENDERER, buildJsonObject { put("renderer", AppSettings.rendererId(renderer)) })
+            dispatcher.dispatch(AppCommandIds.SETTINGS_RENDERER, buildJsonObject { put("renderer", renderer.id) })
 
         fun export(
             uri: Uri,

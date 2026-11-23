@@ -11,7 +11,6 @@ import androidx.work.workDataOf
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.media.TimelapseExportWorker
 import com.mobyle.nanquim.data.media.TimelapseLength
-import com.mobyle.nanquim.data.settings.AppSettings
 import com.mobyle.nanquim.data.transfer.ArtworkTransfer
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
@@ -23,6 +22,7 @@ import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.domain.canvas.CanvasSession
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.formats.nanquim.TimelapseResolution
 import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +47,7 @@ object TimelapseCommandIds {
 fun registerTimelapseCommands(
     registry: CommandRegistry,
     canvas: CanvasSession,
-    settings: AppSettings,
+    settings: AppSettingsRepository,
     workManager: WorkManager?,
     cacheDirectory: File,
     contentResolver: ContentResolver,

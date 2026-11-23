@@ -1,15 +1,15 @@
 package com.mobyle.nanquim.presentation.canvas
 
 import androidx.lifecycle.ViewModel
-import com.mobyle.nanquim.domain.command.toCommandArguments
 import com.mobyle.nanquim.data.macro.Macros
-import com.mobyle.nanquim.data.settings.QuickMenuSettings
 import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.command.AppCommandIds
 import com.mobyle.nanquim.domain.command.CanvasCommandIds
 import com.mobyle.nanquim.domain.command.CommandDispatcher
 import com.mobyle.nanquim.domain.command.GalleryCommandIds
+import com.mobyle.nanquim.domain.command.toCommandArguments
+import com.mobyle.nanquim.domain.settings.repositories.QuickMenuRepository
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.presentation.brush.BrushUiState
 import com.mobyle.nanquim.presentation.gallery.dispatchGalleryCommand
@@ -28,7 +28,7 @@ class CanvasViewModel
         val engine: Engine,
         val session: CanvasSession,
         val brushUi: BrushUiState,
-        val quickMenu: QuickMenuSettings,
+        val quickMenu: QuickMenuRepository,
         val macros: Macros,
         private val dispatcher: CommandDispatcher,
     ) : ViewModel() {

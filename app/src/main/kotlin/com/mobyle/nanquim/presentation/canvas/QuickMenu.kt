@@ -41,12 +41,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.settings.QuickMenuPreset
-import com.mobyle.nanquim.data.settings.QuickMenuSettings
-import com.mobyle.nanquim.data.settings.QuickMenuSlot
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.command.BrushCommandIds
 import com.mobyle.nanquim.domain.command.QuickMenuCommandIds
+import com.mobyle.nanquim.domain.settings.models.QuickMenuPreset
+import com.mobyle.nanquim.domain.settings.models.QuickMenuSlot
+import com.mobyle.nanquim.domain.settings.repositories.QuickMenuRepository
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.cos
@@ -98,7 +98,7 @@ private fun slotName(slot: QuickMenuSlot): String =
 @Composable
 fun QuickMenu(
     session: CanvasSession,
-    settings: QuickMenuSettings,
+    settings: QuickMenuRepository,
     currentBrush: Pair<String, String>?,
     onCommand: (String, Map<String, Any?>) -> Unit,
 ) {
@@ -273,7 +273,7 @@ private fun ChoiceRow(
 
 @Composable
 private fun PresetManager(
-    settings: QuickMenuSettings,
+    settings: QuickMenuRepository,
     onCommand: (String, Map<String, Any?>) -> Unit,
     onDismiss: () -> Unit,
 ) {

@@ -1,25 +1,21 @@
-package com.mobyle.nanquim.data.settings
+package com.mobyle.nanquim.data.settings.repositories
 
+import com.mobyle.nanquim.domain.settings.models.StorageUsage
+import com.mobyle.nanquim.domain.settings.repositories.StorageRepository
 import java.io.File
 
-data class StorageUsage(
-    val artworkBytes: Long,
-    val artworkCount: Int,
-    val cacheBytes: Long,
-)
-
-class StorageCleaner(
+class StorageRepositoryImpl(
     private val artworks: File,
     private val cache: File,
-) {
-    fun usage(): StorageUsage =
+) : StorageRepository {
+    override fun usage(): StorageUsage =
         StorageUsage(
             artworkBytes = sizeOf(artworks),
             artworkCount = artworks.listFiles { file -> file.isDirectory }?.size ?: 0,
             cacheBytes = sizeOf(cache),
         )
 
-    fun clearCaches() {
+    override fun clearCaches() {
         CLEARABLE.forEach { File(cache, it).deleteRecursively() }
     }
 

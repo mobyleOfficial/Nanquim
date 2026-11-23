@@ -3,9 +3,9 @@ package com.mobyle.nanquim.presentation.settings
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import com.mobyle.nanquim.core.navigation.AppNavigator
-import com.mobyle.nanquim.data.settings.KeyboardShortcutSettings
 import com.mobyle.nanquim.domain.command.CommandDispatcher
 import com.mobyle.nanquim.domain.keyboard.ShortcutAction
+import com.mobyle.nanquim.domain.settings.repositories.KeyboardShortcutsRepository
 import com.mobyle.nanquim.presentation.keyboard.KeyboardInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.serialization.json.JsonObject
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class KeyboardShortcutsViewModel
     @Inject
     constructor(
-        val settings: KeyboardShortcutSettings,
+        val settings: KeyboardShortcutsRepository,
         private val dispatcher: CommandDispatcher,
         private val navigator: AppNavigator,
     ) : ViewModel() {

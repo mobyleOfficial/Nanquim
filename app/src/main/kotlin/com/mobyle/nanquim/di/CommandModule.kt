@@ -23,10 +23,6 @@ import com.mobyle.nanquim.data.gallery.Gallery
 import com.mobyle.nanquim.data.gallery.SampleArtworks
 import com.mobyle.nanquim.data.help.Help
 import com.mobyle.nanquim.data.macro.Macros
-import com.mobyle.nanquim.data.settings.AppSettings
-import com.mobyle.nanquim.data.settings.KeyboardShortcutSettings
-import com.mobyle.nanquim.data.settings.QuickMenuSettings
-import com.mobyle.nanquim.data.settings.StorageCleaner
 import com.mobyle.nanquim.data.text.FontLibrary
 import com.mobyle.nanquim.data.transfer.ArtworkTransfer
 import com.mobyle.nanquim.document.command.CommandContext
@@ -45,6 +41,10 @@ import com.mobyle.nanquim.domain.command.registerHelpCommands
 import com.mobyle.nanquim.domain.diagnostics.StylusObservationRecorder
 import com.mobyle.nanquim.domain.feedback.AppLinks
 import com.mobyle.nanquim.domain.feedback.FeedbackKind
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
+import com.mobyle.nanquim.domain.settings.repositories.KeyboardShortcutsRepository
+import com.mobyle.nanquim.domain.settings.repositories.QuickMenuRepository
+import com.mobyle.nanquim.domain.settings.repositories.StorageRepository
 import com.mobyle.nanquim.presentation.brush.BrushUiState
 import dagger.Module
 import dagger.Provides
@@ -77,12 +77,12 @@ object CommandModule {
         canvasSession: CanvasSession,
         gallery: Gallery,
         transfer: ArtworkTransfer,
-        appSettings: AppSettings,
-        storageCleaner: StorageCleaner,
+        appSettings: AppSettingsRepository,
+        storageCleaner: StorageRepository,
         memoryBudgetPolicy: MemoryBudgetPolicy,
         brushUi: BrushUiState,
-        quickMenu: QuickMenuSettings,
-        keyboardShortcuts: KeyboardShortcutSettings,
+        quickMenu: QuickMenuRepository,
+        keyboardShortcuts: KeyboardShortcutsRepository,
         macros: Macros,
         gradients: GradientLibrary,
         palettes: PaletteLibrary,

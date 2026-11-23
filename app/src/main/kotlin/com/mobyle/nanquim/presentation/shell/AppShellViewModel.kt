@@ -12,7 +12,6 @@ import com.mobyle.nanquim.data.ads.GalleryAds
 import com.mobyle.nanquim.data.color.ColorProfileLibrary
 import com.mobyle.nanquim.data.gallery.Gallery
 import com.mobyle.nanquim.data.help.Help
-import com.mobyle.nanquim.data.settings.AppSettings
 import com.mobyle.nanquim.data.transfer.ArtworkTransfer
 import com.mobyle.nanquim.data.transfer.ExportOptions
 import com.mobyle.nanquim.data.transfer.ImportTarget
@@ -27,6 +26,7 @@ import com.mobyle.nanquim.domain.command.PaletteCommandIds
 import com.mobyle.nanquim.domain.command.ToolCommandIds
 import com.mobyle.nanquim.domain.command.TransferCommandIds
 import com.mobyle.nanquim.domain.command.VideoCommandIds
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.ProfileColorSpace
 import com.mobyle.nanquim.presentation.brush.BrushUiState
@@ -51,7 +51,7 @@ class AppShellViewModel
         val gallery: Gallery,
         val transfer: ArtworkTransfer,
         val help: Help,
-        val appSettings: AppSettings,
+        val appSettings: AppSettingsRepository,
         val galleryAds: GalleryAds,
         private val colorProfiles: ColorProfileLibrary,
         private val launchState: LaunchState,

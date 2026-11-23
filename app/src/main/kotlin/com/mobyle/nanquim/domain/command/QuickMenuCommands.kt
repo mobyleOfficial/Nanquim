@@ -1,9 +1,6 @@
 package com.mobyle.nanquim.domain.command
 
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.settings.QuickMenuPreset
-import com.mobyle.nanquim.data.settings.QuickMenuSettings
-import com.mobyle.nanquim.data.settings.QuickMenuSlot
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandContext
 import com.mobyle.nanquim.document.command.CommandErrorCode
@@ -14,6 +11,9 @@ import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.canvas.QuickMenuAnchor
+import com.mobyle.nanquim.domain.settings.models.QuickMenuPreset
+import com.mobyle.nanquim.domain.settings.models.QuickMenuSlot
+import com.mobyle.nanquim.domain.settings.repositories.QuickMenuRepository
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -38,7 +38,7 @@ object QuickMenuCommandIds {
 fun registerQuickMenuCommands(
     registry: CommandRegistry,
     session: CanvasSession,
-    settings: QuickMenuSettings,
+    settings: QuickMenuRepository,
 ) {
     fun register(
         id: String,
@@ -146,7 +146,7 @@ private fun JsonElement.jsonInt(): Int = (this as JsonPrimitive).int
 
 private fun JsonElement.jsonString(): String = (this as JsonPrimitive).content
 
-private fun quickMenuJson(settings: QuickMenuSettings): JsonObject =
+private fun quickMenuJson(settings: QuickMenuRepository): JsonObject =
     JsonObject(
         mapOf(
             "active" to JsonPrimitive(settings.activeIndex),

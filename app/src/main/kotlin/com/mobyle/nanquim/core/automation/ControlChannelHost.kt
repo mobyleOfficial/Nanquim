@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.res.Configuration
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.data.help.Help
-import com.mobyle.nanquim.data.settings.AppSettings
 import com.mobyle.nanquim.di.ApplicationScope
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.command.CommandDispatcher
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.engine.Engine
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,7 +25,7 @@ class ControlChannelHost
         private val dispatcher: Lazy<CommandDispatcher>,
         private val canvasSession: Lazy<CanvasSession>,
         private val engine: Lazy<Engine>,
-        private val appSettings: Lazy<AppSettings>,
+        private val appSettings: Lazy<AppSettingsRepository>,
         private val help: Lazy<Help>,
         @param:ApplicationScope private val scope: CoroutineScope,
     ) {

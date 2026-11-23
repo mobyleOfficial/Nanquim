@@ -13,11 +13,10 @@ import com.mobyle.nanquim.data.gallery.GalleryDatabase
 import com.mobyle.nanquim.data.gallery.GalleryDocumentsProvider
 import com.mobyle.nanquim.data.gallery.GalleryNames
 import com.mobyle.nanquim.data.gallery.SampleArtworks
-import com.mobyle.nanquim.data.settings.AppSettings
-import com.mobyle.nanquim.data.settings.StorageCleaner
 import com.mobyle.nanquim.data.transfer.ArtworkTransfer
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.canvas.MemoryBudgetPolicy
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.presentation.widget.WidgetUpdates
 import dagger.Module
@@ -53,7 +52,7 @@ object GalleryModule {
         database: GalleryDatabase,
         canvasSession: CanvasSession,
         navigator: AppNavigator,
-        appSettings: AppSettings,
+        appSettings: AppSettingsRepository,
         telemetry: Telemetry,
         @ApplicationScope scope: CoroutineScope,
     ): Gallery =
@@ -124,11 +123,4 @@ object GalleryModule {
                 else -> null
             }
         }
-
-    @Provides
-    @Singleton
-    fun storageCleaner(
-        @ApplicationContext context: Context,
-        storage: ArtworkStorage,
-    ): StorageCleaner = StorageCleaner(storage.root, context.cacheDir)
 }

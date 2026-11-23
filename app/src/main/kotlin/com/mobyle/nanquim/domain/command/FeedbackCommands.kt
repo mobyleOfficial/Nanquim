@@ -2,7 +2,6 @@ package com.mobyle.nanquim.domain.command
 
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.feedback.FeedbackActions
-import com.mobyle.nanquim.data.settings.AppSettings
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandRegistry
@@ -15,6 +14,7 @@ import com.mobyle.nanquim.domain.feedback.AppLinks
 import com.mobyle.nanquim.domain.feedback.FeedbackChannel
 import com.mobyle.nanquim.domain.feedback.FeedbackKind
 import com.mobyle.nanquim.domain.feedback.FeedbackLinks
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -40,7 +40,7 @@ class FeedbackTexts(
 fun registerFeedbackCommands(
     registry: CommandRegistry,
     actions: FeedbackActions,
-    appSettings: AppSettings,
+    appSettings: AppSettingsRepository,
     appInfo: suspend () -> AppInfo,
     texts: FeedbackTexts,
     onUsageStatisticsChanged: (Boolean) -> Unit,

@@ -9,13 +9,13 @@ import androidx.lifecycle.viewModelScope
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.core.navigation.AppNavigator
 import com.mobyle.nanquim.data.ads.GalleryAds
-import com.mobyle.nanquim.data.settings.AppSettings
-import com.mobyle.nanquim.data.settings.InputSettings
-import com.mobyle.nanquim.data.settings.StorageCleaner
-import com.mobyle.nanquim.data.settings.StorageUsage
 import com.mobyle.nanquim.domain.command.AppCommandIds
 import com.mobyle.nanquim.domain.command.CommandDispatcher
 import com.mobyle.nanquim.domain.command.dispatchFeedback
+import com.mobyle.nanquim.domain.settings.models.StorageUsage
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
+import com.mobyle.nanquim.domain.settings.repositories.StorageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,14 +23,14 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import javax.inject.Inject
 
-/** The settings themselves stay in [InputSettings] and [AppSettings]; this holds what only the screen needs. */
+/** The settings themselves stay in [InputSettingsRepository] and [AppSettingsRepository]; this holds what only the screen needs. */
 @HiltViewModel
 class SettingsViewModel
     @Inject
     constructor(
-        val inputSettings: InputSettings,
-        val appSettings: AppSettings,
-        private val storage: StorageCleaner,
+        val inputSettings: InputSettingsRepository,
+        val appSettings: AppSettingsRepository,
+        private val storage: StorageRepository,
         private val galleryAds: GalleryAds,
         private val dispatcher: CommandDispatcher,
         private val navigator: AppNavigator,

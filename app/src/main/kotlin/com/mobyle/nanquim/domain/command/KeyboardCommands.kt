@@ -1,7 +1,6 @@
 package com.mobyle.nanquim.domain.command
 
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.settings.KeyboardShortcutSettings
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandRegistry
@@ -11,6 +10,7 @@ import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.domain.keyboard.KeyChord
 import com.mobyle.nanquim.domain.keyboard.ShortcutAction
+import com.mobyle.nanquim.domain.settings.repositories.KeyboardShortcutsRepository
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -25,7 +25,7 @@ object KeyboardCommandIds {
 
 fun registerKeyboardCommands(
     registry: CommandRegistry,
-    settings: KeyboardShortcutSettings,
+    settings: KeyboardShortcutsRepository,
 ) {
     fun answer(extra: Map<String, kotlinx.serialization.json.JsonElement> = emptyMap()) =
         CommandResult.Success(JsonObject(mapOf("shortcuts" to settings.shortcuts.toJson()) + extra))

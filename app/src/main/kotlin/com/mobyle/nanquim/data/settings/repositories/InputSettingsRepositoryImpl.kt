@@ -1,4 +1,4 @@
-package com.mobyle.nanquim.data.settings
+package com.mobyle.nanquim.data.settings.repositories
 
 import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
@@ -6,65 +6,54 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.edit
-import com.mobyle.nanquim.domain.canvas.input.Gesture
-import com.mobyle.nanquim.domain.canvas.input.GestureAction
 import com.mobyle.nanquim.domain.canvas.input.GestureConfiguration
 import com.mobyle.nanquim.domain.canvas.input.PalmSupport
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository.Companion.DEFAULT_UNDO_TAP_FINGERS
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository.Companion.LINEAR
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository.Companion.QUICK_SHAPE_DEFAULT_DELAY
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository.Companion.QUICK_SHAPE_DELAYS
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository.Companion.UNDO_TAP_FINGERS
 import com.mobyle.nanquim.engine.Engine
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 
-class InputSettings(
+/** Saves the input settings and hands the ones the engine applies to it, now and on every change. */
+class InputSettingsRepositoryImpl(
     private val preferences: SharedPreferences,
     private val engine: Engine,
-) {
-    var pressureCurve: List<Pair<Float, Float>> by mutableStateOf(load())
+) : InputSettingsRepository {
+    override var pressureCurve: List<Pair<Float, Float>> by mutableStateOf(load())
         private set
 
-    var globalSmoothing: Float by mutableStateOf(preferences.getFloat(KEY_SMOOTHING, 0f))
+    override var globalSmoothing: Float by mutableStateOf(preferences.getFloat(KEY_SMOOTHING, 0f))
         private set
 
-    val isLinear: Boolean get() = pressureCurve == LINEAR
-
-    var stylusRollReported: Boolean by mutableStateOf(preferences.getBoolean(KEY_ROLL, false))
+    override var stylusRollReported: Boolean by mutableStateOf(preferences.getBoolean(KEY_ROLL, false))
         private set
 
-    fun reportStylusRoll() {
+    override fun reportStylusRoll() {
         stylusRollReported = true
         preferences.edit().putBoolean(KEY_ROLL, true).apply()
         engine.setStylusRoll(true)
     }
 
-    var palmSupport: PalmSupport by mutableStateOf(PalmSupport.fromId(preferences.getString(KEY_PALM_SUPPORT, null)) ?: PalmSupport.DEFAULT)
+    override var palmSupport: PalmSupport by mutableStateOf(
+        PalmSupport.fromId(preferences.getString(KEY_PALM_SUPPORT, null)) ?: PalmSupport.DEFAULT,
+    )
         private set
 
-    fun updatePalmSupport(level: PalmSupport) {
+    override fun updatePalmSupport(level: PalmSupport) {
         palmSupport = level
         preferences.edit { putString(KEY_PALM_SUPPORT, level.id) }
     }
 
-    var gestures: GestureConfiguration by mutableStateOf(loadGestures())
+    override var gestures: GestureConfiguration by mutableStateOf(loadGestures())
         private set
 
-    fun updateGestures(configuration: GestureConfiguration) {
+    override fun updateGestures(configuration: GestureConfiguration) {
         gestures = configuration
         preferences.edit { putString(KEY_GESTURES, configuration.toJson().toString()) }
-    }
-
-    val undoTapFingers: Int
-        get() = if (Gesture.OneFingerTap in gestures.triggersOf(GestureAction.Undo)) 1 else DEFAULT_UNDO_TAP_FINGERS
-
-    fun updateUndoTapFingers(fingers: Int) {
-        val (tap, other) = if (fingers == 1) Gesture.OneFingerTap to Gesture.TwoFingerTap else Gesture.TwoFingerTap to Gesture.OneFingerTap
-        updateGestures(gestures.withTriggers(GestureAction.Undo, gestures.triggersOf(GestureAction.Undo) - other + tap))
-    }
-
-    val fingerPainting: Boolean get() = Gesture.FingerDrag in gestures.triggersOf(GestureAction.Paint)
-
-    fun updateFingerPainting(enabled: Boolean) {
-        val triggers = gestures.triggersOf(GestureAction.Paint)
-        val next = if (enabled) triggers + Gesture.FingerDrag else triggers - Gesture.FingerDrag
-        updateGestures(gestures.withTriggers(GestureAction.Paint, next))
     }
 
     private fun loadGestures(): GestureConfiguration {
@@ -79,25 +68,25 @@ class InputSettings(
             )
     }
 
-    var quickShapeEnabled: Boolean by mutableStateOf(preferences.getBoolean(KEY_QUICK_SHAPE, true))
+    override var quickShapeEnabled: Boolean by mutableStateOf(preferences.getBoolean(KEY_QUICK_SHAPE, true))
         private set
 
-    var hapticsEnabled: Boolean by mutableStateOf(preferences.getBoolean(KEY_HAPTICS, true))
+    override var hapticsEnabled: Boolean by mutableStateOf(preferences.getBoolean(KEY_HAPTICS, true))
         private set
 
-    fun updateHaptics(enabled: Boolean) {
+    override fun updateHaptics(enabled: Boolean) {
         hapticsEnabled = enabled
         preferences.edit().putBoolean(KEY_HAPTICS, enabled).apply()
     }
 
-    var quickShapeDelayMillis: Int by mutableIntStateOf(
+    override var quickShapeDelayMillis: Int by mutableIntStateOf(
         preferences.getInt(KEY_QUICK_SHAPE_DELAY, QUICK_SHAPE_DEFAULT_DELAY).coerceIn(QUICK_SHAPE_DELAYS),
     )
         private set
 
-    fun updateQuickShape(
-        enabled: Boolean = quickShapeEnabled,
-        delayMillis: Int = quickShapeDelayMillis,
+    override fun updateQuickShape(
+        enabled: Boolean,
+        delayMillis: Int,
     ) {
         quickShapeEnabled = enabled
         quickShapeDelayMillis = delayMillis.coerceIn(QUICK_SHAPE_DELAYS)
@@ -108,20 +97,20 @@ class InputSettings(
             .apply()
     }
 
-    fun apply() {
+    init {
         engine.setPressureCurve(pressureCurve.takeUnless { isLinear })
         engine.setGlobalSmoothing(globalSmoothing)
         engine.setStylusRoll(stylusRollReported)
     }
 
-    fun updatePressureCurve(points: List<Pair<Float, Float>>) {
+    override fun updatePressureCurve(points: List<Pair<Float, Float>>) {
         val valid = normalized(points)
         pressureCurve = valid
         preferences.edit().putString(KEY_CURVE, valid.joinToString(";") { "${it.first},${it.second}" }).apply()
         engine.setPressureCurve(valid.takeUnless { it == LINEAR })
     }
 
-    fun updateGlobalSmoothing(amount: Float) {
+    override fun updateGlobalSmoothing(amount: Float) {
         globalSmoothing = amount.coerceIn(0f, 1f)
         preferences.edit().putFloat(KEY_SMOOTHING, globalSmoothing).apply()
         engine.setGlobalSmoothing(globalSmoothing)
@@ -150,17 +139,9 @@ class InputSettings(
         private const val KEY_UNDO_TAP_FINGERS = "undoTapFingers"
         private const val KEY_FINGER_PAINTING = "fingerPainting"
         private const val KEY_GESTURES = "gestures"
-
-        const val DEFAULT_UNDO_TAP_FINGERS = 2
-        val UNDO_TAP_FINGERS = 1..2
         private const val KEY_QUICK_SHAPE_DELAY = "quickShapeDelay"
 
-        const val QUICK_SHAPE_DEFAULT_DELAY = 600
-        val QUICK_SHAPE_DELAYS = 300..1500
-
-        val LINEAR = listOf(0f to 0f, 1f to 1f)
-
-        fun normalized(points: List<Pair<Float, Float>>): List<Pair<Float, Float>> {
+        private fun normalized(points: List<Pair<Float, Float>>): List<Pair<Float, Float>> {
             val sorted =
                 points
                     .map { (x, y) -> x.coerceIn(0f, 1f) to y.coerceIn(0f, 1f) }

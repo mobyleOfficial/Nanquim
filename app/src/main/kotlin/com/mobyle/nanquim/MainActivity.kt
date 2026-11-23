@@ -33,12 +33,12 @@ import com.mobyle.nanquim.data.feedback.ReviewPrompt
 import com.mobyle.nanquim.data.gallery.Gallery
 import com.mobyle.nanquim.data.gallery.SampleArtworks
 import com.mobyle.nanquim.data.help.Help
-import com.mobyle.nanquim.data.settings.AppSettings
-import com.mobyle.nanquim.data.settings.KeyboardShortcutSettings
-import com.mobyle.nanquim.data.settings.ThemeMode
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.command.CanvasCommandIds
 import com.mobyle.nanquim.domain.command.CommandDispatcher
+import com.mobyle.nanquim.domain.settings.models.ThemeMode
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
+import com.mobyle.nanquim.domain.settings.repositories.KeyboardShortcutsRepository
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.presentation.common.ProvideWindowLayout
 import com.mobyle.nanquim.presentation.display.ProjectedCanvas
@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
 
     @Inject lateinit var telemetry: Telemetry
 
-    @Inject lateinit var appSettings: Lazy<AppSettings>
+    @Inject lateinit var appSettings: Lazy<AppSettingsRepository>
 
     @Inject lateinit var gallery: Lazy<Gallery>
 
@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
 
     @Inject lateinit var galleryAds: Lazy<GalleryAds>
 
-    @Inject lateinit var keyboardShortcutSettings: Lazy<KeyboardShortcutSettings>
+    @Inject lateinit var keyboardShortcutSettings: Lazy<KeyboardShortcutsRepository>
 
     @Inject lateinit var commandDispatcher: Lazy<CommandDispatcher>
 

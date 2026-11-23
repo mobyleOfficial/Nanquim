@@ -6,17 +6,17 @@ import androidx.compose.runtime.setValue
 import com.mobyle.nanquim.data.brush.BrushThumbnails
 import com.mobyle.nanquim.data.brush.library.BrushLibrary
 import com.mobyle.nanquim.data.brush.library.BrushTool
-import com.mobyle.nanquim.data.settings.InputSettings
 import com.mobyle.nanquim.domain.brush.ActiveBrushes
 import com.mobyle.nanquim.domain.brush.BrushEditorSession
 import com.mobyle.nanquim.domain.canvas.SrgbColor
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
 import kotlinx.coroutines.CoroutineScope
 
 class BrushUiState(
     val library: BrushLibrary,
     val brushes: ActiveBrushes,
     val thumbnails: BrushThumbnails,
-    val inputSettings: InputSettings,
+    val inputSettings: InputSettingsRepository,
     val scope: CoroutineScope,
 ) {
     var libraryTool: BrushTool? by mutableStateOf(null)

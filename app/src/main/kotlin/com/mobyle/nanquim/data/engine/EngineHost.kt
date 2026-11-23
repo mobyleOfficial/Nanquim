@@ -6,12 +6,12 @@ import android.content.Context
 import android.widget.Toast
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.core.telemetry.Telemetry
-import com.mobyle.nanquim.data.settings.AppSettings
 import com.mobyle.nanquim.di.ApplicationScope
 import com.mobyle.nanquim.domain.canvas.MemoryBudgetPolicy
+import com.mobyle.nanquim.domain.settings.models.Renderer
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.EngineConfig
-import com.mobyle.nanquim.engine.Renderer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -30,7 +30,7 @@ class EngineHost
     @Inject
     constructor(
         @param:ApplicationContext private val context: Context,
-        private val appSettings: AppSettings,
+        private val appSettings: AppSettingsRepository,
         private val telemetry: Telemetry,
         private val memoryBudgetPolicy: MemoryBudgetPolicy,
         @param:ApplicationScope private val scope: CoroutineScope,
@@ -45,13 +45,14 @@ class EngineHost
             appSettings.startedRenderer = renderer
             telemetry.memoryBudgetChanged(memoryBudgetPolicy.currentBytes)
             reportInterruptedShaderCompile()
-            Engine(EngineConfig(memoryBudgetPolicy.currentBytes, scratchDirectory().absolutePath, renderer = renderer)).also { engine ->
+            val config = EngineConfig(memoryBudgetPolicy.currentBytes, scratchDirectory().absolutePath, renderer = renderer.toEngine())
+            Engine(config).also { engine ->
                 scope.launch { engine.unrecoverableError.filterNotNull().collect(telemetry::engineFailed) }
                 engine.requestGpuInfo { info ->
                     scope.launch {
                         val active = if (info.api == "vulkan") Renderer.Vulkan else Renderer.Gles
                         appSettings.activeRenderer = active
-                        telemetry.rendererChanged(AppSettings.rendererId(renderer), AppSettings.rendererId(active))
+                        telemetry.rendererChanged(renderer.id, active.id)
                         if (active != renderer) {
                             Toast.makeText(context, R.string.renderer_fallback_notice, Toast.LENGTH_LONG).show()
                         }
@@ -100,7 +101,7 @@ class EngineHost
                     @Suppress("PrivateApi")
                     Class.forName("android.os.SystemProperties").getMethod("get", String::class.java).invoke(null, "debug.nanquim.renderer")
                 }.getOrNull() as? String
-            return AppSettings.rendererFromId(value)
+            return Renderer.fromId(value)
         }
 
         private companion object {
@@ -112,3 +113,9 @@ class EngineHost
 
 fun Context.memoryInfo(): ActivityManager.MemoryInfo =
     ActivityManager.MemoryInfo().also { getSystemService(ActivityManager::class.java).getMemoryInfo(it) }
+
+private fun Renderer.toEngine(): com.mobyle.nanquim.engine.Renderer =
+    when (this) {
+        Renderer.Gles -> com.mobyle.nanquim.engine.Renderer.Gles
+        Renderer.Vulkan -> com.mobyle.nanquim.engine.Renderer.Vulkan
+    }

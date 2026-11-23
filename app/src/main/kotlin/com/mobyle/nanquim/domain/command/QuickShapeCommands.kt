@@ -1,7 +1,6 @@
 package com.mobyle.nanquim.domain.command
 
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.settings.InputSettings
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -16,6 +15,7 @@ import com.mobyle.nanquim.document.shape.ShapeHandle
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.canvas.ShapeSnapResult
 import com.mobyle.nanquim.domain.canvas.input.PalmSupport
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
 import com.mobyle.nanquim.engine.Point
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
@@ -46,7 +46,7 @@ object QuickShapeCommandIds {
 fun registerQuickShapeCommands(
     registry: CommandRegistry,
     canvas: CanvasSession,
-    inputSettings: InputSettings,
+    inputSettings: InputSettingsRepository,
 ) {
     registry.register(
         CommandSpec(
@@ -99,14 +99,16 @@ fun registerQuickShapeCommands(
                     ParameterSpec(
                         "fingers",
                         ParameterType.Integer,
-                        minimum = InputSettings.UNDO_TAP_FINGERS.first.toDouble(),
-                        maximum = InputSettings.UNDO_TAP_FINGERS.last.toDouble(),
+                        minimum = InputSettingsRepository.UNDO_TAP_FINGERS.first.toDouble(),
+                        maximum = InputSettingsRepository.UNDO_TAP_FINGERS.last.toDouble(),
                     ),
                 ),
             undoable = false,
         ),
     ) { _, arguments ->
-        inputSettings.updateUndoTapFingers((arguments["fingers"] as? JsonPrimitive)?.intOrNull ?: InputSettings.DEFAULT_UNDO_TAP_FINGERS)
+        inputSettings.updateUndoTapFingers(
+            (arguments["fingers"] as? JsonPrimitive)?.intOrNull ?: InputSettingsRepository.DEFAULT_UNDO_TAP_FINGERS,
+        )
         CommandResult.Success(buildJsonObject { put("fingers", inputSettings.undoTapFingers) })
     }
     registry.register(
@@ -133,8 +135,8 @@ fun registerQuickShapeCommands(
                         "delay",
                         ParameterType.Integer,
                         JsonNull,
-                        InputSettings.QUICK_SHAPE_DELAYS.first.toDouble(),
-                        InputSettings.QUICK_SHAPE_DELAYS.last.toDouble(),
+                        InputSettingsRepository.QUICK_SHAPE_DELAYS.first.toDouble(),
+                        InputSettingsRepository.QUICK_SHAPE_DELAYS.last.toDouble(),
                     ),
                 ),
             undoable = false,

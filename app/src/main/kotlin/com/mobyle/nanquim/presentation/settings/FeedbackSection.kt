@@ -22,17 +22,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.settings.AppSettings
 import com.mobyle.nanquim.domain.command.FeedbackCommandIds
 import com.mobyle.nanquim.domain.feedback.FeedbackChannel
 import com.mobyle.nanquim.domain.feedback.FeedbackKind
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
 /** Rate, share, report, privacy and the legal pages, at the end of Settings. */
 @Composable
 fun FeedbackSection(
-    appSettings: AppSettings,
+    appSettings: AppSettingsRepository,
     onCommand: (String, JsonObject) -> Unit,
     onOpenAdChoices: (() -> Unit)? = null,
     adsAvailable: Boolean = false,
@@ -111,7 +111,7 @@ fun FeedbackSection(
 /** The saved choice; when it differs from this launch's, a line says it takes effect the next time the app opens. */
 @Composable
 private fun GalleryAdsSwitch(
-    appSettings: AppSettings,
+    appSettings: AppSettingsRepository,
     onChange: (Boolean) -> Unit,
 ) {
     Row(

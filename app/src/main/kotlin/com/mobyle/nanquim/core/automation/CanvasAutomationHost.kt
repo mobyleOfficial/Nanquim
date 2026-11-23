@@ -3,11 +3,11 @@ package com.mobyle.nanquim.core.automation
 import androidx.compose.runtime.snapshotFlow
 import com.mobyle.nanquim.data.brush.library.BrushTool
 import com.mobyle.nanquim.data.help.Help
-import com.mobyle.nanquim.data.settings.AppSettings
 import com.mobyle.nanquim.document.layer.toJson
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.command.stateJson
 import com.mobyle.nanquim.domain.command.toJson
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.EngineEvent
 import com.mobyle.nanquim.engine.SceneRender
@@ -29,7 +29,7 @@ class CanvasAutomationHost(
     private val canvas: CanvasSession,
     private val engine: Engine,
     scope: CoroutineScope,
-    private val appSettings: AppSettings,
+    private val appSettings: AppSettingsRepository,
     private val help: Help? = null,
 ) : AutomationHost {
     private val mutableEvents = MutableSharedFlow<JsonObject>(extraBufferCapacity = EVENT_BUFFER)
@@ -173,8 +173,8 @@ class CanvasAutomationHost(
                 } ?: JsonNull,
             )
             putJsonObject("renderer") {
-                put("selected", AppSettings.rendererId(appSettings.renderer))
-                put("active", appSettings.activeRenderer?.let { JsonPrimitive(AppSettings.rendererId(it)) } ?: JsonNull)
+                put("selected", appSettings.renderer.id)
+                put("active", appSettings.activeRenderer?.let { JsonPrimitive(it.id) } ?: JsonNull)
                 put("fellBack", appSettings.rendererFellBack)
             }
         }

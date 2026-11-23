@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.os.Build
 import com.mobyle.nanquim.BuildConfig
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.core.navigation.AppNavigator
 import com.mobyle.nanquim.core.telemetry.Telemetry
 import com.mobyle.nanquim.data.ads.GalleryAds
@@ -16,10 +15,8 @@ import com.mobyle.nanquim.data.feedback.FeedbackActions
 import com.mobyle.nanquim.data.feedback.ReviewPrompt
 import com.mobyle.nanquim.data.help.Help
 import com.mobyle.nanquim.data.macro.Macros
-import com.mobyle.nanquim.data.settings.AppSettings
-import com.mobyle.nanquim.data.settings.KeyboardShortcutSettings
-import com.mobyle.nanquim.data.settings.QuickMenuSettings
 import com.mobyle.nanquim.domain.diagnostics.StylusObservationRecorder
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.engine.Engine
 import dagger.Module
 import dagger.Provides
@@ -36,8 +33,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    private const val QUICK_MENU_PREFERENCES = "quick-menu"
-
     @Provides
     @Singleton
     @ApplicationScope
@@ -45,15 +40,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun appSettings(
-        @ApplicationContext context: Context,
-    ): AppSettings = AppSettings(context.getSharedPreferences(AppSettings.PREFERENCES_NAME, MODE_PRIVATE))
-
-    @Provides
-    @Singleton
     fun telemetry(
         @ApplicationContext context: Context,
-        appSettings: AppSettings,
+        appSettings: AppSettingsRepository,
     ): Telemetry =
         Telemetry.create(
             context,
@@ -67,22 +56,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun quickMenuSettings(
-        @ApplicationContext context: Context,
-    ): QuickMenuSettings =
-        QuickMenuSettings(context.getSharedPreferences(QUICK_MENU_PREFERENCES, MODE_PRIVATE), context.getString(R.string.quick_menu_default_preset))
-
-    @Provides
-    @Singleton
     fun macros(
         @ApplicationContext context: Context,
     ): Macros = Macros(File(context.filesDir, Macros.FOLDER))
-
-    @Provides
-    @Singleton
-    fun keyboardShortcutSettings(
-        @ApplicationContext context: Context,
-    ): KeyboardShortcutSettings = KeyboardShortcutSettings(context.getSharedPreferences(KeyboardShortcutSettings.PREFERENCES_NAME, MODE_PRIVATE))
 
     @Provides
     @Singleton
@@ -104,7 +80,7 @@ object AppModule {
     @Singleton
     fun galleryAds(
         @ApplicationContext context: Context,
-        appSettings: AppSettings,
+        appSettings: AppSettingsRepository,
     ): GalleryAds = GalleryAds(context, allowedByUser = appSettings.galleryAdsThisLaunch)
 
     @Provides

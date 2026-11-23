@@ -49,7 +49,7 @@ import com.mobyle.nanquim.domain.diagnostics.DiagnosticsReport
 import com.mobyle.nanquim.domain.diagnostics.StylusObservation
 import com.mobyle.nanquim.domain.diagnostics.StylusObservationRecorder
 import com.mobyle.nanquim.domain.diagnostics.StylusSample
-import com.mobyle.nanquim.engine.Renderer
+import com.mobyle.nanquim.domain.settings.models.Renderer
 import com.mobyle.nanquim.presentation.common.ScreenHeader
 import java.util.Locale
 

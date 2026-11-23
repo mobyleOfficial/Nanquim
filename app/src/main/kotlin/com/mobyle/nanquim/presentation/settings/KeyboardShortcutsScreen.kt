@@ -45,11 +45,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.settings.KeyboardShortcutSettings
 import com.mobyle.nanquim.domain.command.KeyboardCommandIds
 import com.mobyle.nanquim.domain.keyboard.KeyChord
 import com.mobyle.nanquim.domain.keyboard.KeyboardShortcuts
 import com.mobyle.nanquim.domain.keyboard.ShortcutAction
+import com.mobyle.nanquim.domain.settings.repositories.KeyboardShortcutsRepository
 import com.mobyle.nanquim.presentation.common.ScreenHeader
 import com.mobyle.nanquim.presentation.keyboard.KeyboardInput
 import kotlinx.serialization.json.JsonObject
@@ -69,7 +69,7 @@ fun KeyboardShortcutsRoute(viewModel: KeyboardShortcutsViewModel = hiltViewModel
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun KeyboardShortcutsScreen(
-    settings: KeyboardShortcutSettings,
+    settings: KeyboardShortcutsRepository,
     describe: (ShortcutAction) -> String,
     onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,

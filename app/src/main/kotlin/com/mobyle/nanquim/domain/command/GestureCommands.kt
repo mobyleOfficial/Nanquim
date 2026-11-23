@@ -1,7 +1,6 @@
 package com.mobyle.nanquim.domain.command
 
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.settings.InputSettings
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandRegistry
@@ -12,6 +11,7 @@ import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.domain.canvas.input.Gesture
 import com.mobyle.nanquim.domain.canvas.input.GestureAction
 import com.mobyle.nanquim.domain.canvas.input.GestureConfiguration
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -29,7 +29,7 @@ object GestureCommandIds {
 
 fun registerGestureCommands(
     registry: CommandRegistry,
-    inputSettings: InputSettings,
+    inputSettings: InputSettingsRepository,
 ) {
     fun answer() = CommandResult.Success(gesturesJson(inputSettings.gestures))
     registry.register(

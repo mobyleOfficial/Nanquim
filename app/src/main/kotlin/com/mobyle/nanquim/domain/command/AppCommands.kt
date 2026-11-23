@@ -17,11 +17,6 @@ import com.mobyle.nanquim.data.diagnostics.ShapeTraceRecorder
 import com.mobyle.nanquim.data.diagnostics.TouchSessionRecorder
 import com.mobyle.nanquim.data.gallery.Gallery
 import com.mobyle.nanquim.data.macro.Macros
-import com.mobyle.nanquim.data.settings.AppSettings
-import com.mobyle.nanquim.data.settings.KeyboardShortcutSettings
-import com.mobyle.nanquim.data.settings.QuickMenuSettings
-import com.mobyle.nanquim.data.settings.StorageCleaner
-import com.mobyle.nanquim.data.settings.ThemeMode
 import com.mobyle.nanquim.data.text.FontLibrary
 import com.mobyle.nanquim.data.transfer.ArtworkTransfer
 import com.mobyle.nanquim.data.transfer.TransferReport
@@ -34,7 +29,12 @@ import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.domain.canvas.CanvasSession
-import com.mobyle.nanquim.engine.Renderer
+import com.mobyle.nanquim.domain.settings.models.Renderer
+import com.mobyle.nanquim.domain.settings.models.ThemeMode
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
+import com.mobyle.nanquim.domain.settings.repositories.KeyboardShortcutsRepository
+import com.mobyle.nanquim.domain.settings.repositories.QuickMenuRepository
+import com.mobyle.nanquim.domain.settings.repositories.StorageRepository
 import com.mobyle.nanquim.formats.interchange.ImportWarning
 import com.mobyle.nanquim.presentation.brush.BrushUiState
 import kotlinx.serialization.json.boolean
@@ -78,12 +78,12 @@ fun createAppCommandRegistry(
     transfer: ArtworkTransfer,
     cacheDirectory: File,
     shareSheet: ShareSheet,
-    appSettings: AppSettings,
-    storageCleaner: StorageCleaner,
+    appSettings: AppSettingsRepository,
+    storageCleaner: StorageRepository,
     memoryBudgetBytes: () -> Long,
     brushUi: BrushUiState,
-    quickMenu: QuickMenuSettings,
-    keyboardShortcuts: KeyboardShortcutSettings,
+    quickMenu: QuickMenuRepository,
+    keyboardShortcuts: KeyboardShortcutsRepository,
     macros: Macros,
     gradients: GradientLibrary,
     palettes: PaletteLibrary,
@@ -234,16 +234,16 @@ fun createAppCommandRegistry(
             category = CommandCategory.Settings,
             parameters =
                 listOf(
-                    ParameterSpec("renderer", ParameterType.Enumeration, allowedValues = Renderer.entries.map(AppSettings::rendererId)),
+                    ParameterSpec("renderer", ParameterType.Enumeration, allowedValues = Renderer.entries.map(Renderer::id)),
                 ),
             undoable = false,
         ),
     ) { _, arguments ->
-        val renderer = AppSettings.rendererFromId(arguments.getValue("renderer").jsonPrimitive.content) ?: Renderer.Gles
+        val renderer = Renderer.fromId(arguments.getValue("renderer").jsonPrimitive.content) ?: Renderer.Gles
         appSettings.changeRenderer(renderer)
         CommandResult.Success(
             buildJsonObject {
-                put("renderer", AppSettings.rendererId(renderer))
+                put("renderer", renderer.id)
                 put("restartRequired", appSettings.startedRenderer != renderer)
             },
         )

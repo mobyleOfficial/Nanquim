@@ -36,7 +36,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.settings.InputSettings
 import com.mobyle.nanquim.domain.canvas.input.Gesture
 import com.mobyle.nanquim.domain.canvas.input.GestureAction
 import com.mobyle.nanquim.domain.canvas.input.GestureConfiguration
@@ -44,6 +43,7 @@ import com.mobyle.nanquim.domain.canvas.input.PalmSupport
 import com.mobyle.nanquim.domain.command.BrushCommandIds
 import com.mobyle.nanquim.domain.command.GestureCommandIds
 import com.mobyle.nanquim.domain.command.QuickShapeCommandIds
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
 import com.mobyle.nanquim.presentation.common.ScreenHeader
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -58,7 +58,7 @@ fun GestureSettingsRoute(viewModel: GestureSettingsViewModel = hiltViewModel()) 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun GestureSettingsScreen(
-    inputSettings: InputSettings,
+    inputSettings: InputSettingsRepository,
     onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -173,7 +173,7 @@ private fun ConflictBanner(conflicts: Map<Gesture, List<GestureAction>>) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun GeneralOptions(
-    inputSettings: InputSettings,
+    inputSettings: InputSettingsRepository,
     configuration: GestureConfiguration,
     onCommand: (String, JsonObject) -> Unit,
 ) {

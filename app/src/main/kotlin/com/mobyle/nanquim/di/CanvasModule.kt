@@ -1,7 +1,6 @@
 package com.mobyle.nanquim.di
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.data.adjust.GradientLibrary
 import com.mobyle.nanquim.data.brush.BrushThumbnails
@@ -16,13 +15,13 @@ import com.mobyle.nanquim.data.document.DocumentPersistence
 import com.mobyle.nanquim.data.engine.EngineHost
 import com.mobyle.nanquim.data.engine.memoryInfo
 import com.mobyle.nanquim.data.gallery.Gallery
-import com.mobyle.nanquim.data.settings.AppSettings
-import com.mobyle.nanquim.data.settings.InputSettings
 import com.mobyle.nanquim.data.text.FontLibrary
 import com.mobyle.nanquim.document.color.ColorState
 import com.mobyle.nanquim.domain.brush.ActiveBrushes
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.canvas.MemoryBudgetPolicy
+import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
+import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.presentation.brush.BrushUiState
 import dagger.Lazy
@@ -106,13 +105,6 @@ object CanvasModule {
 
     @Provides
     @Singleton
-    fun inputSettings(
-        @ApplicationContext context: Context,
-        engine: Engine,
-    ): InputSettings = InputSettings(context.getSharedPreferences(InputSettings.PREFERENCES_NAME, MODE_PRIVATE), engine).also { it.apply() }
-
-    @Provides
-    @Singleton
     fun fontLibrary(
         @ApplicationContext context: Context,
         engine: Engine,
@@ -132,9 +124,9 @@ object CanvasModule {
         gradientLibrary: GradientLibrary,
         paletteLibrary: PaletteLibrary,
         colorProfileLibrary: ColorProfileLibrary,
-        inputSettings: InputSettings,
+        inputSettings: InputSettingsRepository,
         fontLibrary: FontLibrary,
-        appSettings: AppSettings,
+        appSettings: AppSettingsRepository,
         // The gallery holds the session too; it is only needed once a save finishes, long after both exist.
         gallery: Lazy<Gallery>,
         @ApplicationScope scope: CoroutineScope,
@@ -183,7 +175,7 @@ object CanvasModule {
         @ApplicationContext context: Context,
         brushLibrary: BrushLibrary,
         canvasSession: CanvasSession,
-        inputSettings: InputSettings,
+        inputSettings: InputSettingsRepository,
         @ApplicationScope scope: CoroutineScope,
     ): BrushUiState =
         BrushUiState(
