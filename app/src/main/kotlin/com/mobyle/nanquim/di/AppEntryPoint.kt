@@ -1,13 +1,13 @@
 package com.mobyle.nanquim.di
 
 import android.content.Context
-import com.mobyle.nanquim.automation.ControlChannelHost
-import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.command.CommandDispatcher
-import com.mobyle.nanquim.document.ArtworkStorage
-import com.mobyle.nanquim.gallery.ArtworkTransfer
-import com.mobyle.nanquim.gallery.Gallery
-import com.mobyle.nanquim.gallery.GalleryDatabase
+import com.mobyle.nanquim.core.automation.ControlChannelHost
+import com.mobyle.nanquim.data.document.ArtworkStorage
+import com.mobyle.nanquim.data.gallery.Gallery
+import com.mobyle.nanquim.data.gallery.GalleryDatabase
+import com.mobyle.nanquim.data.transfer.ArtworkTransfer
+import com.mobyle.nanquim.domain.canvas.CanvasSession
+import com.mobyle.nanquim.domain.command.CommandDispatcher
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors

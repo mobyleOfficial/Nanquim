@@ -1,8 +1,8 @@
 package com.mobyle.nanquim
 
 import android.app.Application
-import com.mobyle.nanquim.canvas.EngineHost
-import com.mobyle.nanquim.telemetry.Telemetry
+import com.mobyle.nanquim.core.telemetry.Telemetry
+import com.mobyle.nanquim.data.engine.EngineHost
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 

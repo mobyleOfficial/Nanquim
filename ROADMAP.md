@@ -15,7 +15,7 @@ Páginas legais (já escritas, no repo `mobyleofficial.github.io`, pasta `nanqui
 
 ## Entrega 1 — v0.3: Confiança e Configurações (itens 3, 4, 5, 6, 2)
 
-Tudo isso mexe na mesma tela (`ui/settings/SettingsScreen.kt`) e é pré-requisito do Play Console (política de privacidade obrigatória, porque o app usa Firebase).
+Tudo isso mexe na mesma tela (`presentation/settings/SettingsScreen.kt`) e é pré-requisito do Play Console (política de privacidade obrigatória, porque o app usa Firebase).
 
 ### Nova seção "Sobre e feedback" em Configurações
 

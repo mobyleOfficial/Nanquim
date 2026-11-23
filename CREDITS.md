@@ -54,8 +54,8 @@ Procedural textures are generated with `nanquim-cli texture <kind> <size> <seed>
 | `goldens/brushes/test-flat/grain.png` | Nanquim contributors | Procedural: `noise 64 14 0.6` | MIT |
 | `goldens/brushes/test-stamp/shape.png` | Nanquim contributors | Procedural: `tools/goldens/make_brush_scenes.py` (arrow) | MIT |
 | `goldens/brushes/test-stamp/color.png` | Nanquim contributors | Procedural: `tools/goldens/make_brush_scenes.py` (color teardrop) | MIT |
-| `app/src/main/kotlin/com/mobyle/nanquim/canvas/adjust/GradientLibrary.kt` (`BUILT_INS`) | Nanquim contributors | Original gradients (color stops written for the project) | MIT |
-| `app/src/main/kotlin/com/mobyle/nanquim/color/BuiltInPalettes.kt` | Nanquim contributors | Original palettes Basics, Earth, Pastel (colors chosen for the project) | MIT |
+| `app/src/main/kotlin/com/mobyle/nanquim/data/adjust/GradientLibrary.kt` (`BUILT_INS`) | Nanquim contributors | Original gradients (color stops written for the project) | MIT |
+| `app/src/main/kotlin/com/mobyle/nanquim/data/color/BuiltInPalettes.kt` | Nanquim contributors | Original palettes Basics, Earth, Pastel (colors chosen for the project) | MIT |
 | `assets-src/profiles/sRGB-v4.icc` | Clinton Ingram (Compact ICC Profiles) | https://github.com/saucecontrol/Compact-ICC-Profiles (sRGB, V4 parametric curve); also a fuzz seed in `engine/src/fuzz/corpus/icc/` | CC0-1.0 |
 | `assets-src/profiles/DisplayP3-v4.icc` | Clinton Ingram (Compact ICC Profiles) | https://github.com/saucecontrol/Compact-ICC-Profiles (Display P3, V4); also a fuzz seed in `engine/src/fuzz/corpus/icc/` | CC0-1.0 |
 | `assets-src/profiles/AdobeCompat-v4.icc` | Clinton Ingram (Compact ICC Profiles) | https://github.com/saucecontrol/Compact-ICC-Profiles (Adobe RGB (1998) compatible, V4); also a fuzz seed in `engine/src/fuzz/corpus/icc/` | CC0-1.0 |
