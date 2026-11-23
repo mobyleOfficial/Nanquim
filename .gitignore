@@ -69,3 +69,10 @@ app/google-services.json
 *.pftrace
 *.perfetto-trace
 *.log
+
+# Fastlane / Ruby
+fastlane/report.xml
+fastlane/README.md
+fastlane/test_output/
+vendor/bundle/
+.bundle/

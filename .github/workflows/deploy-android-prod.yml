@@ -1,0 +1,80 @@
+name: Deploy Android Prod
+run-name: Build and deploy prod from ${{ github.ref_name }} - By ${{ github.actor }}
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '.github/**'
+      - '**.md'
+  workflow_dispatch:
+
+# A prod run tags the repository, so a newer merge waits instead of cancelling it halfway.
+concurrency:
+  group: deploy-android-prod
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-android-release
+        with:
+          package-name: com.mobyle.nanquim
+          keystore-base64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          keystore-password: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          key-alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          key-password: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          google-services-json-base64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          firebase-credentials-base64: ${{ secrets.FIREBASE_CREDENTIALS_BASE64 }}
+          admob-app-id: ${{ secrets.ADMOB_APP_ID }}
+          admob-gallery-banner-id: ${{ secrets.ADMOB_GALLERY_BANNER_ID }}
+
+      # Builds the signed prodRelease AAB (for Play / App Distribution) and APK
+      # (for GitHub) with the next versionCode, and uploads the AAB to Firebase
+      # App Distribution.
+      - name: Run fastlane Android Prod
+        run: bundle exec fastlane android distribute_release_build
+
+      - name: Collect release files
+        run: |
+          mkdir -p release
+          cp app/build/outputs/bundle/prodRelease/app-prod-release.aab "release/nanquim-${VERSION_NAME}-${VERSION_CODE}.aab"
+          cp app/build/outputs/apk/prod/release/app-prod-release.apk "release/nanquim-${VERSION_NAME}-${VERSION_CODE}.apk"
+          # Crashlytics needs this to deobfuscate if minify is ever turned on; harmless when absent.
+          if [ -f app/build/outputs/mapping/prodRelease/mapping.txt ]; then
+            cp app/build/outputs/mapping/prodRelease/mapping.txt "release/mapping-${VERSION_NAME}-${VERSION_CODE}.txt"
+          fi
+
+      - name: Keep the AAB and APK as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nanquim-${{ env.VERSION_NAME }}-${{ env.VERSION_CODE }}
+          path: release/
+          if-no-files-found: error
+          retention-days: 90
+
+      # Every prod build gets its own tag (versionName+versionCode, so it stays
+      # unique even when versionName is not bumped) and a DRAFT release with the
+      # files attached. Review the notes and publish it from the Releases page.
+      - name: Tag the build and draft a GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="v${VERSION_NAME}+${VERSION_CODE}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag --annotate "$tag" --message "Nanquim ${VERSION_NAME} (${VERSION_CODE})" "$GITHUB_SHA"
+          git push origin "refs/tags/$tag"
+
+          gh release create "$tag" release/* \
+            --draft \
+            --verify-tag \
+            --title "Nanquim ${VERSION_NAME} (${VERSION_CODE})" \
+            --generate-notes

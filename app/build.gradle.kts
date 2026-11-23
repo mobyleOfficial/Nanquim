@@ -62,8 +62,9 @@ android {
             libs.versions.targetSdk
                 .get()
                 .toInt()
-        // Bumped by one for every Play upload.
-        versionCode = 3
+        // Bumped by one for every Play upload. The deploy workflows pass -PversionCode with the next number after the
+        // latest Firebase App Distribution release (never below this one).
+        versionCode = providers.gradleProperty("versionCode").orNull?.toInt() ?: 3
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

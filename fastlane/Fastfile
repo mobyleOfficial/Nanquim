@@ -1,0 +1,119 @@
+default_platform(:android)
+
+# Fastlane runs lanes from the fastlane/ directory.
+ROOT = File.expand_path("..", Dir.pwd)
+APP_GRADLE = File.join(ROOT, "app", "build.gradle.kts")
+
+# Firebase App Distribution tester groups, one per flavor. Create them in the
+# Firebase console (App Distribution > Testers & Groups) with these aliases.
+TESTER_GROUPS = {
+  "dev" => "nanquim-dev",
+  "prod" => "nanquim-prod"
+}.freeze
+
+platform :android do
+  desc "Build the signed devRelease APK and send it to Firebase App Distribution"
+  lane :distribute_dev_build do
+    distribute(flavor: "dev", artifact_type: "APK", gradle_tasks: [":app:assembleDevRelease"])
+  end
+
+  desc "Build the signed prodRelease AAB (plus an APK for GitHub) and send the AAB to Firebase App Distribution"
+  lane :distribute_release_build do
+    distribute(flavor: "prod", artifact_type: "AAB", gradle_tasks: [":app:bundleProdRelease", ":app:assembleProdRelease"])
+  end
+
+  private_lane :distribute do |options|
+    flavor = options[:flavor]
+    credentials = required_env("FIREBASE_CREDENTIALS_PATH")
+    app_id = required_env("FIREBASE_APP_ID")
+
+    # Every upload needs a versionCode above the last one: take the latest release
+    # already in App Distribution plus one, but never go below the versionCode
+    # written in app/build.gradle.kts (it tracks what Play has already seen).
+    latest_release = firebase_app_distribution_get_latest_release(
+      app: app_id,
+      service_credentials_file: credentials
+    )
+    latest_build = latest_release ? latest_release[:buildVersion].to_i : 0
+    version_code = [latest_build + 1, gradle_value("versionCode").to_i].max
+    version_name = gradle_value("versionName")
+    version_name += "-dev" if flavor == "dev"
+    UI.message("Building #{flavor} #{version_name} (#{version_code})")
+
+    # The release signing config only exists when keystore.properties points at a
+    # real keystore; without it Gradle quietly produces an unsigned artifact.
+    keystore_properties = File.join(ROOT, "keystore.properties")
+    UI.user_error!("Missing #{keystore_properties} - the workflow writes it from the ANDROID_KEYSTORE_* secrets") unless File.exist?(keystore_properties)
+
+    sh("cd #{ROOT.shellescape} && ./gradlew #{options[:gradle_tasks].join(' ')} -PversionCode=#{version_code} --stacktrace")
+
+    artifacts = Dir[File.join(ROOT, "app/build/outputs/{apk/#{flavor}/release,bundle/#{flavor}Release}/*.{apk,aab}")]
+    artifacts.each { |artifact| verify_release_signature(artifact) }
+    upload = artifacts.find { |artifact| artifact.end_with?(".#{options[:artifact_type].downcase}") }
+    UI.user_error!("No #{options[:artifact_type]} produced for #{flavor}Release") unless upload
+
+    # Native symbols let Crashlytics symbolicate engine crashes. A failed upload
+    # must never block the distribution, so it is only reported.
+    sh("cd #{ROOT.shellescape} && ./gradlew :app:uploadCrashlyticsSymbolFile#{flavor.capitalize}Release -PversionCode=#{version_code}") do |status|
+      UI.important("Crashlytics symbol upload failed (non-fatal, exit #{status.exitstatus})") unless status.success?
+    end
+
+    firebase_app_distribution(
+      app: app_id,
+      service_credentials_file: credentials,
+      groups: TESTER_GROUPS.fetch(flavor),
+      android_artifact_type: options[:artifact_type],
+      android_artifact_path: upload,
+      release_notes: last_git_commit[:message]
+    )
+
+    # Hand the build identity and artifact paths to the next workflow steps.
+    if ENV["GITHUB_ENV"]
+      File.open(ENV["GITHUB_ENV"], "a") do |file|
+        file.puts("VERSION_NAME=#{version_name}")
+        file.puts("VERSION_CODE=#{version_code}")
+      end
+    end
+  end
+end
+
+def required_env(name)
+  value = ENV[name].to_s
+  UI.user_error!("#{name} is not set") if value.empty?
+  value
+end
+
+# Reads the default versionCode (the number after `?:`) and the versionName
+# from app/build.gradle.kts.
+GRADLE_PATTERNS = {
+  "versionCode" => /^\s*versionCode\s*=.*?(\d+)\s*$/,
+  "versionName" => /^\s*versionName\s*=\s*"([^"]+)"/
+}.freeze
+
+def gradle_value(key)
+  match = File.read(APP_GRADLE).match(GRADLE_PATTERNS.fetch(key))
+  UI.user_error!("Could not read #{key} from #{APP_GRADLE}") unless match
+  match[1]
+end
+
+# Play and App Distribution both reject unsigned or debug-signed builds, so
+# catch a missing release signature here instead of at upload time. APKs are
+# v2-signed only (minSdk 29), which keytool cannot read, so they go through
+# apksigner; the AAB is a jar-signed bundle that keytool handles.
+def verify_release_signature(artifact)
+  name = File.basename(artifact)
+  command =
+    if artifact.end_with?(".apk")
+      build_tools = Dir[File.join(ENV.fetch("ANDROID_HOME"), "build-tools", "*")].max_by { |dir| Gem::Version.new(File.basename(dir)) rescue Gem::Version.new("0") }
+      UI.user_error!("No Android build-tools found to run apksigner") unless build_tools
+      "#{File.join(build_tools, 'apksigner').shellescape} verify --print-certs #{artifact.shellescape}"
+    else
+      "keytool -printcert -jarfile #{artifact.shellescape}"
+    end
+  certificate = sh(command, log: false, error_callback: ->(_) { UI.user_error!("#{name} is not signed - check the ANDROID_KEYSTORE_* secrets") })
+  if certificate.strip.empty? || certificate.include?("Not a signed jar file")
+    UI.user_error!("#{name} is not signed - check the ANDROID_KEYSTORE_* secrets")
+  end
+  UI.user_error!("#{name} is DEBUG-signed") if certificate.include?("Android Debug")
+  UI.success("#{name} is signed with the release key")
+end
