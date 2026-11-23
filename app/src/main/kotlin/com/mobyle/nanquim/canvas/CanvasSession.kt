@@ -288,7 +288,9 @@ class CanvasSession(
     private val conversionDispatcher = Dispatchers.Default.limitedParallelism(1)
 
     init {
-        scope.launch {
+        // Dispatched, never run in place: on Main.immediate it would start before the properties below (artwork) exist,
+        // which crashed when something outside the activity (the documents provider) created the session first.
+        scope.launch(Dispatchers.Main) {
             snapshotFlow { colorProfile to cmykProfile }.distinctUntilChanged().collect { (rgb, cmyk) ->
                 val conversion =
                     cmyk?.let { withContext(conversionDispatcher) { CmykColors.create(rgb?.icc, it.icc)?.let(::ProfileCmykConversion) } }
