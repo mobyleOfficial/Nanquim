@@ -1651,6 +1651,17 @@
     <string name="settings_confirm_exit">Ask before leaving with Back</string>
     <string name="command_settings_confirm_exit">Ask before leaving with Back</string>
     <string name="settings_ad_choices">Ad choices</string>
+    <string name="settings_gallery_ads">Show the ad in the gallery</string>
+    <string name="settings_gallery_ads_hint">A single banner at the bottom of the gallery helps fund Nanquim. It never appears while you draw.</string>
+    <string name="settings_gallery_ads_pending_off">Ads will not appear the next time you open the app.</string>
+    <string name="settings_gallery_ads_pending_on">The ad will come back the next time you open the app.</string>
+    <string name="command_settings_gallery_ads">Show the ad in the gallery</string>
+    <string name="ads_off_dialog_title">Turn off ads?</string>
+    <string name="ads_off_dialog_body">The gallery banner helps fund the development of Nanquim. If you turn it off, ads will not appear the next time you open the app. You can turn them back on here at any time.</string>
+    <string name="ads_off_dialog_confirm">Turn off</string>
+    <string name="ads_notice_title">How Nanquim is funded</string>
+    <string name="ads_notice_body">Nanquim is free, and ads help fund its development.\n\nThere is only one ad: a small banner at the bottom of the gallery. It never appears while you draw and never interrupts you.\n\nIf you prefer, you can turn it off at any time in Settings › Privacy.</string>
+    <string name="ads_notice_ok">Got it</string>
     <string name="welcome_close">Close</string>
     <string name="welcome_quick_shape_title">QuickShape</string>
     <string name="welcome_quick_shape_body">Draw a line, a circle or a shape and keep the pen still at the end: it turns into a clean shape you can still adjust.</string>

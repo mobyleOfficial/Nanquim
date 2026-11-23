@@ -90,6 +90,7 @@ import com.mobyle.nanquim.ui.brush.BrushEditorScreen
 import com.mobyle.nanquim.ui.canvas.CanvasScreen
 import com.mobyle.nanquim.ui.canvas.canvasSurroundColor
 import com.mobyle.nanquim.ui.common.ExitDialog
+import com.mobyle.nanquim.ui.common.AdsNoticeDialog
 import com.mobyle.nanquim.ui.common.ProvideWindowLayout
 import com.mobyle.nanquim.ui.diagnostics.DiagnosticsScreen
 import com.mobyle.nanquim.ui.diagnostics.LatencyTestScreen
@@ -224,7 +225,10 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             // Consent and ads wait for the introduction to end and the gallery to show, so nothing interrupts a first launch.
             snapshotFlow { !application.help.welcomeVisible && application.navigator.current == AppDestination.Gallery }.first { it }
-            if (application.help.automatic) application.galleryAds.start(this@MainActivity)
+            if (!application.help.automatic) return@launch
+            // The one-time note on ads (shown by NanquimApp) comes before any consent form or banner.
+            if (application.galleryAds.enabled) snapshotFlow { application.appSettings.adsNoticeSeen }.first { it }
+            application.galleryAds.start(this@MainActivity)
         }
     }
 
@@ -526,6 +530,11 @@ private fun NanquimApp(application: NanquimApplication) {
         }
     }
     if (confirmingExit) {
+    if (atGallery && application.galleryAds.enabled && application.help.automatic && !application.help.welcomeVisible &&
+        !application.appSettings.adsNoticeSeen
+    ) {
+        AdsNoticeDialog(onDismiss = application.appSettings::markAdsNoticeSeen)
+    }
         ExitDialog(
             onExit = { dontAskAgain ->
                 confirmingExit = false
@@ -623,6 +632,7 @@ private fun NanquimApp(application: NanquimApplication) {
                 )
             AppDestination.Diagnostics ->
                 DiagnosticsScreen(
+                    adsAvailable = BuildConfig.ADS_ENABLED,
                     collector = application.diagnosticsCollector,
                     recorder = application.stylusObservationRecorder,
                     onBack = navigator::back,

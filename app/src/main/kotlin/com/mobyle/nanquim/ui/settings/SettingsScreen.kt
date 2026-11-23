@@ -78,6 +78,7 @@ fun SettingsScreen(
     onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,
     onOpenDiagnostics: () -> Unit,
+    adsAvailable: Boolean = false,
     onOpenAdChoices: (() -> Unit)? = null,
 ) {
     var storageRefresh by remember { mutableIntStateOf(0) }
@@ -242,7 +243,7 @@ fun SettingsScreen(
                     }
                 }
                 HorizontalDivider()
-                FeedbackSection(appSettings, onCommand, onOpenAdChoices)
+                FeedbackSection(appSettings, onCommand, onOpenAdChoices, adsAvailable)
                 HorizontalDivider()
                 TextButton(
                     onClick = { onCommand(AppCommandIds.SUPPORT_OPEN, JsonObject(emptyMap())) },

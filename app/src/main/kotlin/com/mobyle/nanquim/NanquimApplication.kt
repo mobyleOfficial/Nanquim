@@ -302,7 +302,7 @@ class NanquimApplication : Application() {
 
     val resumeState: ResumeState by lazy { ResumeState(getSharedPreferences(ResumeState.PREFERENCES_NAME, MODE_PRIVATE)) }
 
-    val galleryAds: GalleryAds by lazy { GalleryAds(this) }
+    val galleryAds: GalleryAds by lazy { GalleryAds(this, allowedByUser = appSettings.galleryAdsThisLaunch) }
 
     val reviewPrompt: ReviewPrompt by lazy { ReviewPrompt(getSharedPreferences(ReviewPrompt.PREFERENCES_NAME, MODE_PRIVATE)) }
 

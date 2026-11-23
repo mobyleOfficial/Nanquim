@@ -35,8 +35,10 @@ fun FeedbackSection(
     appSettings: AppSettings,
     onCommand: (String, JsonObject) -> Unit,
     onOpenAdChoices: (() -> Unit)? = null,
+    adsAvailable: Boolean = false,
 ) {
     var reporting by remember { mutableStateOf<FeedbackKind?>(null) }
+    var confirmingAdsOff by remember { mutableStateOf(false) }
     val none = JsonObject(emptyMap())
     Text(stringResource(R.string.settings_feedback_title), style = MaterialTheme.typography.titleMedium)
     TextButton(onClick = { onCommand(FeedbackCommandIds.RATE, none) }) { Text(stringResource(R.string.settings_rate)) }
@@ -60,9 +62,36 @@ fun FeedbackSection(
         Switch(checked = appSettings.usageStatistics, onCheckedChange = null)
     }
     Text(stringResource(R.string.settings_usage_statistics_hint), style = MaterialTheme.typography.bodySmall)
+    if (adsAvailable) {
+        GalleryAdsSwitch(
+            appSettings = appSettings,
+            onChange = { enabled ->
+                if (enabled) {
+                    onCommand(FeedbackCommandIds.GALLERY_ADS, JsonObject(mapOf("enabled" to JsonPrimitive(true))))
+                } else {
+                    confirmingAdsOff = true
+                }
+            },
+        )
+    }
     // Only where the consent form applies (EEA, UK…): elsewhere Android's own ad settings are the place.
     onOpenAdChoices?.let { open -> TextButton(onClick = open) { Text(stringResource(R.string.settings_ad_choices)) } }
     LegalLinks(onCommand)
+
+    if (confirmingAdsOff) {
+        AlertDialog(
+            onDismissRequest = { confirmingAdsOff = false },
+            title = { Text(stringResource(R.string.ads_off_dialog_title)) },
+            text = { Text(stringResource(R.string.ads_off_dialog_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmingAdsOff = false
+                    onCommand(FeedbackCommandIds.GALLERY_ADS, JsonObject(mapOf("enabled" to JsonPrimitive(false))))
+                }) { Text(stringResource(R.string.ads_off_dialog_confirm)) }
+            },
+            dismissButton = { TextButton(onClick = { confirmingAdsOff = false }) { Text(stringResource(android.R.string.cancel)) } },
+        )
+    }
 
     reporting?.let { kind ->
         FeedbackChannelDialog(
@@ -77,6 +106,31 @@ fun FeedbackSection(
             onDismiss = { reporting = null },
         )
     }
+}
+
+/** The saved choice; when it differs from this launch's, a line says it takes effect the next time the app opens. */
+@Composable
+private fun GalleryAdsSwitch(
+    appSettings: AppSettings,
+    onChange: (Boolean) -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .toggleable(value = appSettings.galleryAds, role = Role.Switch, onValueChange = onChange),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(stringResource(R.string.settings_gallery_ads), modifier = Modifier.weight(1f))
+        Switch(checked = appSettings.galleryAds, onCheckedChange = null)
+    }
+    val hint =
+        when {
+            appSettings.galleryAds == appSettings.galleryAdsThisLaunch -> R.string.settings_gallery_ads_hint
+            appSettings.galleryAds -> R.string.settings_gallery_ads_pending_on
+            else -> R.string.settings_gallery_ads_pending_off
+        }
+    Text(stringResource(hint), style = MaterialTheme.typography.bodySmall)
 }
 
 @Composable

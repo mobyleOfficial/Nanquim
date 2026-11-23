@@ -81,6 +81,29 @@ class AppSettings(
         preferences.edit { putBoolean(KEY_CONFIRM_EXIT, enabled) }
     }
 
+    /**
+     * The gallery banner. A change is saved now but applies from the next launch ([galleryAdsThisLaunch]), so the banner
+     * never disappears or appears halfway through a session.
+     */
+    var galleryAds: Boolean by mutableStateOf(preferences.getBoolean(KEY_GALLERY_ADS, true))
+        private set
+
+    val galleryAdsThisLaunch: Boolean = galleryAds
+
+    fun changeGalleryAds(enabled: Boolean) {
+        galleryAds = enabled
+        preferences.edit { putBoolean(KEY_GALLERY_ADS, enabled) }
+    }
+
+    /** The one-time note explaining why the gallery has an ad and how to turn it off. */
+    var adsNoticeSeen: Boolean by mutableStateOf(preferences.getBoolean(KEY_ADS_NOTICE_SEEN, false))
+        private set
+
+    fun markAdsNoticeSeen() {
+        adsNoticeSeen = true
+        preferences.edit { putBoolean(KEY_ADS_NOTICE_SEEN, true) }
+    }
+
     fun changeRenderer(renderer: Renderer) {
         this.renderer = renderer
         preferences.edit { putString(KEY_RENDERER, rendererId(renderer)) }
@@ -95,6 +118,8 @@ class AppSettings(
         private const val KEY_RECORD_TIMELAPSE = "recordTimelapse"
         private const val KEY_USAGE_STATISTICS = "usageStatistics"
         private const val KEY_CONFIRM_EXIT = "confirmExit"
+        private const val KEY_GALLERY_ADS = "galleryAds"
+        private const val KEY_ADS_NOTICE_SEEN = "adsNoticeSeen"
 
         fun rendererId(renderer: Renderer): String =
             when (renderer) {

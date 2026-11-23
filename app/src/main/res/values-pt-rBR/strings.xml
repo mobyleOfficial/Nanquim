@@ -1652,6 +1652,17 @@
     <string name="settings_confirm_exit">Perguntar antes de sair com o botão Voltar</string>
     <string name="command_settings_confirm_exit">Perguntar antes de sair com o botão Voltar</string>
     <string name="settings_ad_choices">Opções de anúncios</string>
+    <string name="settings_gallery_ads">Mostrar o anúncio na galeria</string>
+    <string name="settings_gallery_ads_hint">Um único banner no rodapé da galeria ajuda a financiar o Nanquim. Ele nunca aparece enquanto você desenha.</string>
+    <string name="settings_gallery_ads_pending_off">Os anúncios não vão aparecer na próxima vez que você abrir o app.</string>
+    <string name="settings_gallery_ads_pending_on">O anúncio volta na próxima vez que você abrir o app.</string>
+    <string name="command_settings_gallery_ads">Mostrar o anúncio na galeria</string>
+    <string name="ads_off_dialog_title">Desligar os anúncios?</string>
+    <string name="ads_off_dialog_body">O banner da galeria ajuda a financiar o desenvolvimento do Nanquim. Se você desligar, os anúncios não vão aparecer na próxima vez que você abrir o app. Você pode religá-los aqui quando quiser.</string>
+    <string name="ads_off_dialog_confirm">Desligar</string>
+    <string name="ads_notice_title">Como o Nanquim é financiado</string>
+    <string name="ads_notice_body">O Nanquim é gratuito, e os anúncios ajudam a financiar o seu desenvolvimento.\n\nExiste apenas um anúncio: um pequeno banner no rodapé da galeria. Ele nunca aparece enquanto você desenha e nunca interrompe você.\n\nSe preferir, você pode desligá-lo a qualquer momento em Configurações › Privacidade.</string>
+    <string name="ads_notice_ok">Entendi</string>
     <string name="welcome_close">Fechar</string>
     <string name="welcome_quick_shape_title">QuickShape</string>
     <string name="welcome_quick_shape_body">Desenhe uma linha, um círculo ou uma forma e segure a caneta parada no fim: o traço vira uma forma limpa que ainda dá para ajustar.</string>
