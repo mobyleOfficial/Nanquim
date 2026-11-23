@@ -79,7 +79,7 @@ android {
         // Bumped by one for every Play upload. The deploy workflows pass -PversionCode with the next number after the
         // latest Firebase App Distribution release (never below this one).
         versionCode = providers.gradleProperty("versionCode").orNull?.toInt() ?: 4
-        versionName = "1.1.0"
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Consent testing is for debug builds only; see the AdMob settings above.
         buildConfigField("String", "ADS_TEST_DEVICE_IDS", "\"\"")
