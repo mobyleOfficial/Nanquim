@@ -18,6 +18,7 @@ import com.mobyle.nanquim.data.document.ArtworkStorage
 import com.mobyle.nanquim.data.document.DocumentPersistence
 import com.mobyle.nanquim.data.document.LoadedArtwork
 import com.mobyle.nanquim.data.document.OpenArtwork
+import com.mobyle.nanquim.data.transfer.RgbaImages
 import com.mobyle.nanquim.data.transfer.failureOf
 import com.mobyle.nanquim.document.layer.Background
 import com.mobyle.nanquim.document.layer.DocumentState
@@ -384,7 +385,10 @@ class Gallery(
         val startedAt = SystemClock.elapsedRealtime()
         val state = canvasSession.document
         canvasSession.artwork?.let { open ->
-            val picture = canvasSession.compositePicture(CLOSE_PICTURE_SIDE)?.asImageBitmap()
+            val picture =
+                canvasSession.compositePreview(CLOSE_PICTURE_SIDE)?.let { render ->
+                    RgbaImages.premultipliedToBitmap(render.width, render.height, render.pixels).asImageBitmap()
+                }
             transitions.prepareClose(open.id, canvasSession.canvasRectOnScreen(), picture)
         }
         val saved = closeCanvasAndWait()

@@ -5,7 +5,7 @@ import kotlinx.serialization.json.JsonObject
 
 data class CommandSpec(
     val id: String,
-    val titleRes: Int,
+    val titleKey: TextKey,
     val category: CommandCategory,
     val parameters: List<ParameterSpec> = emptyList(),
     val undoable: Boolean,

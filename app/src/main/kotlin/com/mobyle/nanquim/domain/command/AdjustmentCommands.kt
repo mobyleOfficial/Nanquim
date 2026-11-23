@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
@@ -9,6 +8,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.canvas.adjust.AdjustmentEditor
 import com.mobyle.nanquim.domain.canvas.adjust.AdjustmentMode
@@ -54,40 +54,40 @@ private val requiresDocument: (com.mobyle.nanquim.document.command.AppState) -> 
     if (state.hasOpenDocument) Availability.Enabled else Availability.Disabled("No open document")
 }
 
-private fun AdjustmentFilter.previewTitle(): Int =
+private fun AdjustmentFilter.previewTitle(): TextKey =
     when (this) {
-        AdjustmentFilter.HueSaturationBrightness -> R.string.command_adjust_hue_saturation_brightness_preview
-        AdjustmentFilter.ColorBalance -> R.string.command_adjust_color_balance_preview
-        AdjustmentFilter.Curves -> R.string.command_adjust_curves_preview
-        AdjustmentFilter.GradientMap -> R.string.command_adjust_gradient_map_preview
-        AdjustmentFilter.GaussianBlur -> R.string.command_adjust_gaussian_blur_preview
-        AdjustmentFilter.MotionBlur -> R.string.command_adjust_motion_blur_preview
-        AdjustmentFilter.PerspectiveBlur -> R.string.command_adjust_perspective_blur_preview
-        AdjustmentFilter.Sharpen -> R.string.command_adjust_sharpen_preview
-        AdjustmentFilter.Noise -> R.string.command_adjust_noise_preview
-        AdjustmentFilter.Bloom -> R.string.command_adjust_bloom_preview
-        AdjustmentFilter.Glitch -> R.string.command_adjust_glitch_preview
-        AdjustmentFilter.Halftone -> R.string.command_adjust_halftone_preview
-        AdjustmentFilter.ChromaticAberration -> R.string.command_adjust_chromatic_aberration_preview
-        AdjustmentFilter.Liquify -> R.string.command_liquify_open
+        AdjustmentFilter.HueSaturationBrightness -> TextKey("command_adjust_hue_saturation_brightness_preview")
+        AdjustmentFilter.ColorBalance -> TextKey("command_adjust_color_balance_preview")
+        AdjustmentFilter.Curves -> TextKey("command_adjust_curves_preview")
+        AdjustmentFilter.GradientMap -> TextKey("command_adjust_gradient_map_preview")
+        AdjustmentFilter.GaussianBlur -> TextKey("command_adjust_gaussian_blur_preview")
+        AdjustmentFilter.MotionBlur -> TextKey("command_adjust_motion_blur_preview")
+        AdjustmentFilter.PerspectiveBlur -> TextKey("command_adjust_perspective_blur_preview")
+        AdjustmentFilter.Sharpen -> TextKey("command_adjust_sharpen_preview")
+        AdjustmentFilter.Noise -> TextKey("command_adjust_noise_preview")
+        AdjustmentFilter.Bloom -> TextKey("command_adjust_bloom_preview")
+        AdjustmentFilter.Glitch -> TextKey("command_adjust_glitch_preview")
+        AdjustmentFilter.Halftone -> TextKey("command_adjust_halftone_preview")
+        AdjustmentFilter.ChromaticAberration -> TextKey("command_adjust_chromatic_aberration_preview")
+        AdjustmentFilter.Liquify -> TextKey("command_liquify_open")
     }
 
-private fun AdjustmentFilter.applyTitle(): Int =
+private fun AdjustmentFilter.applyTitle(): TextKey =
     when (this) {
-        AdjustmentFilter.HueSaturationBrightness -> R.string.command_adjust_hue_saturation_brightness_apply
-        AdjustmentFilter.ColorBalance -> R.string.command_adjust_color_balance_apply
-        AdjustmentFilter.Curves -> R.string.command_adjust_curves_apply
-        AdjustmentFilter.GradientMap -> R.string.command_adjust_gradient_map_apply
-        AdjustmentFilter.GaussianBlur -> R.string.command_adjust_gaussian_blur_apply
-        AdjustmentFilter.MotionBlur -> R.string.command_adjust_motion_blur_apply
-        AdjustmentFilter.PerspectiveBlur -> R.string.command_adjust_perspective_blur_apply
-        AdjustmentFilter.Sharpen -> R.string.command_adjust_sharpen_apply
-        AdjustmentFilter.Noise -> R.string.command_adjust_noise_apply
-        AdjustmentFilter.Bloom -> R.string.command_adjust_bloom_apply
-        AdjustmentFilter.Glitch -> R.string.command_adjust_glitch_apply
-        AdjustmentFilter.Halftone -> R.string.command_adjust_halftone_apply
-        AdjustmentFilter.ChromaticAberration -> R.string.command_adjust_chromatic_aberration_apply
-        AdjustmentFilter.Liquify -> R.string.command_liquify_apply
+        AdjustmentFilter.HueSaturationBrightness -> TextKey("command_adjust_hue_saturation_brightness_apply")
+        AdjustmentFilter.ColorBalance -> TextKey("command_adjust_color_balance_apply")
+        AdjustmentFilter.Curves -> TextKey("command_adjust_curves_apply")
+        AdjustmentFilter.GradientMap -> TextKey("command_adjust_gradient_map_apply")
+        AdjustmentFilter.GaussianBlur -> TextKey("command_adjust_gaussian_blur_apply")
+        AdjustmentFilter.MotionBlur -> TextKey("command_adjust_motion_blur_apply")
+        AdjustmentFilter.PerspectiveBlur -> TextKey("command_adjust_perspective_blur_apply")
+        AdjustmentFilter.Sharpen -> TextKey("command_adjust_sharpen_apply")
+        AdjustmentFilter.Noise -> TextKey("command_adjust_noise_apply")
+        AdjustmentFilter.Bloom -> TextKey("command_adjust_bloom_apply")
+        AdjustmentFilter.Glitch -> TextKey("command_adjust_glitch_apply")
+        AdjustmentFilter.Halftone -> TextKey("command_adjust_halftone_apply")
+        AdjustmentFilter.ChromaticAberration -> TextKey("command_adjust_chromatic_aberration_apply")
+        AdjustmentFilter.Liquify -> TextKey("command_liquify_apply")
     }
 
 private val CURVE_NAMES = CurveChannel.entries.map { it.name.lowercase(Locale.ROOT) }
@@ -169,7 +169,7 @@ fun registerAdjustmentCommands(
         registry.register(
             CommandSpec(
                 id = AdjustmentCommandIds.preview(filter),
-                titleRes = filter.previewTitle(),
+                titleKey = filter.previewTitle(),
                 category = CommandCategory.Adjust,
                 parameters = parameters,
                 undoable = false,
@@ -179,7 +179,7 @@ fun registerAdjustmentCommands(
         registry.register(
             CommandSpec(
                 id = AdjustmentCommandIds.apply(filter),
-                titleRes = filter.applyTitle(),
+                titleKey = filter.applyTitle(),
                 category = CommandCategory.Adjust,
                 parameters = parameters,
                 undoable = true,
@@ -194,14 +194,14 @@ fun registerAdjustmentCommands(
 
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         undoable: Boolean = false,
         action: (AdjustmentEditor, JsonObject) -> Unit,
     ) = registry.register(
         CommandSpec(
             id = id,
-            titleRes = titleRes,
+            titleKey = titleKey,
             category = CommandCategory.Adjust,
             parameters = parameters,
             undoable = undoable,
@@ -224,7 +224,7 @@ fun registerAdjustmentCommands(
 
     register(
         AdjustmentCommandIds.SET_PARAMETER,
-        R.string.command_adjust_set_parameter,
+        TextKey("command_adjust_set_parameter"),
         listOf(ParameterSpec("name", ParameterType.String), ParameterSpec("value", ParameterType.Number)),
     ) { editor, arguments ->
         val index = editor.filter.parameterNames.indexOf(arguments.getValue("name").jsonPrimitive.content)
@@ -247,20 +247,20 @@ fun registerAdjustmentCommands(
     }
     register(
         AdjustmentCommandIds.SELECT_PARAMETER,
-        R.string.command_adjust_select_parameter,
+        TextKey("command_adjust_select_parameter"),
         listOf(ParameterSpec("name", ParameterType.String)),
     ) { editor, arguments ->
         editor.selectMainParameter(editor.filter.parameterNames.indexOf(arguments.getValue("name").jsonPrimitive.content))
     }
     register(
         AdjustmentCommandIds.COMPARE,
-        R.string.adjust_preview,
+        TextKey("adjust_preview"),
         listOf(ParameterSpec("enabled", ParameterType.Boolean)),
     ) { editor, arguments -> editor.comparing = arguments.getValue("enabled").jsonPrimitive.boolean }
-    register(AdjustmentCommandIds.RESET, R.string.adjust_reset) { _, _ -> canvas.resetAdjustment() }
+    register(AdjustmentCommandIds.RESET, TextKey("adjust_reset")) { _, _ -> canvas.resetAdjustment() }
     register(
         AdjustmentCommandIds.SET_CURVE,
-        R.string.command_adjust_set_curve,
+        TextKey("command_adjust_set_curve"),
         listOf(
             ParameterSpec("curve", ParameterType.Enumeration, allowedValues = CURVE_NAMES),
             ParameterSpec("points", ParameterType.Array),
@@ -272,7 +272,7 @@ fun registerAdjustmentCommands(
     }
     register(
         AdjustmentCommandIds.SET_GRADIENT,
-        R.string.command_adjust_set_gradient,
+        TextKey("command_adjust_set_gradient"),
         listOf(ParameterSpec("gradientId", ParameterType.String)),
     ) { editor, arguments ->
         require(editor.filter == AdjustmentFilter.GradientMap) { "The open adjustment is not Gradient Map" }
@@ -282,7 +282,7 @@ fun registerAdjustmentCommands(
     }
     register(
         LIQUIFY_STROKE_PATH,
-        R.string.command_liquify_stroke_path,
+        TextKey("command_liquify_stroke_path"),
         listOf(ParameterSpec("samples", ParameterType.Array)),
     ) { editor, arguments ->
         require(editor.filter == AdjustmentFilter.Liquify) { "The open adjustment is not Liquify" }
@@ -295,12 +295,12 @@ fun registerAdjustmentCommands(
         require(samples.isNotEmpty()) { "No samples" }
         canvas.liquifyPath(samples.toFloatArray())
     }
-    register(AdjustmentCommandIds.UNDO, R.string.adjust_undo) { _, _ -> canvas.undoAdjustment() }
-    register(AdjustmentCommandIds.REDO, R.string.adjust_redo) { _, _ -> canvas.redoAdjustment() }
+    register(AdjustmentCommandIds.UNDO, TextKey("adjust_undo")) { _, _ -> canvas.undoAdjustment() }
+    register(AdjustmentCommandIds.REDO, TextKey("adjust_redo")) { _, _ -> canvas.redoAdjustment() }
     registry.register(
         CommandSpec(
             id = AdjustmentCommandIds.COMMIT,
-            titleRes = R.string.adjust_apply,
+            titleKey = TextKey("adjust_apply"),
             category = CommandCategory.Adjust,
             undoable = true,
             availability = requiresDocument,
@@ -313,7 +313,7 @@ fun registerAdjustmentCommands(
     registry.register(
         CommandSpec(
             id = AdjustmentCommandIds.CANCEL,
-            titleRes = R.string.adjust_cancel,
+            titleKey = TextKey("adjust_cancel"),
             category = CommandCategory.Adjust,
             undoable = false,
             availability = requiresDocument,

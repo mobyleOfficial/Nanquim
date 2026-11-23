@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.history.HistoryEntry
 import com.mobyle.nanquim.document.layer.Background
 import com.mobyle.nanquim.document.layer.BlendMode
@@ -108,7 +108,7 @@ fun registerDocumentCommands(
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         category: CommandCategory = CommandCategory.Layer,
         parameters: List<ParameterSpec> = emptyList(),
         undoable: Boolean = true,
@@ -116,7 +116,7 @@ fun registerDocumentCommands(
     ) = registry.register(
         CommandSpec(
             id = id,
-            titleRes = titleRes,
+            titleKey = titleKey,
             category = category,
             parameters = parameters,
             undoable = undoable,
@@ -142,15 +142,15 @@ fun registerDocumentCommands(
 
     fun id(value: Int) = buildJsonObject { put("layerId", value) }
 
-    register(DocumentCommandIds.UNDO, R.string.command_edit_undo, CommandCategory.Canvas, undoable = false) { _, _ ->
+    register(DocumentCommandIds.UNDO, TextKey("command_edit_undo"), CommandCategory.Canvas, undoable = false) { _, _ ->
         canvas.undo()?.toResult()
     }
-    register(DocumentCommandIds.REDO, R.string.command_edit_redo, CommandCategory.Canvas, undoable = false) { _, _ ->
+    register(DocumentCommandIds.REDO, TextKey("command_edit_redo"), CommandCategory.Canvas, undoable = false) { _, _ ->
         canvas.redo()?.toResult()
     }
     register(
         DocumentCommandIds.LAYERS_PANEL,
-        R.string.command_view_layers_panel,
+        TextKey("command_view_layers_panel"),
         CommandCategory.View,
         parameters = listOf(ParameterSpec("visible", ParameterType.Boolean, defaultValue = JsonNull)),
         undoable = false,
@@ -161,7 +161,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.EYEDROPPER_ARM,
-        R.string.command_color_eyedropper_arm,
+        TextKey("command_color_eyedropper_arm"),
         CommandCategory.Color,
         parameters = listOf(ParameterSpec("armed", ParameterType.Boolean, defaultValue = JsonNull)),
         undoable = false,
@@ -172,7 +172,7 @@ fun registerDocumentCommands(
     registry.register(
         CommandSpec(
             id = DocumentCommandIds.EYEDROPPER,
-            titleRes = R.string.command_color_eyedropper,
+            titleKey = TextKey("command_color_eyedropper"),
             category = CommandCategory.Color,
             parameters =
                 listOf(
@@ -200,21 +200,21 @@ fun registerDocumentCommands(
             },
         )
     }
-    register(DocumentCommandIds.LAYER_NEW, R.string.command_layer_new) { session, _ -> id(session.newLayer()) }
+    register(DocumentCommandIds.LAYER_NEW, TextKey("command_layer_new")) { session, _ -> id(session.newLayer()) }
     register(
         DocumentCommandIds.LAYER_DUPLICATE,
-        R.string.command_layer_duplicate,
+        TextKey("command_layer_duplicate"),
         parameters = listOf(optionalLayerId),
     ) { session, arguments ->
         id(session.duplicate(session.target(arguments)))
     }
-    register(DocumentCommandIds.LAYER_DELETE, R.string.command_layer_delete, parameters = listOf(layerIds)) { session, arguments ->
+    register(DocumentCommandIds.LAYER_DELETE, TextKey("command_layer_delete"), parameters = listOf(layerIds)) { session, arguments ->
         session.delete(session.targets(arguments))
         null
     }
     register(
         DocumentCommandIds.LAYER_RENAME,
-        R.string.command_layer_rename,
+        TextKey("command_layer_rename"),
         parameters = listOf(layerId, ParameterSpec("name", ParameterType.String)),
     ) { session, arguments ->
         session.rename(arguments.int("layerId"), arguments.getValue("name").jsonPrimitive.content)
@@ -222,7 +222,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.LAYER_SET_OPACITY,
-        R.string.command_layer_set_opacity,
+        TextKey("command_layer_set_opacity"),
         parameters =
             listOf(
                 layerId,
@@ -235,7 +235,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.LAYER_SET_BLEND,
-        R.string.command_layer_set_blend,
+        TextKey("command_layer_set_blend"),
         parameters =
             listOf(
                 layerId,
@@ -248,38 +248,38 @@ fun registerDocumentCommands(
 
     fun registerFlag(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         name: String,
         apply: DocumentSession.(Int, Boolean) -> Unit,
-    ) = register(id, titleRes, parameters = listOf(layerId, ParameterSpec(name, ParameterType.Boolean))) { session, arguments ->
+    ) = register(id, titleKey, parameters = listOf(layerId, ParameterSpec(name, ParameterType.Boolean))) { session, arguments ->
         session.apply(arguments.int("layerId"), arguments.boolean(name))
         null
     }
     registerFlag(
         DocumentCommandIds.LAYER_SET_HIDDEN,
-        R.string.command_layer_set_hidden,
+        TextKey("command_layer_set_hidden"),
         "hidden",
     ) { layer, value -> setHidden(layer, value) }
-    registerFlag(DocumentCommandIds.LAYER_LOCK, R.string.command_layer_lock, "locked") { layer, value -> setLocked(layer, value) }
+    registerFlag(DocumentCommandIds.LAYER_LOCK, TextKey("command_layer_lock"), "locked") { layer, value -> setLocked(layer, value) }
     registerFlag(
         DocumentCommandIds.LAYER_ALPHA_LOCK,
-        R.string.command_layer_alpha_lock,
+        TextKey("command_layer_alpha_lock"),
         "enabled",
     ) { layer, value -> setAlphaLock(layer, value) }
     registerFlag(
         DocumentCommandIds.LAYER_SET_ASSISTED,
-        R.string.command_layer_set_assisted,
+        TextKey("command_layer_set_assisted"),
         "enabled",
     ) { layer, value -> setAssisted(layer, value) }
     registerFlag(
         DocumentCommandIds.LAYER_SET_PRIVATE,
-        R.string.command_layer_set_private,
+        TextKey("command_layer_set_private"),
         "enabled",
     ) { layer, value -> setPrivate(layer, value) }
     registry.register(
         CommandSpec(
             id = DocumentCommandIds.LAYER_SELECT_AT,
-            titleRes = R.string.command_layer_select_at,
+            titleKey = TextKey("command_layer_select_at"),
             category = CommandCategory.Layer,
             parameters = listOf(ParameterSpec("x", ParameterType.Number), ParameterSpec("y", ParameterType.Number)),
             undoable = false,
@@ -296,27 +296,27 @@ fun registerDocumentCommands(
     }
     registerFlag(
         DocumentCommandIds.LAYER_CLIPPING,
-        R.string.command_layer_clipping,
+        TextKey("command_layer_clipping"),
         "enabled",
     ) { layer, value -> setClipping(layer, value) }
     registerFlag(
         DocumentCommandIds.LAYER_SET_REFERENCE,
-        R.string.command_layer_set_reference,
+        TextKey("command_layer_set_reference"),
         "enabled",
     ) { layer, value -> setReference(layer, value) }
     registerFlag(
         DocumentCommandIds.LAYER_MASK_SET_ENABLED,
-        R.string.command_layer_mask_set_enabled,
+        TextKey("command_layer_mask_set_enabled"),
         "enabled",
     ) { layer, value -> setMaskEnabled(layer, value) }
     registerFlag(
         DocumentCommandIds.LAYER_MASK_SET_INVERTED,
-        R.string.command_layer_mask_set_inverted,
+        TextKey("command_layer_mask_set_inverted"),
         "inverted",
     ) { layer, value -> setMaskInverted(layer, value) }
     register(
         DocumentCommandIds.LAYER_SET_COLLAPSED,
-        R.string.command_layer_set_collapsed,
+        TextKey("command_layer_set_collapsed"),
         parameters = listOf(layerId, ParameterSpec("collapsed", ParameterType.Boolean)),
         undoable = false,
     ) { session, arguments ->
@@ -326,14 +326,14 @@ fun registerDocumentCommands(
 
     register(
         DocumentCommandIds.LAYER_MASK_ADD,
-        R.string.command_layer_mask_add,
+        TextKey("command_layer_mask_add"),
         parameters = listOf(optionalLayerId),
     ) { session, arguments ->
         buildJsonObject { put("maskId", session.addMask(session.target(arguments))) }
     }
     register(
         DocumentCommandIds.LAYER_MASK_DELETE,
-        R.string.command_layer_mask_delete,
+        TextKey("command_layer_mask_delete"),
         parameters = listOf(optionalLayerId),
     ) { session, arguments ->
         session.deleteMask(session.target(arguments))
@@ -341,7 +341,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.LAYER_MASK_APPLY,
-        R.string.command_layer_mask_apply,
+        TextKey("command_layer_mask_apply"),
         parameters = listOf(optionalLayerId),
     ) { session, arguments ->
         session.applyMask(session.target(arguments))
@@ -349,33 +349,37 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.LAYER_MERGE_DOWN,
-        R.string.command_layer_merge_down,
+        TextKey("command_layer_merge_down"),
         parameters = listOf(optionalLayerId),
     ) { session, arguments ->
         session.mergeDown(session.target(arguments))
         null
     }
-    register(DocumentCommandIds.LAYER_MERGE, R.string.command_layer_merge, parameters = listOf(layerIds)) { session, arguments ->
+    register(DocumentCommandIds.LAYER_MERGE, TextKey("command_layer_merge"), parameters = listOf(layerIds)) { session, arguments ->
         session.mergeLayers(session.targets(arguments))
         null
     }
     register(
         DocumentCommandIds.LAYER_COMBINE_DOWN,
-        R.string.command_layer_combine_down,
+        TextKey("command_layer_combine_down"),
         parameters = listOf(optionalLayerId),
     ) { session, arguments ->
         id(session.combineDown(session.target(arguments)))
     }
-    register(DocumentCommandIds.LAYER_GROUP, R.string.command_layer_group, parameters = listOf(layerIds)) { session, arguments ->
+    register(DocumentCommandIds.LAYER_GROUP, TextKey("command_layer_group"), parameters = listOf(layerIds)) { session, arguments ->
         id(session.group(session.targets(arguments)))
     }
-    register(DocumentCommandIds.LAYER_UNGROUP, R.string.command_layer_ungroup, parameters = listOf(optionalLayerId)) { session, arguments ->
+    register(
+        DocumentCommandIds.LAYER_UNGROUP,
+        TextKey("command_layer_ungroup"),
+        parameters = listOf(optionalLayerId),
+    ) { session, arguments ->
         session.ungroup(session.target(arguments))
         null
     }
     register(
         DocumentCommandIds.LAYER_FLATTEN,
-        R.string.command_layer_flatten,
+        TextKey("command_layer_flatten"),
         parameters = listOf(ParameterSpec("groupId", ParameterType.Integer, defaultValue = JsonNull, minimum = 1.0)),
     ) { session, arguments ->
         val groupId = arguments.optionalInt("groupId")
@@ -384,7 +388,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.LAYER_FILL,
-        R.string.command_layer_fill,
+        TextKey("command_layer_fill"),
         parameters = listOf(optionalLayerId, ParameterSpec("color", ParameterType.Array, defaultValue = JsonNull)),
     ) { session, arguments ->
         val color =
@@ -402,39 +406,39 @@ fun registerDocumentCommands(
         if (color == null) canvas.recordColorUse()
         null
     }
-    register(DocumentCommandIds.EDIT_COPY, R.string.command_edit_copy, undoable = false) { session, _ ->
+    register(DocumentCommandIds.EDIT_COPY, TextKey("command_edit_copy"), undoable = false) { session, _ ->
         session.copy()
         null
     }
-    register(DocumentCommandIds.EDIT_COPY_MERGED, R.string.command_edit_copy_merged, undoable = false) { session, _ ->
+    register(DocumentCommandIds.EDIT_COPY_MERGED, TextKey("command_edit_copy_merged"), undoable = false) { session, _ ->
         session.copy(merged = true)
         null
     }
-    register(DocumentCommandIds.EDIT_CUT, R.string.command_edit_cut) { session, _ ->
+    register(DocumentCommandIds.EDIT_CUT, TextKey("command_edit_cut")) { session, _ ->
         session.cut()
         null
     }
-    register(DocumentCommandIds.EDIT_PASTE, R.string.command_edit_paste) { session, _ ->
+    register(DocumentCommandIds.EDIT_PASTE, TextKey("command_edit_paste")) { session, _ ->
         buildJsonObject { put("layerId", session.paste()) }
     }
-    register(DocumentCommandIds.SELECTION_COPY_PASTE, R.string.command_selection_copy_paste, CommandCategory.Selection) { session, _ ->
+    register(DocumentCommandIds.SELECTION_COPY_PASTE, TextKey("command_selection_copy_paste"), CommandCategory.Selection) { session, _ ->
         buildJsonObject { put("layerId", session.copyToNewLayer()) }
     }
-    register(DocumentCommandIds.SELECTION_ALL, R.string.command_selection_all, CommandCategory.Selection) { session, _ ->
+    register(DocumentCommandIds.SELECTION_ALL, TextKey("command_selection_all"), CommandCategory.Selection) { session, _ ->
         session.selectAll()
         null
     }
-    register(DocumentCommandIds.SELECTION_CLEAR, R.string.command_selection_clear, CommandCategory.Selection) { session, _ ->
+    register(DocumentCommandIds.SELECTION_CLEAR, TextKey("command_selection_clear"), CommandCategory.Selection) { session, _ ->
         session.deselect()
         null
     }
-    register(DocumentCommandIds.SELECTION_INVERT, R.string.command_selection_invert, CommandCategory.Selection) { session, _ ->
+    register(DocumentCommandIds.SELECTION_INVERT, TextKey("command_selection_invert"), CommandCategory.Selection) { session, _ ->
         session.invertSelection()
         null
     }
     register(
         DocumentCommandIds.SELECTION_CONTENTS,
-        R.string.command_selection_contents,
+        TextKey("command_selection_contents"),
         CommandCategory.Selection,
         parameters = listOf(optionalLayerId),
     ) { session, arguments ->
@@ -443,7 +447,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.SELECTION_SAVE,
-        R.string.command_selection_save,
+        TextKey("command_selection_save"),
         CommandCategory.Selection,
         parameters = listOf(ParameterSpec("name", ParameterType.String, defaultValue = JsonNull)),
     ) { session, arguments ->
@@ -453,7 +457,7 @@ fun registerDocumentCommands(
     val savedSelectionId = ParameterSpec("selectionId", ParameterType.Integer)
     register(
         DocumentCommandIds.SELECTION_LOAD,
-        R.string.command_selection_load,
+        TextKey("command_selection_load"),
         CommandCategory.Selection,
         parameters = listOf(savedSelectionId),
     ) { session, arguments ->
@@ -462,24 +466,24 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.SELECTION_DELETE_SAVED,
-        R.string.command_selection_delete_saved,
+        TextKey("command_selection_delete_saved"),
         CommandCategory.Selection,
         parameters = listOf(savedSelectionId),
     ) { session, arguments ->
         session.deleteSavedSelection(arguments.int("selectionId"))
         null
     }
-    register(DocumentCommandIds.LAYER_CLEAR, R.string.command_layer_clear, parameters = listOf(optionalLayerId)) { session, arguments ->
+    register(DocumentCommandIds.LAYER_CLEAR, TextKey("command_layer_clear"), parameters = listOf(optionalLayerId)) { session, arguments ->
         session.clear(arguments.optionalInt("layerId"))
         null
     }
-    register(DocumentCommandIds.LAYER_INVERT, R.string.command_layer_invert, parameters = listOf(optionalLayerId)) { session, arguments ->
+    register(DocumentCommandIds.LAYER_INVERT, TextKey("command_layer_invert"), parameters = listOf(optionalLayerId)) { session, arguments ->
         session.invert(arguments.optionalInt("layerId"))
         null
     }
     register(
         DocumentCommandIds.LAYER_SELECT,
-        R.string.command_layer_select,
+        TextKey("command_layer_select"),
         parameters = listOf(layerId, ParameterSpec("mask", ParameterType.Boolean, defaultValue = JsonPrimitive(false))),
         undoable = false,
     ) { session, arguments ->
@@ -488,7 +492,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.LAYER_TOGGLE_SELECTED,
-        R.string.command_layer_toggle_selected,
+        TextKey("command_layer_toggle_selected"),
         parameters = listOf(layerId),
         undoable = false,
     ) { session, arguments ->
@@ -497,7 +501,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.LAYER_SOLO,
-        R.string.command_layer_solo,
+        TextKey("command_layer_solo"),
         parameters = listOf(optionalLayerId),
         undoable = false,
     ) { session, arguments ->
@@ -506,7 +510,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.LAYER_MOVE,
-        R.string.command_layer_move,
+        TextKey("command_layer_move"),
         parameters =
             listOf(
                 layerId,
@@ -519,7 +523,7 @@ fun registerDocumentCommands(
     }
     register(
         DocumentCommandIds.CANVAS_SET_BACKGROUND,
-        R.string.command_canvas_set_background,
+        TextKey("command_canvas_set_background"),
         CommandCategory.Canvas,
         parameters =
             listOf(

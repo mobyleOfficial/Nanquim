@@ -17,6 +17,7 @@ import com.mobyle.nanquim.document.reference.ReferenceMode
 import com.mobyle.nanquim.document.reference.ReferenceSettings
 import com.mobyle.nanquim.document.reference.ReferenceView
 import com.mobyle.nanquim.domain.canvas.SrgbColor
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import com.mobyle.nanquim.engine.Engine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import java.nio.ByteBuffer
 
 class ReferenceWindowState(
     private val engine: Engine,
@@ -76,15 +78,15 @@ class ReferenceWindowState(
     fun changeView(view: ReferenceView) = change(settings.withView(view))
 
     suspend fun importImage(
-        contentResolver: ContentResolver,
-        uri: Uri,
-    ): Result<Bitmap> {
+        files: ExternalFiles,
+        uri: String,
+    ): Result<Unit> {
         val serial = documentSerial
         val folder = artwork?.folder
         val result =
             withContext(Dispatchers.IO) {
                 runCatching {
-                    val bitmap = decode(contentResolver, uri)
+                    val bitmap = decode(files, uri)
                     if (folder != null) writeImage(folder, bitmap)
                     bitmap
                 }
@@ -94,7 +96,7 @@ class ReferenceWindowState(
             image = bitmap
             change(settings.copy(visible = true, mode = ReferenceMode.Image, imageView = ReferenceView(), hasImage = folder != null))
         }
-        return result
+        return result.map { }
     }
 
     fun imageColor(
@@ -146,10 +148,11 @@ class ReferenceWindowState(
         fun imageFile(folder: File) = File(folder, IMAGE_PATH)
 
         private fun decode(
-            contentResolver: ContentResolver,
-            uri: Uri,
-        ): Bitmap =
-            ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri)) { decoder, info, _ ->
+            files: ExternalFiles,
+            uri: String,
+        ): Bitmap {
+            val bytes = files.openInput(uri)?.use { it.readBytes() } ?: throw IOException("Cannot read $uri")
+            return ImageDecoder.decodeBitmap(ImageDecoder.createSource(ByteBuffer.wrap(bytes))) { decoder, info, _ ->
                 val longer = maxOf(info.size.width, info.size.height)
                 if (longer > MAXIMUM_IMAGE_SIDE) {
                     val scale = MAXIMUM_IMAGE_SIDE.toDouble() / longer
@@ -158,6 +161,7 @@ class ReferenceWindowState(
                 decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
                 decoder.setTargetColorSpace(ColorSpace.get(ColorSpace.Named.SRGB))
             }
+        }
 
         private fun writeImage(
             folder: File,

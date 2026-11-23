@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
 }
 
 val firebaseConfigured = file("google-services.json").exists()
@@ -217,18 +216,21 @@ dependencies {
     implementation(libs.play.review.ktx)
     implementation(libs.play.services.ads)
     implementation(libs.user.messaging.platform)
-    implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose.viewmodel)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     ksp(libs.androidx.room.compiler)
-    ksp(libs.hilt.compiler)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit.jupiter)
+    testImplementation(platform(libs.koin.bom))
+    testImplementation(libs.koin.test)
     testRuntimeOnly(libs.junit.platform.launcher)
 
     androidTestImplementation(libs.androidx.test.ext.junit)

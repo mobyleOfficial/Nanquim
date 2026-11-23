@@ -1,5 +1,4 @@
 package com.mobyle.nanquim.presentation.canvas
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -18,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
@@ -26,10 +24,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.core.automation.ControlChannel
-import com.mobyle.nanquim.di.AppEntryPoint
+import com.mobyle.nanquim.core.automation.ControlChannelHost
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.command.CanvasCommandIds
 import com.mobyle.nanquim.domain.command.DocumentCommandIds
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -106,7 +105,7 @@ fun DebugPanel(
                 OutlinedButton(
                     onClick = { onCommand(CanvasCommandIds.VIEW_FLIP, emptyMap()) },
                 ) { Text(stringResource(R.string.command_view_flip)) }
-                AppEntryPoint.from(LocalContext.current).controlChannelHost().channel?.let { channel ->
+                koinInject<ControlChannelHost>().channel?.let { channel ->
                     Text(stringResource(R.string.debug_control_channel, ControlChannel.SOCKET_NAME, channel.token))
                 }
                 OutlinedButton(onClick = { onCommand(CanvasCommandIds.DEBUG_CAMERA_TOUR, emptyMap()) }) {

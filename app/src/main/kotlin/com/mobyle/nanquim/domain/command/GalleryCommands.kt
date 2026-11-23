@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.core.navigation.AppDestination
 import com.mobyle.nanquim.core.navigation.AppNavigator
 import com.mobyle.nanquim.data.color.ColorProfileLibrary
@@ -17,6 +16,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.layer.Background
 import com.mobyle.nanquim.document.layer.PixelFormat
 import com.mobyle.nanquim.document.layer.RgbaColor
@@ -87,12 +87,12 @@ fun registerGalleryCommands(
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         availability: (AppState) -> Availability = { Availability.Enabled },
         handler: suspend (JsonObject) -> CommandResult,
     ) = registry.register(
-        CommandSpec(id, titleRes, CommandCategory.Gallery, parameters, undoable = false, availability = availability),
+        CommandSpec(id, titleKey, CommandCategory.Gallery, parameters, undoable = false, availability = availability),
     ) { _, arguments ->
         try {
             handler(arguments)
@@ -103,14 +103,14 @@ fun registerGalleryCommands(
 
     val idsParameter = ParameterSpec("ids", ParameterType.Array)
 
-    register(GalleryCommandIds.NEW_CANVAS_SCREEN, R.string.command_gallery_new_canvas_open) {
+    register(GalleryCommandIds.NEW_CANVAS_SCREEN, TextKey("command_gallery_new_canvas_open")) {
         navigator.open(AppDestination.NewCanvas)
         CommandResult.Success()
     }
 
     register(
         GalleryCommandIds.NEW_CANVAS,
-        R.string.command_gallery_new_canvas,
+        TextKey("command_gallery_new_canvas"),
         listOf(
             ParameterSpec("width", ParameterType.Number, minimum = 0.001),
             ParameterSpec("height", ParameterType.Number, minimum = 0.001),
@@ -176,12 +176,12 @@ fun registerGalleryCommands(
         CommandResult.Success(buildJsonObject { put("id", id) })
     }
 
-    register(GalleryCommandIds.OPEN, R.string.command_gallery_open, listOf(ParameterSpec("id", ParameterType.String))) { arguments ->
+    register(GalleryCommandIds.OPEN, TextKey("command_gallery_open"), listOf(ParameterSpec("id", ParameterType.String))) { arguments ->
         gallery.open(arguments.string("id"))
         CommandResult.Success()
     }
 
-    register(GalleryCommandIds.CLOSE, R.string.command_gallery_close) {
+    register(GalleryCommandIds.CLOSE, TextKey("command_gallery_close")) {
         gallery.closeCanvas()
         CommandResult.Success()
     }
@@ -189,7 +189,7 @@ fun registerGalleryCommands(
     registry.register(
         CommandSpec(
             GalleryCommandIds.SAVE,
-            R.string.command_document_save,
+            TextKey("command_document_save"),
             CommandCategory.Canvas,
             undoable = false,
             availability = requiresCanvas,
@@ -207,19 +207,19 @@ fun registerGalleryCommands(
         }
     }
 
-    register(GalleryCommandIds.DUPLICATE, R.string.command_gallery_duplicate, listOf(idsParameter)) { arguments ->
+    register(GalleryCommandIds.DUPLICATE, TextKey("command_gallery_duplicate"), listOf(idsParameter)) { arguments ->
         val created = gallery.duplicate(arguments.ids("ids"), copyName)
         CommandResult.Success(buildJsonObject { putJsonArray("ids") { created.forEach { add(JsonPrimitive(it)) } } })
     }
 
-    register(GalleryCommandIds.DELETE, R.string.command_gallery_delete, listOf(idsParameter)) { arguments ->
+    register(GalleryCommandIds.DELETE, TextKey("command_gallery_delete"), listOf(idsParameter)) { arguments ->
         gallery.delete(arguments.ids("ids"))
         CommandResult.Success()
     }
 
     register(
         GalleryCommandIds.RENAME,
-        R.string.command_gallery_rename,
+        TextKey("command_gallery_rename"),
         listOf(ParameterSpec("id", ParameterType.String), ParameterSpec("name", ParameterType.String)),
     ) { arguments ->
         gallery.rename(arguments.string("id"), arguments.string("name"))
@@ -228,7 +228,7 @@ fun registerGalleryCommands(
 
     register(
         GalleryCommandIds.STACK,
-        R.string.command_gallery_stack,
+        TextKey("command_gallery_stack"),
         listOf(idsParameter, ParameterSpec("name", ParameterType.String, JsonNull)),
     ) { arguments ->
         val stackId =
@@ -237,14 +237,14 @@ fun registerGalleryCommands(
         CommandResult.Success(buildJsonObject { put("stackId", stackId) })
     }
 
-    register(GalleryCommandIds.UNSTACK, R.string.command_gallery_unstack, listOf(idsParameter)) { arguments ->
+    register(GalleryCommandIds.UNSTACK, TextKey("command_gallery_unstack"), listOf(idsParameter)) { arguments ->
         gallery.moveToStack(arguments.ids("ids"), null)
         CommandResult.Success()
     }
 
     register(
         GalleryCommandIds.MOVE_TO_STACK,
-        R.string.command_gallery_move_to_stack,
+        TextKey("command_gallery_move_to_stack"),
         listOf(idsParameter, ParameterSpec("stackId", ParameterType.String)),
     ) { arguments ->
         gallery.moveToStack(arguments.ids("ids"), arguments.string("stackId"))
@@ -253,7 +253,7 @@ fun registerGalleryCommands(
 
     register(
         GalleryCommandIds.RENAME_STACK,
-        R.string.command_gallery_rename_stack,
+        TextKey("command_gallery_rename_stack"),
         listOf(ParameterSpec("stackId", ParameterType.String), ParameterSpec("name", ParameterType.String)),
     ) { arguments ->
         gallery.renameStack(arguments.string("stackId"), arguments.string("name"))
@@ -262,7 +262,7 @@ fun registerGalleryCommands(
 
     register(
         GalleryCommandIds.OPEN_STACK,
-        R.string.command_gallery_open_stack,
+        TextKey("command_gallery_open_stack"),
         listOf(ParameterSpec("stackId", ParameterType.String, JsonNull)),
     ) { arguments ->
         gallery.openStackId = arguments.optionalString("stackId")
@@ -272,7 +272,7 @@ fun registerGalleryCommands(
 
     register(
         GalleryCommandIds.SELECT_MODE,
-        R.string.command_gallery_select,
+        TextKey("command_gallery_select"),
         listOf(ParameterSpec("enabled", ParameterType.Boolean)),
     ) { arguments ->
         gallery.changeSelecting(arguments.getValue("enabled").jsonPrimitive.content == "true")
@@ -281,7 +281,7 @@ fun registerGalleryCommands(
 
     register(
         GalleryCommandIds.TOGGLE_SELECTED,
-        R.string.command_gallery_toggle_selected,
+        TextKey("command_gallery_toggle_selected"),
         listOf(ParameterSpec("id", ParameterType.String)),
     ) { arguments ->
         if (!gallery.selecting) gallery.changeSelecting(true)
@@ -291,21 +291,25 @@ fun registerGalleryCommands(
 
     register(
         GalleryCommandIds.SORT,
-        R.string.command_gallery_sort,
+        TextKey("command_gallery_sort"),
         listOf(ParameterSpec("order", ParameterType.Enumeration, allowedValues = GallerySort.entries.map { it.id })),
     ) { arguments ->
         gallery.changeSort(GallerySort.fromId(arguments.string("order")) ?: GallerySort.Date)
         CommandResult.Success()
     }
 
-    register(GalleryCommandIds.SEARCH, R.string.command_gallery_search, listOf(ParameterSpec("query", ParameterType.String))) { arguments ->
+    register(
+        GalleryCommandIds.SEARCH,
+        TextKey("command_gallery_search"),
+        listOf(ParameterSpec("query", ParameterType.String)),
+    ) { arguments ->
         gallery.searchQuery = arguments.string("query")
         CommandResult.Success()
     }
 
     register(
         GalleryCommandIds.PREVIEW,
-        R.string.command_gallery_preview,
+        TextKey("command_gallery_preview"),
         listOf(ParameterSpec("id", ParameterType.String, JsonNull)),
     ) { arguments ->
         gallery.previewId = arguments.optionalString("id")
@@ -314,7 +318,7 @@ fun registerGalleryCommands(
 
     register(
         GalleryCommandIds.PRESET_SAVE,
-        R.string.command_gallery_preset_save,
+        TextKey("command_gallery_preset_save"),
         listOf(
             ParameterSpec("id", ParameterType.String, JsonNull),
             ParameterSpec("name", ParameterType.String),
@@ -337,7 +341,7 @@ fun registerGalleryCommands(
 
     register(
         GalleryCommandIds.PRESET_DELETE,
-        R.string.command_gallery_preset_delete,
+        TextKey("command_gallery_preset_delete"),
         listOf(ParameterSpec("id", ParameterType.String)),
     ) { arguments ->
         gallery.deletePreset(arguments.string("id"))

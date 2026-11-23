@@ -45,7 +45,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.domain.command.AppCommandIds
@@ -64,10 +63,11 @@ import com.mobyle.nanquim.presentation.common.rememberOpenFailedNotice
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 
 @Composable
-fun SettingsRoute(viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsRoute(viewModel: SettingsViewModel = koinViewModel()) {
     val context = LocalContext.current
     val openFailed = rememberOpenFailedNotice()
     SettingsScreen(

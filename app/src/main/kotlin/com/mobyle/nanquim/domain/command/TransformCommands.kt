@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.canvas.input.CanvasTool
 import com.mobyle.nanquim.domain.canvas.transform.TransformEditor
@@ -58,13 +58,13 @@ fun registerTransformCommands(
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         action: (TransformEditor, JsonObject) -> Unit,
     ) = registry.register(
         CommandSpec(
             id = id,
-            titleRes = titleRes,
+            titleKey = titleKey,
             category = CommandCategory.Transform,
             parameters = parameters,
             undoable = false,
@@ -82,7 +82,7 @@ fun registerTransformCommands(
     registry.register(
         CommandSpec(
             id = TransformCommandIds.CLONE_SOURCE,
-            titleRes = R.string.command_clone_set_source,
+            titleKey = TextKey("command_clone_set_source"),
             category = CommandCategory.Brush,
             parameters = listOf(ParameterSpec("x", ParameterType.Number), ParameterSpec("y", ParameterType.Number)),
             undoable = false,
@@ -95,7 +95,7 @@ fun registerTransformCommands(
     registry.register(
         CommandSpec(
             id = TransformCommandIds.CLONE_OPTIONS,
-            titleRes = R.string.command_clone_set_options,
+            titleKey = TextKey("command_clone_set_options"),
             category = CommandCategory.Brush,
             parameters =
                 listOf(
@@ -122,7 +122,7 @@ fun registerTransformCommands(
     registry.register(
         CommandSpec(
             id = TransformCommandIds.BEGIN,
-            titleRes = R.string.command_transform_begin,
+            titleKey = TextKey("command_transform_begin"),
             category = CommandCategory.Transform,
             undoable = false,
             availability = requiresDocument,
@@ -137,7 +137,7 @@ fun registerTransformCommands(
     }
     register(
         TransformCommandIds.SET_MODE,
-        R.string.command_transform_set_mode,
+        TextKey("command_transform_set_mode"),
         listOf(
             ParameterSpec("mode", ParameterType.Enumeration, allowedValues = TransformMode.entries.map { it.name.lowercase(Locale.ROOT) }),
         ),
@@ -155,7 +155,7 @@ fun registerTransformCommands(
     }
     register(
         TransformCommandIds.SET_MATRIX,
-        R.string.command_transform_set_matrix,
+        TextKey("command_transform_set_matrix"),
         listOf(ParameterSpec("matrix", ParameterType.Array)),
     ) { editor, arguments ->
         val matrix = (arguments.getValue("matrix") as JsonArray).map { (it as JsonPrimitive).double }
@@ -179,7 +179,7 @@ fun registerTransformCommands(
     }
     register(
         TransformCommandIds.WARP_MESH,
-        R.string.command_transform_warp_mesh,
+        TextKey("command_transform_warp_mesh"),
         listOf(ParameterSpec("points", ParameterType.Array)),
     ) { editor, arguments ->
         val points =
@@ -199,14 +199,14 @@ fun registerTransformCommands(
             editor.setWarpGrid(points)
         }
     }
-    register(TransformCommandIds.FLIP_HORIZONTAL, R.string.transform_flip_horizontal) { editor, _ -> editor.flipHorizontal() }
-    register(TransformCommandIds.FLIP_VERTICAL, R.string.transform_flip_vertical) { editor, _ -> editor.flipVertical() }
-    register(TransformCommandIds.ROTATE_45, R.string.transform_rotate_45) { editor, _ -> editor.rotate45() }
-    register(TransformCommandIds.FIT, R.string.transform_fit) { editor, _ -> editor.fitToCanvas() }
-    register(TransformCommandIds.RESET, R.string.transform_reset) { editor, _ -> editor.reset() }
+    register(TransformCommandIds.FLIP_HORIZONTAL, TextKey("transform_flip_horizontal")) { editor, _ -> editor.flipHorizontal() }
+    register(TransformCommandIds.FLIP_VERTICAL, TextKey("transform_flip_vertical")) { editor, _ -> editor.flipVertical() }
+    register(TransformCommandIds.ROTATE_45, TextKey("transform_rotate_45")) { editor, _ -> editor.rotate45() }
+    register(TransformCommandIds.FIT, TextKey("transform_fit")) { editor, _ -> editor.fitToCanvas() }
+    register(TransformCommandIds.RESET, TextKey("transform_reset")) { editor, _ -> editor.reset() }
     register(
         TransformCommandIds.SET_FILTER,
-        R.string.command_transform_set_filter,
+        TextKey("command_transform_set_filter"),
         listOf(
             ParameterSpec(
                 "filter",
@@ -220,28 +220,28 @@ fun registerTransformCommands(
     }
     register(
         TransformCommandIds.SET_MAGNETICS,
-        R.string.transform_magnetics,
+        TextKey("transform_magnetics"),
         listOf(ParameterSpec("enabled", ParameterType.Boolean)),
     ) { editor, arguments ->
         editor.magnetics = arguments.getValue("enabled").jsonPrimitive.boolean
     }
     register(
         TransformCommandIds.SET_FITTED,
-        R.string.transform_fitted_box,
+        TextKey("transform_fitted_box"),
         listOf(ParameterSpec("enabled", ParameterType.Boolean)),
     ) { editor, arguments ->
         editor.setFitted(arguments.getValue("enabled").jsonPrimitive.boolean)
     }
     register(
         TransformCommandIds.SET_WARP_SIZE,
-        R.string.command_transform_set_warp_size,
+        TextKey("command_transform_set_warp_size"),
         listOf(ParameterSpec("size", ParameterType.Integer, minimum = 4.0, maximum = 8.0)),
     ) { editor, arguments ->
         editor.setWarpSize(arguments.getValue("size").jsonPrimitive.int)
     }
     register(
         TransformCommandIds.SET_NUMERIC,
-        R.string.transform_numeric,
+        TextKey("transform_numeric"),
         listOf("x", "y", "width", "height", "rotation").map { ParameterSpec(it, ParameterType.Number) },
     ) { editor, arguments ->
         fun value(name: String) = (arguments.getValue(name) as JsonPrimitive).doubleOrNull ?: 0.0
@@ -250,7 +250,7 @@ fun registerTransformCommands(
     registry.register(
         CommandSpec(
             id = TransformCommandIds.COMMIT,
-            titleRes = R.string.transform_done,
+            titleKey = TextKey("transform_done"),
             category = CommandCategory.Transform,
             undoable = true,
             availability = requiresDocument,
@@ -262,7 +262,7 @@ fun registerTransformCommands(
     registry.register(
         CommandSpec(
             id = TransformCommandIds.CANCEL,
-            titleRes = R.string.transform_cancel,
+            titleKey = TextKey("transform_cancel"),
             category = CommandCategory.Transform,
             undoable = false,
             availability = requiresDocument,

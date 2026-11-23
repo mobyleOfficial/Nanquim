@@ -27,7 +27,7 @@ class CommandRegistryTest {
     private fun opacitySpec(aliases: List<String> = emptyList()) =
         CommandSpec(
             id = "layer.setOpacity",
-            titleRes = 0,
+            titleKey = TextKey("test"),
             category = CommandCategory.Layer,
             parameters =
                 listOf(
@@ -57,7 +57,7 @@ class CommandRegistryTest {
         runTest {
             val registry = CommandRegistry()
             registry.register(opacitySpec(aliases = listOf("layer.opacity")), echoHandler())
-            registry.register(CommandSpec("macro.run", 0, CommandCategory.Settings, undoable = false)) { context, _ ->
+            registry.register(CommandSpec("macro.run", TextKey("test"), CommandCategory.Settings, undoable = false)) { context, _ ->
                 registry.execute(context, "layer.setOpacity", buildJsonObject { put("opacity", 0.25) })
             }
             val reported = mutableListOf<Pair<String, JsonObject>>()
@@ -143,7 +143,7 @@ class CommandRegistryTest {
             registry.register(
                 CommandSpec(
                     id = "layer.setBlend",
-                    titleRes = 0,
+                    titleKey = TextKey("test"),
                     category = CommandCategory.Layer,
                     parameters = listOf(ParameterSpec("blend", ParameterType.Enumeration, allowedValues = listOf("normal", "multiply"))),
                     undoable = true,
@@ -163,7 +163,7 @@ class CommandRegistryTest {
         runTest {
             val registry = CommandRegistry()
             registry.register(
-                CommandSpec(id = "canvas.info", titleRes = 0, category = CommandCategory.Canvas, undoable = false),
+                CommandSpec(id = "canvas.info", titleKey = TextKey("test"), category = CommandCategory.Canvas, undoable = false),
             ) { _, _ -> error("boom") }
 
             val result = registry.execute(contextWithDocument, "canvas.info")
@@ -181,7 +181,7 @@ class CommandRegistryTest {
         assertThrows<IllegalArgumentException> { registry.register(opacitySpec(), echoHandler()) }
         assertThrows<IllegalArgumentException> {
             registry.register(
-                CommandSpec(id = "layer.opacity", titleRes = 0, category = CommandCategory.Layer, undoable = false),
+                CommandSpec(id = "layer.opacity", titleKey = TextKey("test"), category = CommandCategory.Layer, undoable = false),
                 echoHandler(),
             )
         }
@@ -191,7 +191,7 @@ class CommandRegistryTest {
     fun `rejects malformed ids`() {
         listOf("Layer.new", "layer", "layer..new", "layer.new-one", "").forEach { badId ->
             assertThrows<IllegalArgumentException>("id: '$badId'") {
-                CommandSpec(id = badId, titleRes = 0, category = CommandCategory.Layer, undoable = false)
+                CommandSpec(id = badId, titleKey = TextKey("test"), category = CommandCategory.Layer, undoable = false)
             }
         }
     }
@@ -199,7 +199,10 @@ class CommandRegistryTest {
     @Test
     fun `lists commands sorted by id and reports availability`() {
         val registry = CommandRegistry()
-        registry.register(CommandSpec(id = "view.fit", titleRes = 0, category = CommandCategory.View, undoable = false), echoHandler())
+        registry.register(
+            CommandSpec(id = "view.fit", titleKey = TextKey("test"), category = CommandCategory.View, undoable = false),
+            echoHandler(),
+        )
         registry.register(opacitySpec(), echoHandler())
 
         assertEquals(listOf("layer.setOpacity", "view.fit"), registry.commands().map { it.id })

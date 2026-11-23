@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.layer.LayerOperationException
 import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.document.session.SelectionCombine
@@ -69,14 +69,14 @@ fun registerSelectionCommands(
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         undoable: Boolean = true,
         action: (JsonObject) -> JsonObject?,
     ) = registry.register(
         CommandSpec(
             id = id,
-            titleRes = titleRes,
+            titleKey = titleKey,
             category = CommandCategory.Selection,
             parameters = parameters,
             undoable = undoable,
@@ -98,7 +98,7 @@ fun registerSelectionCommands(
 
     register(
         SelectionCommandIds.SET_MODE,
-        R.string.command_selection_set_mode,
+        TextKey("command_selection_set_mode"),
         parameters = listOf(ParameterSpec("mode", ParameterType.Enumeration, allowedValues = MODES.keys.toList())),
         undoable = false,
     ) { arguments ->
@@ -107,7 +107,7 @@ fun registerSelectionCommands(
     }
     register(
         SelectionCommandIds.SET_COMBINE,
-        R.string.command_selection_set_combine,
+        TextKey("command_selection_set_combine"),
         parameters = listOf(ParameterSpec("combine", ParameterType.Enumeration, allowedValues = COMBINES.keys.toList())),
         undoable = false,
     ) { arguments ->
@@ -115,11 +115,11 @@ fun registerSelectionCommands(
         null
     }
     val box = listOf("x", "y", "width", "height").map { ParameterSpec(it, ParameterType.Number) } + combine
-    for ((id, titleRes, ellipse) in listOf(
-        Triple(SelectionCommandIds.RECT, R.string.command_selection_rect, false),
-        Triple(SelectionCommandIds.ELLIPSE, R.string.command_selection_ellipse, true),
+    for ((id, titleKey, ellipse) in listOf(
+        Triple(SelectionCommandIds.RECT, TextKey("command_selection_rect"), false),
+        Triple(SelectionCommandIds.ELLIPSE, TextKey("command_selection_ellipse"), true),
     )) {
-        register(id, titleRes, parameters = box) { arguments ->
+        register(id, titleKey, parameters = box) { arguments ->
             val x = arguments.getValue("x").jsonPrimitive.double
             val y = arguments.getValue("y").jsonPrimitive.double
             val right = x + arguments.getValue("width").jsonPrimitive.double
@@ -131,7 +131,7 @@ fun registerSelectionCommands(
     }
     register(
         SelectionCommandIds.FREEHAND,
-        R.string.command_selection_freehand,
+        TextKey("command_selection_freehand"),
         parameters =
             listOf(
                 ParameterSpec("points", ParameterType.Array),
@@ -161,7 +161,7 @@ fun registerSelectionCommands(
     }
     register(
         SelectionCommandIds.FEATHER,
-        R.string.command_selection_feather,
+        TextKey("command_selection_feather"),
         parameters = listOf(ParameterSpec("radius", ParameterType.Number, minimum = 0.0, maximum = 100.0)),
     ) { arguments ->
         canvas.documentSession?.featherSelection(
@@ -176,7 +176,7 @@ fun registerSelectionCommands(
     val threshold = ParameterSpec("threshold", ParameterType.Number, minimum = 0.0, maximum = 1.0, defaultValue = JsonNull)
 
     fun JsonObject.threshold(): Double = (get("threshold") as? JsonPrimitive)?.doubleOrNull ?: canvas.fillThreshold.toDouble()
-    register(SelectionCommandIds.AUTO, R.string.command_selection_auto, parameters = point + threshold + combine) { arguments ->
+    register(SelectionCommandIds.AUTO, TextKey("command_selection_auto"), parameters = point + threshold + combine) { arguments ->
         val session = canvas.documentSession!!
         session.beginAutomaticSelection(
             arguments.getValue("x").jsonPrimitive.double,
@@ -187,7 +187,7 @@ fun registerSelectionCommands(
         session.endFill(commit = true)
         null
     }
-    register(SelectionCommandIds.FILL, R.string.command_selection_fill) { _ ->
+    register(SelectionCommandIds.FILL, TextKey("command_selection_fill")) { _ ->
         val color = canvas.primaryColor
         canvas.documentSession!!.fill(RgbaColor(color.red, color.green, color.blue))
         canvas.recordColorUse()
@@ -195,7 +195,7 @@ fun registerSelectionCommands(
     }
     register(
         FillCommandIds.DROP,
-        R.string.command_fill_drop,
+        TextKey("command_fill_drop"),
         parameters = point + threshold + ParameterSpec("whole", ParameterType.Boolean, defaultValue = JsonPrimitive(false)),
     ) { arguments ->
         val session = canvas.documentSession!!
@@ -212,15 +212,15 @@ fun registerSelectionCommands(
         canvas.recordColorUse()
         null
     }
-    register(FillCommandIds.STOP_CONTINUE, R.string.command_fill_stop_continue, undoable = false) { _ ->
+    register(FillCommandIds.STOP_CONTINUE, TextKey("command_fill_stop_continue"), undoable = false) { _ ->
         canvas.stopContinueFilling()
         null
     }
-    register(SelectionCommandIds.APPLY_PENDING, R.string.command_selection_apply_pending) { _ ->
+    register(SelectionCommandIds.APPLY_PENDING, TextKey("command_selection_apply_pending")) { _ ->
         canvas.applyPendingSelection()
         null
     }
-    register(SelectionCommandIds.DISCARD_PENDING, R.string.command_selection_discard_pending, undoable = false) { _ ->
+    register(SelectionCommandIds.DISCARD_PENDING, TextKey("command_selection_discard_pending"), undoable = false) { _ ->
         canvas.discardPendingSelection()
         null
     }

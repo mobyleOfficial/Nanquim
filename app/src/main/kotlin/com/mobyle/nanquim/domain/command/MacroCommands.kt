@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.macro.Macro
 import com.mobyle.nanquim.data.macro.Macros
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -35,10 +35,10 @@ fun registerMacroCommands(
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         handler: suspend (com.mobyle.nanquim.document.command.CommandContext, JsonObject) -> CommandResult,
-    ) = registry.register(CommandSpec(id, titleRes, CommandCategory.Settings, parameters, undoable = false)) { context, arguments ->
+    ) = registry.register(CommandSpec(id, titleKey, CommandCategory.Settings, parameters, undoable = false)) { context, arguments ->
         handler(context, arguments)
     }
 
@@ -73,7 +73,7 @@ fun registerMacroCommands(
 
     register(
         MacroCommandIds.PANEL,
-        R.string.command_macro_panel,
+        TextKey("command_macro_panel"),
         listOf(ParameterSpec("visible", ParameterType.Boolean, JsonNull)),
     ) { _, arguments ->
         macros.panelVisible = (arguments["visible"] as? JsonPrimitive)?.booleanOrNull ?: !macros.panelVisible
@@ -81,7 +81,7 @@ fun registerMacroCommands(
     }
     register(
         MacroCommandIds.RECORD_START,
-        R.string.command_macro_record_start,
+        TextKey("command_macro_record_start"),
         listOf(ParameterSpec("name", ParameterType.String)),
     ) { _, arguments ->
         val name = arguments.text("name").trim()
@@ -89,17 +89,17 @@ fun registerMacroCommands(
         macros.startRecording(name)
         list()
     }
-    register(MacroCommandIds.RECORD_STOP, R.string.command_macro_record_stop) { _, _ ->
+    register(MacroCommandIds.RECORD_STOP, TextKey("command_macro_record_stop")) { _, _ ->
         if (macros.recordingName == null) return@register CommandResult.Failure(CommandErrorCode.Unavailable, "Not recording")
         val saved = macros.stopRecording()
         CommandResult.Success(JsonObject(mapOf("id" to (saved?.id?.let(::JsonPrimitive) ?: JsonNull))))
     }
-    register(MacroCommandIds.RECORD_CANCEL, R.string.command_macro_record_cancel) { _, _ ->
+    register(MacroCommandIds.RECORD_CANCEL, TextKey("command_macro_record_cancel")) { _, _ ->
         macros.cancelRecording()
         list()
     }
-    register(MacroCommandIds.LIST, R.string.command_macro_list) { _, _ -> list() }
-    register(MacroCommandIds.RUN, R.string.command_macro_run, listOf(idParameter)) { context, arguments ->
+    register(MacroCommandIds.LIST, TextKey("command_macro_list")) { _, _ -> list() }
+    register(MacroCommandIds.RUN, TextKey("command_macro_run"), listOf(idParameter)) { context, arguments ->
         val macro = macros.find(arguments.text("id")) ?: return@register unknown(arguments.text("id"))
         if (!running.add(macro.id)) return@register CommandResult.Failure(CommandErrorCode.Unavailable, "The macro is already running")
         try {
@@ -119,13 +119,13 @@ fun registerMacroCommands(
     }
     register(
         MacroCommandIds.RENAME,
-        R.string.command_macro_rename,
+        TextKey("command_macro_rename"),
         listOf(idParameter, ParameterSpec("name", ParameterType.String)),
     ) { _, arguments ->
         if (!macros.rename(arguments.text("id"), arguments.text("name").trim())) return@register unknown(arguments.text("id"))
         list()
     }
-    register(MacroCommandIds.DELETE, R.string.command_macro_delete, listOf(idParameter)) { _, arguments ->
+    register(MacroCommandIds.DELETE, TextKey("command_macro_delete"), listOf(idParameter)) { _, arguments ->
         if (!macros.delete(arguments.text("id"))) return@register unknown(arguments.text("id"))
         list()
     }

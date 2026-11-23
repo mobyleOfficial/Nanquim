@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import com.mobyle.nanquim.data.brush.BrushThumbnails
 import com.mobyle.nanquim.data.brush.library.BrushLibrary
 import com.mobyle.nanquim.data.brush.library.BrushTool
+import com.mobyle.nanquim.data.platform.BitmapRgbaImage
 import com.mobyle.nanquim.domain.brush.ActiveBrushes
 import com.mobyle.nanquim.domain.brush.BrushEditorSession
 import com.mobyle.nanquim.domain.canvas.SrgbColor
@@ -44,6 +45,7 @@ class BrushUiState(
                 library = library,
                 brushes = brushes,
                 scope = scope,
+                images = BitmapRgbaImage,
                 padSizePx = BrushEditorSession.padSizeFor(brushes, tool, brushId, brushPackage.document),
                 padOpacity = active?.opacity ?: 1f,
                 pressureCurve = inputSettings.pressureCurve.takeUnless { inputSettings.isLinear },

@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandRegistry
@@ -8,6 +7,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.input.Gesture
 import com.mobyle.nanquim.domain.canvas.input.GestureAction
 import com.mobyle.nanquim.domain.canvas.input.GestureConfiguration
@@ -35,7 +35,7 @@ fun registerGestureCommands(
     registry.register(
         CommandSpec(
             id = GestureCommandIds.GET,
-            titleRes = R.string.command_settings_gestures_get,
+            titleKey = TextKey("command_settings_gestures_get"),
             category = CommandCategory.Settings,
             undoable = false,
         ),
@@ -43,7 +43,7 @@ fun registerGestureCommands(
     registry.register(
         CommandSpec(
             id = GestureCommandIds.SET_TRIGGERS,
-            titleRes = R.string.command_settings_gestures_set_triggers,
+            titleKey = TextKey("command_settings_gestures_set_triggers"),
             category = CommandCategory.Settings,
             parameters =
                 listOf(
@@ -71,7 +71,7 @@ fun registerGestureCommands(
     registry.register(
         CommandSpec(
             id = GestureCommandIds.SET,
-            titleRes = R.string.command_settings_gestures_set,
+            titleKey = TextKey("command_settings_gestures_set"),
             category = CommandCategory.Settings,
             parameters =
                 listOf(
@@ -100,7 +100,7 @@ fun registerGestureCommands(
     registry.register(
         CommandSpec(
             id = GestureCommandIds.RESET,
-            titleRes = R.string.command_settings_gestures_reset,
+            titleKey = TextKey("command_settings_gestures_reset"),
             category = CommandCategory.Settings,
             undoable = false,
         ),

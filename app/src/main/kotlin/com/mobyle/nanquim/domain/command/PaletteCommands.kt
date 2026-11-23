@@ -1,9 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import android.content.ContentResolver
-import android.provider.OpenableColumns
-import androidx.core.net.toUri
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.brush.BrushFiles
 import com.mobyle.nanquim.data.color.PaletteEntry
 import com.mobyle.nanquim.data.color.PaletteFileFormat
@@ -19,7 +15,10 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.layer.RgbaColor
+import com.mobyle.nanquim.domain.platform.ExternalFiles
+import com.mobyle.nanquim.domain.platform.ShareSheet
 import com.mobyle.nanquim.formats.interchange.ImportWarning
 import com.mobyle.nanquim.formats.palette.Palette
 import com.mobyle.nanquim.formats.palette.PaletteFile
@@ -63,7 +62,7 @@ object PaletteCommandIds {
 fun registerPaletteCommands(
     registry: CommandRegistry,
     library: PaletteLibrary,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
     shareSheet: ShareSheet,
     cacheDirectory: File,
     onImportReport: (List<ImportWarning>) -> Unit,
@@ -71,11 +70,11 @@ fun registerPaletteCommands(
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         handler: suspend (JsonObject) -> CommandResult,
     ) = registry.register(
-        CommandSpec(id = id, titleRes = titleRes, category = CommandCategory.Color, parameters = parameters, undoable = false),
+        CommandSpec(id = id, titleKey = titleKey, category = CommandCategory.Color, parameters = parameters, undoable = false),
     ) { _, arguments -> handler(arguments) }
 
     val paletteId = ParameterSpec("paletteId", ParameterType.String)
@@ -88,7 +87,7 @@ fun registerPaletteCommands(
 
     fun created(entry: PaletteEntry) = CommandResult.Success(buildJsonObject { put("paletteId", entry.id) })
 
-    register(PaletteCommandIds.LIST, R.string.command_palette_list) {
+    register(PaletteCommandIds.LIST, TextKey("command_palette_list")) {
         CommandResult.Success(
             buildJsonObject {
                 put("defaultId", library.defaultPalette?.id?.let(::JsonPrimitive) ?: JsonNull)
@@ -120,7 +119,7 @@ fun registerPaletteCommands(
     }
     register(
         PaletteCommandIds.CREATE,
-        R.string.command_palette_create,
+        TextKey("command_palette_create"),
         listOf(
             name,
             ParameterSpec(
@@ -134,32 +133,32 @@ fun registerPaletteCommands(
     ) { arguments ->
         created(library.create(arguments.getValue("name").jsonPrimitive.content, arguments.getValue("columns").jsonPrimitive.int))
     }
-    register(PaletteCommandIds.RENAME, R.string.command_palette_rename, listOf(paletteId, name)) { arguments ->
+    register(PaletteCommandIds.RENAME, TextKey("command_palette_rename"), listOf(paletteId, name)) { arguments ->
         val entry = arguments.palette() ?: return@register unknown(arguments)
         library.rename(entry.id, arguments.getValue("name").jsonPrimitive.content)
         CommandResult.Success()
     }
-    register(PaletteCommandIds.DELETE, R.string.command_palette_delete, listOf(paletteId)) { arguments ->
+    register(PaletteCommandIds.DELETE, TextKey("command_palette_delete"), listOf(paletteId)) { arguments ->
         val entry = arguments.palette() ?: return@register unknown(arguments)
         library.delete(entry.id)
         CommandResult.Success()
     }
     register(
         PaletteCommandIds.DUPLICATE,
-        R.string.command_palette_duplicate,
+        TextKey("command_palette_duplicate"),
         listOf(paletteId, ParameterSpec("name", ParameterType.String, JsonNull)),
     ) { arguments ->
         val entry = arguments.palette() ?: return@register unknown(arguments)
         created(library.duplicate(entry.id, (arguments["name"] as? JsonPrimitive)?.contentOrNull))
     }
-    register(PaletteCommandIds.SET_DEFAULT, R.string.command_palette_set_default, listOf(paletteId)) { arguments ->
+    register(PaletteCommandIds.SET_DEFAULT, TextKey("command_palette_set_default"), listOf(paletteId)) { arguments ->
         val entry = arguments.palette() ?: return@register unknown(arguments)
         library.setDefault(entry.id)
         CommandResult.Success()
     }
     register(
         PaletteCommandIds.MOVE,
-        R.string.command_palette_move,
+        TextKey("command_palette_move"),
         listOf(paletteId, ParameterSpec("index", ParameterType.Integer, minimum = 0.0)),
     ) { arguments ->
         val entry = arguments.palette() ?: return@register unknown(arguments)
@@ -168,7 +167,7 @@ fun registerPaletteCommands(
     }
     register(
         PaletteCommandIds.SET_SWATCH,
-        R.string.command_palette_set_swatch,
+        TextKey("command_palette_set_swatch"),
         listOf(
             paletteId,
             ParameterSpec("index", ParameterType.Integer, minimum = 0.0, maximum = (Palette.MAXIMUM_SWATCHES - 1).toDouble()),
@@ -202,7 +201,7 @@ fun registerPaletteCommands(
     }
     register(
         PaletteCommandIds.ADD,
-        R.string.command_palette_add,
+        TextKey("command_palette_add"),
         listOf(
             name,
             ParameterSpec("colors", ParameterType.Array),
@@ -234,7 +233,7 @@ fun registerPaletteCommands(
     }
     register(
         PaletteCommandIds.CREATE_FROM_IMAGE,
-        R.string.command_palette_create_from_image,
+        TextKey("command_palette_create_from_image"),
         listOf(
             ParameterSpec("uri", ParameterType.String),
             name,
@@ -251,15 +250,14 @@ fun registerPaletteCommands(
             arguments
                 .getValue("uri")
                 .jsonPrimitive.content
-                .toUri()
-        if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
+        if (!files.accepts(uri)) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
         val count = arguments.getValue("count").jsonPrimitive.int
         val colors =
             try {
                 withContext(Dispatchers.Default) {
-                    val bitmap = PaletteImages.decode(contentResolver, uri)
+                    val bitmap = PaletteImages.decode(files, uri)
                     val pixels = IntArray(bitmap.width * bitmap.height)
                     bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
                     PaletteExtractor.extract(pixels, bitmap.width, bitmap.height, count).also { bitmap.recycle() }
@@ -276,15 +274,14 @@ fun registerPaletteCommands(
     }
     register(
         PaletteCommandIds.IMPORT,
-        R.string.command_palette_import,
+        TextKey("command_palette_import"),
         listOf(ParameterSpec("uri", ParameterType.String), ParameterSpec("name", ParameterType.String, JsonNull)),
     ) { arguments ->
         val uri =
             arguments
                 .getValue("uri")
                 .jsonPrimitive.content
-                .toUri()
-        if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
+        if (!files.accepts(uri)) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
         val profile = cmykProfile()
@@ -293,12 +290,11 @@ fun registerPaletteCommands(
                 withContext(Dispatchers.IO) {
                     val fallbackName =
                         (arguments["name"] as? JsonPrimitive)?.contentOrNull
-                            ?: contentResolver
-                                .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
-                                ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+                            ?: files
+                                .displayName(uri)
                                 ?.substringBeforeLast('.')
                                 .orEmpty()
-                    val input = contentResolver.openInputStream(uri) ?: throw IOException("Cannot read $uri")
+                    val input = files.openInput(uri) ?: throw IOException("Cannot read $uri")
                     PaletteImport.read(input.use(PaletteImport::readLimited), fallbackName, profile)
                 }
             } catch (exception: PaletteImport.TooLargeException) {
@@ -317,7 +313,7 @@ fun registerPaletteCommands(
     }
     register(
         PaletteCommandIds.EXPORT,
-        R.string.command_palette_export,
+        TextKey("command_palette_export"),
         listOf(
             paletteId,
             ParameterSpec("uri", ParameterType.String, JsonNull),
@@ -330,8 +326,8 @@ fun registerPaletteCommands(
         ),
     ) { arguments ->
         val entry = arguments.palette() ?: return@register unknown(arguments)
-        val uri = (arguments["uri"] as? JsonPrimitive)?.contentOrNull?.toUri()
-        if (uri != null && uri.scheme != ContentResolver.SCHEME_CONTENT) {
+        val uri = (arguments["uri"] as? JsonPrimitive)?.contentOrNull
+        if (uri != null && !files.accepts(uri)) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
         val format = PaletteFileFormat.fromId(arguments.getValue("format").jsonPrimitive.content)!!
@@ -344,7 +340,7 @@ fun registerPaletteCommands(
         val fileName = BrushFiles.fileName(entry.palette.name, format.extension)
         withContext(Dispatchers.IO) {
             if (uri != null) {
-                val output = contentResolver.openOutputStream(uri, "wt") ?: throw IOException("Cannot write $uri")
+                val output = files.openOutput(uri) ?: throw IOException("Cannot write $uri")
                 output.use { it.write(bytes) }
             } else {
                 val folder = File(cacheDirectory, ArtworkTransfer.EXPORT_FOLDER).apply { mkdirs() }

@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.help.Help
 import com.mobyle.nanquim.data.help.WelcomeCard
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.input.CanvasTool
 import com.mobyle.nanquim.presentation.settings.SupportLink
 import kotlinx.serialization.json.JsonArray
@@ -42,18 +42,18 @@ fun registerHelpCommands(
 ) {
     fun spec(
         id: String,
-        title: Int,
+        title: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
     ) = CommandSpec(id, title, CommandCategory.Settings, parameters, undoable = false)
 
-    registry.register(spec(HelpCommandIds.WELCOME_SHOW, R.string.command_help_welcome_show)) { _, _ ->
+    registry.register(spec(HelpCommandIds.WELCOME_SHOW, TextKey("command_help_welcome_show"))) { _, _ ->
         help.showWelcome()
         CommandResult.Success()
     }
     registry.register(
         spec(
             HelpCommandIds.WELCOME_CARD,
-            R.string.command_help_welcome_card,
+            TextKey("command_help_welcome_card"),
             listOf(ParameterSpec("index", ParameterType.Integer, minimum = 0.0, maximum = WelcomeCard.entries.lastIndex.toDouble())),
         ),
     ) { _, arguments ->
@@ -61,7 +61,7 @@ fun registerHelpCommands(
         help.welcomeCard = arguments.getValue("index").jsonPrimitive.int
         CommandResult.Success()
     }
-    registry.register(spec(HelpCommandIds.WELCOME_FINISH, R.string.command_help_welcome_finish)) { _, _ ->
+    registry.register(spec(HelpCommandIds.WELCOME_FINISH, TextKey("command_help_welcome_finish"))) { _, _ ->
         help.finishWelcome(completed = false)
         CommandResult.Success()
     }
@@ -69,22 +69,22 @@ fun registerHelpCommands(
     registry.register(
         spec(
             HelpCommandIds.TIP_SHOW,
-            R.string.command_help_tip_show,
+            TextKey("command_help_tip_show"),
             listOf(ParameterSpec("tool", ParameterType.Enumeration, allowedValues = tipTools)),
         ),
     ) { _, arguments ->
         help.showTip(CanvasTool.valueOf(arguments.getValue("tool").jsonPrimitive.content))
         CommandResult.Success()
     }
-    registry.register(spec(HelpCommandIds.TIP_DISMISS, R.string.command_help_tip_dismiss)) { _, _ ->
+    registry.register(spec(HelpCommandIds.TIP_DISMISS, TextKey("command_help_tip_dismiss"))) { _, _ ->
         help.dismissTip()
         CommandResult.Success()
     }
-    registry.register(spec(HelpCommandIds.TIPS_RESET, R.string.command_help_tips_reset)) { _, _ ->
+    registry.register(spec(HelpCommandIds.TIPS_RESET, TextKey("command_help_tips_reset"))) { _, _ ->
         help.resetTips()
         CommandResult.Success()
     }
-    registry.register(spec(HelpCommandIds.MANUAL_OPEN, R.string.command_help_manual_open)) { _, _ ->
+    registry.register(spec(HelpCommandIds.MANUAL_OPEN, TextKey("command_help_manual_open"))) { _, _ ->
         val url = manualUrl()
         when {
             url.isBlank() -> CommandResult.Failure(CommandErrorCode.Unavailable, "The project has no manual site yet")
@@ -95,7 +95,7 @@ fun registerHelpCommands(
     registry.register(
         spec(
             HelpCommandIds.SUPPORT_OPEN_LINK,
-            R.string.command_settings_support_open_link,
+            TextKey("command_settings_support_open_link"),
             listOf(ParameterSpec("index", ParameterType.Integer, minimum = 0.0)),
         ),
     ) { _, arguments ->
@@ -111,12 +111,12 @@ fun registerHelpCommands(
             CommandResult.Failure(CommandErrorCode.HandlerFailed, "No app opens ${link.url}")
         }
     }
-    registry.register(spec(HelpCommandIds.SAMPLES_INSTALL, R.string.command_gallery_samples_install)) { _, _ ->
+    registry.register(spec(HelpCommandIds.SAMPLES_INSTALL, TextKey("command_gallery_samples_install"))) { _, _ ->
         val ids = installSamples()
         CommandResult.Success(JsonObject(mapOf("ids" to JsonArray(ids.map(::JsonPrimitive)))))
     }
     registry.register(
-        spec(HelpCommandIds.AUTOMATIC_SET, R.string.command_help_automatic_set, listOf(ParameterSpec("enabled", ParameterType.Boolean))),
+        spec(HelpCommandIds.AUTOMATIC_SET, TextKey("command_help_automatic_set"), listOf(ParameterSpec("enabled", ParameterType.Boolean))),
     ) { _, arguments ->
         help.automatic = arguments.getValue("enabled").jsonPrimitive.boolean
         CommandResult.Success()

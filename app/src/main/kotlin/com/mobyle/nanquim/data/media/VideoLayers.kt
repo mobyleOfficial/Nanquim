@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.data.media
 
-import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
@@ -8,10 +7,10 @@ import android.graphics.Paint
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
-import android.net.Uri
 import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.VideoLayerContent
 import com.mobyle.nanquim.document.layer.videoLayers
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import com.mobyle.nanquim.engine.Engine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +26,7 @@ import kotlin.math.min
 class VideoLayers(
     private val engine: Engine,
     private val scope: CoroutineScope,
-    private val contentResolver: ContentResolver,
+    private val files: ExternalFiles,
     private val folder: () -> File?,
 ) {
     private data class Shown(
@@ -48,7 +47,7 @@ class VideoLayers(
     )
 
     suspend fun import(
-        uri: Uri,
+        uri: String,
         displayName: String,
     ): Imported? =
         withContext(Dispatchers.IO) {
@@ -56,7 +55,7 @@ class VideoLayers(
             val extension = displayName.substringAfterLast('.', "").lowercase().takeIf { it.matches(Regex("[a-z0-9]{1,5}")) } ?: "mp4"
             val file = File(videos, "${UUID.randomUUID()}.$extension")
             try {
-                val input = contentResolver.openInputStream(uri) ?: return@withContext null
+                val input = files.openInput(uri) ?: return@withContext null
                 input.use { stream ->
                     file.outputStream().use { output ->
                         val buffer = ByteArray(BUFFER_BYTES)

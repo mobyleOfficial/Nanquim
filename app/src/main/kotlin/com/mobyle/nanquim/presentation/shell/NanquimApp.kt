@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.core.navigation.AppDestination
 import com.mobyle.nanquim.data.transfer.ImportTarget
@@ -64,10 +63,11 @@ import com.mobyle.nanquim.presentation.transition.ArtworkLoadingIndicator
 import com.mobyle.nanquim.presentation.transition.ArtworkOpenOverlay
 import com.mobyle.nanquim.presentation.transition.BlockingLoadingIndicator
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 /** The activity's whole UI: the current screen, and the sheets, dialogs and help cards that can show over any of them. */
 @Composable
-fun NanquimApp(viewModel: AppShellViewModel = hiltViewModel()) {
+fun NanquimApp(viewModel: AppShellViewModel = koinViewModel()) {
     val context = LocalContext.current
     val resources = LocalResources.current
     val toast = rememberToast()
@@ -115,13 +115,13 @@ fun NanquimApp(viewModel: AppShellViewModel = hiltViewModel()) {
     viewModel.incomingFile?.let { uri ->
         val wholeArtworkOnly =
             remember(uri) {
-                val format = transfer.interchangeFormatOf(uri)
-                transfer.isDocumentPackage(uri) || (format != null && format != InterchangeFormat.Tiff)
+                val format = transfer.interchangeFormatOf(uri.toString())
+                transfer.isDocumentPackage(uri.toString()) || (format != null && format != InterchangeFormat.Tiff)
             }
-        val isBrush by produceState(false, uri) { value = transfer.isBrushFile(uri) }
-        val isPalette by produceState(false, uri) { value = transfer.isPaletteFile(uri) }
+        val isBrush by produceState(false, uri) { value = transfer.isBrushFile(uri.toString()) }
+        val isPalette by produceState(false, uri) { value = transfer.isPaletteFile(uri.toString()) }
         IncomingFileDialog(
-            name = transfer.displayName(uri) ?: uri.lastPathSegment.orEmpty(),
+            name = transfer.displayName(uri.toString()) ?: uri.lastPathSegment.orEmpty(),
             isPackage = wholeArtworkOnly,
             isBrush = isBrush,
             isPalette = isPalette,

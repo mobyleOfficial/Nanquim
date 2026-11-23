@@ -63,7 +63,6 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.gallery.ArtworkEntity
 import com.mobyle.nanquim.data.gallery.Gallery
@@ -73,6 +72,7 @@ import com.mobyle.nanquim.domain.command.GalleryCommandIds
 import com.mobyle.nanquim.presentation.common.LocalWindowLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.koin.compose.viewmodel.koinViewModel
 import java.io.File
 import kotlin.math.hypot
 
@@ -82,7 +82,7 @@ fun GalleryRoute(
     onImport: () -> Unit,
     onPhoto: () -> Unit,
     onShare: (List<String>) -> Unit,
-    viewModel: GalleryViewModel = hiltViewModel(),
+    viewModel: GalleryViewModel = koinViewModel(),
 ) {
     val failed = rememberGalleryFailureNotice()
     GalleryScreen(

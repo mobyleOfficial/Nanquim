@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandContext
 import com.mobyle.nanquim.document.command.CommandErrorCode
@@ -9,6 +8,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.canvas.QuickMenuAnchor
 import com.mobyle.nanquim.domain.settings.models.QuickMenuPreset
@@ -42,10 +42,10 @@ fun registerQuickMenuCommands(
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         handler: suspend (CommandContext, JsonObject) -> CommandResult,
-    ) = registry.register(CommandSpec(id, titleRes, CommandCategory.Canvas, parameters, undoable = false)) { context, arguments ->
+    ) = registry.register(CommandSpec(id, titleKey, CommandCategory.Canvas, parameters, undoable = false)) { context, arguments ->
         handler(context, arguments)
     }
 
@@ -59,19 +59,19 @@ fun registerQuickMenuCommands(
 
     register(
         QuickMenuCommandIds.SHOW,
-        R.string.command_quick_menu_show,
+        TextKey("command_quick_menu_show"),
         listOf(ParameterSpec("x", ParameterType.Number, JsonNull), ParameterSpec("y", ParameterType.Number, JsonNull)),
     ) { _, arguments ->
         fun coordinate(name: String) = (arguments[name] as? JsonPrimitive)?.doubleOrNull?.toFloat()
         session.quickMenu = QuickMenuAnchor(coordinate("x"), coordinate("y"))
         answer()
     }
-    register(QuickMenuCommandIds.HIDE, R.string.command_quick_menu_hide) { _, _ ->
+    register(QuickMenuCommandIds.HIDE, TextKey("command_quick_menu_hide")) { _, _ ->
         session.quickMenu = null
         CommandResult.Success()
     }
-    register(QuickMenuCommandIds.GET, R.string.command_quick_menu_get) { _, _ -> answer() }
-    register(QuickMenuCommandIds.RUN, R.string.command_quick_menu_run, listOf(slotParameter)) { context, arguments ->
+    register(QuickMenuCommandIds.GET, TextKey("command_quick_menu_get")) { _, _ -> answer() }
+    register(QuickMenuCommandIds.RUN, TextKey("command_quick_menu_run"), listOf(slotParameter)) { context, arguments ->
         session.quickMenu = null
         val slot =
             settings.active.slots[arguments.getValue("slot").jsonInt()]
@@ -80,7 +80,7 @@ fun registerQuickMenuCommands(
     }
     register(
         QuickMenuCommandIds.SET_SLOT,
-        R.string.command_quick_menu_set_slot,
+        TextKey("command_quick_menu_set_slot"),
         listOf(
             slotParameter,
             ParameterSpec("command", ParameterType.String, JsonNull),
@@ -110,7 +110,7 @@ fun registerQuickMenuCommands(
     }
     register(
         QuickMenuCommandIds.ADD_PRESET,
-        R.string.command_quick_menu_add_preset,
+        TextKey("command_quick_menu_add_preset"),
         listOf(ParameterSpec("name", ParameterType.String)),
     ) { _, arguments ->
         settings.addPreset(arguments.getValue("name").jsonString())
@@ -118,7 +118,7 @@ fun registerQuickMenuCommands(
     }
     register(
         QuickMenuCommandIds.RENAME_PRESET,
-        R.string.command_quick_menu_rename_preset,
+        TextKey("command_quick_menu_rename_preset"),
         listOf(presetParameter, ParameterSpec("name", ParameterType.String)),
     ) { _, arguments ->
         val preset = arguments.preset()!!
@@ -126,13 +126,13 @@ fun registerQuickMenuCommands(
         settings.renamePreset(preset, arguments.getValue("name").jsonString())
         answer()
     }
-    register(QuickMenuCommandIds.DELETE_PRESET, R.string.command_quick_menu_delete_preset, listOf(presetParameter)) { _, arguments ->
+    register(QuickMenuCommandIds.DELETE_PRESET, TextKey("command_quick_menu_delete_preset"), listOf(presetParameter)) { _, arguments ->
         val preset = arguments.preset()!!
         if (preset !in settings.presets.indices) return@register badPreset(preset)
         if (!settings.deletePreset(preset)) return@register CommandResult.Failure(CommandErrorCode.Unavailable, "The last preset stays")
         answer()
     }
-    register(QuickMenuCommandIds.SELECT_PRESET, R.string.command_quick_menu_select_preset, listOf(presetParameter)) { _, arguments ->
+    register(QuickMenuCommandIds.SELECT_PRESET, TextKey("command_quick_menu_select_preset"), listOf(presetParameter)) { _, arguments ->
         val preset = arguments.preset()!!
         if (preset !in settings.presets.indices) return@register badPreset(preset)
         settings.select(preset)

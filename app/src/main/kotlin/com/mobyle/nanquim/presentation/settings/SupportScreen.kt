@@ -24,12 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.domain.feedback.FeedbackChannel
 import com.mobyle.nanquim.domain.feedback.FeedbackKind
 import com.mobyle.nanquim.presentation.common.ScreenHeader
 import com.mobyle.nanquim.presentation.common.rememberOpenFailedNotice
+import org.koin.compose.viewmodel.koinViewModel
 
 data class SupportLink(
     val label: String,
@@ -44,7 +44,7 @@ fun parseSupportLinks(items: List<String>): List<SupportLink> =
     }
 
 @Composable
-fun SupportRoute(viewModel: SupportViewModel = hiltViewModel()) {
+fun SupportRoute(viewModel: SupportViewModel = koinViewModel()) {
     val openFailed = rememberOpenFailedNotice()
     SupportScreen(
         links = viewModel.links,

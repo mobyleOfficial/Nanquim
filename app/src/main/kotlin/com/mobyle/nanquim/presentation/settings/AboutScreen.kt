@@ -17,12 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.presentation.common.ScreenHeader
 import com.mobyle.nanquim.presentation.common.rememberOpenFailedNotice
 import kotlinx.serialization.json.JsonObject
+import org.koin.compose.viewmodel.koinViewModel
 
 data class CreditEntry(
     val section: String,
@@ -69,7 +69,7 @@ fun parseCredits(markdown: String): List<CreditEntry> {
 }
 
 @Composable
-fun AboutRoute(viewModel: AboutViewModel = hiltViewModel()) {
+fun AboutRoute(viewModel: AboutViewModel = koinViewModel()) {
     val openFailed = rememberOpenFailedNotice()
     AboutScreen(
         credits = viewModel.credits,

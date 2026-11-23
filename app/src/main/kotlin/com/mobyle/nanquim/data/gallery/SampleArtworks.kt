@@ -36,7 +36,7 @@ class SampleArtworks(
                     copy.parentFile?.mkdirs()
                     assets.open("$FOLDER/$key$EXTENSION").use { input -> copy.outputStream().use(input::copyTo) }
                 }
-                val id = transfer.importDocument(Uri.fromFile(copy))
+                val id = transfer.importDocument(Uri.fromFile(copy).toString())
                 names(key)?.let { gallery.rename(id, it) }
                 created += id
             } catch (error: GalleryException) {

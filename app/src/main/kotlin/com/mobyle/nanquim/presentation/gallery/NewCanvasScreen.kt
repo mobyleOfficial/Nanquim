@@ -49,7 +49,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.color.ColorProfileEntry
 import com.mobyle.nanquim.data.color.ColorProfileLibrary
@@ -66,10 +65,11 @@ import com.mobyle.nanquim.domain.gallery.CanvasSize
 import com.mobyle.nanquim.formats.nanquim.CanvasUnit
 import com.mobyle.nanquim.presentation.common.LocalWindowLayout
 import com.mobyle.nanquim.presentation.common.ScreenHeader
+import org.koin.compose.viewmodel.koinViewModel
 import java.util.Locale
 
 @Composable
-fun NewCanvasRoute(viewModel: NewCanvasViewModel = hiltViewModel()) {
+fun NewCanvasRoute(viewModel: NewCanvasViewModel = koinViewModel()) {
     val failed = rememberGalleryFailureNotice()
     NewCanvasScreen(
         gallery = viewModel.gallery,

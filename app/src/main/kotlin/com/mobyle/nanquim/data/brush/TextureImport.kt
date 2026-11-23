@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
 import com.mobyle.nanquim.domain.brush.TextureSlot
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import java.io.ByteArrayOutputStream
 import kotlin.math.max
 import kotlin.math.min
@@ -21,13 +22,13 @@ object TextureImport {
     private const val BLUE_WEIGHT = 0.114f
 
     fun read(
-        resolver: ContentResolver,
-        uri: Uri,
+        files: ExternalFiles,
+        uri: String,
         slot: TextureSlot,
         keepColors: Boolean = false,
     ): ByteArray? {
         val maximumSide = if (slot == TextureSlot.Shape) MAXIMUM_SHAPE_SIDE else MAXIMUM_GRAIN_SIDE
-        val source = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: return null
+        val source = files.openInput(uri)?.use { BitmapFactory.decodeStream(it) } ?: return null
         val crop =
             if (slot == TextureSlot.Shape) {
                 val side = min(source.width, source.height)

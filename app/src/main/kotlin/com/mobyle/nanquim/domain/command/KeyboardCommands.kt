@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
 import com.mobyle.nanquim.document.command.CommandRegistry
@@ -8,6 +7,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.keyboard.KeyChord
 import com.mobyle.nanquim.domain.keyboard.ShortcutAction
 import com.mobyle.nanquim.domain.settings.repositories.KeyboardShortcutsRepository
@@ -36,12 +36,12 @@ fun registerKeyboardCommands(
         CommandResult.Failure(CommandErrorCode.InvalidArguments, "Not a shortcut: ${arguments["shortcut"]}")
 
     registry.register(
-        CommandSpec(KeyboardCommandIds.GET, R.string.command_keyboard_shortcuts_get, CommandCategory.Settings, undoable = false),
+        CommandSpec(KeyboardCommandIds.GET, TextKey("command_keyboard_shortcuts_get"), CommandCategory.Settings, undoable = false),
     ) { _, _ -> answer() }
     registry.register(
         CommandSpec(
             KeyboardCommandIds.SET,
-            R.string.command_keyboard_shortcuts_set,
+            TextKey("command_keyboard_shortcuts_set"),
             CommandCategory.Settings,
             listOf(
                 ParameterSpec("shortcut", ParameterType.String),
@@ -71,7 +71,7 @@ fun registerKeyboardCommands(
     registry.register(
         CommandSpec(
             KeyboardCommandIds.REMOVE,
-            R.string.command_keyboard_shortcuts_remove,
+            TextKey("command_keyboard_shortcuts_remove"),
             CommandCategory.Settings,
             listOf(ParameterSpec("shortcut", ParameterType.String)),
             undoable = false,
@@ -82,7 +82,7 @@ fun registerKeyboardCommands(
         answer()
     }
     registry.register(
-        CommandSpec(KeyboardCommandIds.RESET, R.string.command_keyboard_shortcuts_reset, CommandCategory.Settings, undoable = false),
+        CommandSpec(KeyboardCommandIds.RESET, TextKey("command_keyboard_shortcuts_reset"), CommandCategory.Settings, undoable = false),
     ) { _, _ ->
         settings.reset()
         answer()

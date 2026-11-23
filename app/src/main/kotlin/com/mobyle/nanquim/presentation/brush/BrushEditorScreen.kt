@@ -61,8 +61,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
+import com.mobyle.nanquim.data.platform.imageBitmap
 import com.mobyle.nanquim.document.brush.BrushCurve
 import com.mobyle.nanquim.document.brush.BrushDocument
 import com.mobyle.nanquim.domain.brush.BrushEditorSection
@@ -74,11 +74,12 @@ import com.mobyle.nanquim.presentation.common.CurveEditor
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.PI
 import kotlin.math.roundToInt
 
 @Composable
-fun BrushEditorRoute(viewModel: BrushEditorViewModel = hiltViewModel()) {
+fun BrushEditorRoute(viewModel: BrushEditorViewModel = koinViewModel()) {
     val editor = viewModel.editor
     if (editor == null) {
         LaunchedEffect(Unit) { viewModel.leave() }
@@ -518,7 +519,7 @@ private fun DrawingPad(
             },
     ) {
         drawRect(background)
-        editor.padImage?.let { image ->
+        editor.padImage?.imageBitmap()?.let { image ->
             drawImage(
                 image,
                 srcOffset = IntOffset.Zero,

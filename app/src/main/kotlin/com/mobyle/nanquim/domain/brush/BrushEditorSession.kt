@@ -1,13 +1,9 @@
 package com.mobyle.nanquim.domain.brush
 
-import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import com.mobyle.nanquim.data.brush.TextureImport
 import com.mobyle.nanquim.data.brush.library.BrushLibrary
 import com.mobyle.nanquim.data.brush.library.BrushTool
@@ -15,6 +11,9 @@ import com.mobyle.nanquim.document.brush.BrushDocument
 import com.mobyle.nanquim.document.brush.BrushPackage
 import com.mobyle.nanquim.document.brush.BrushResetPoints
 import com.mobyle.nanquim.domain.canvas.SrgbColor
+import com.mobyle.nanquim.domain.platform.Logger
+import com.mobyle.nanquim.domain.platform.RgbaImage
+import com.mobyle.nanquim.domain.platform.RgbaImages
 import com.mobyle.nanquim.engine.BrushPad
 import com.mobyle.nanquim.engine.StrokeSampleBuffer
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +57,7 @@ class BrushEditorSession(
     private val library: BrushLibrary,
     private val brushes: ActiveBrushes,
     private val scope: CoroutineScope,
+    images: RgbaImages,
     padSizePx: Float,
     private val padOpacity: Float,
     private val pressureCurve: List<Pair<Float, Float>>?,
@@ -80,7 +80,8 @@ class BrushEditorSession(
         padSizePx = sizePx.coerceIn(1f, MAXIMUM_PAD_SIZE_PX)
     }
 
-    var padImage: ImageBitmap? by mutableStateOf(null)
+    /** The pad's latest frame. Two images take turns, so the one on screen is never the one being written. */
+    var padImage: RgbaImage? by mutableStateOf(null)
         private set
 
     var lastPressure: Float? by mutableStateOf(null)
@@ -94,8 +95,8 @@ class BrushEditorSession(
 
     private val padThread = Dispatchers.Default.limitedParallelism(1)
     private val pad = BrushPad(PAD_WIDTH, PAD_HEIGHT)
-    private val bitmaps = Array(2) { Bitmap.createBitmap(PAD_WIDTH, PAD_HEIGHT, Bitmap.Config.ARGB_8888) }
-    private var backBitmap = 0
+    private val frames = Array(2) { images.create(PAD_WIDTH, PAD_HEIGHT) }
+    private var backFrame = 0
     private val pendingBrush = AtomicReference<BrushPackage?>(original)
     private var closed = false
 
@@ -271,16 +272,16 @@ class BrushEditorSession(
         val brushPackage = pendingBrush.getAndSet(null) ?: return
         val error =
             pad.setBrush(brushPackage.document.toJsonText(), brushPackage.shapeTextureBytes, brushPackage.grainTextureBytes)
-        if (error != null) Log.w(TAG, "Brush editor: $error")
+        if (error != null) Logger.w(TAG, "Brush editor: $error")
         scope.launch { brushError = error }
     }
 
     private suspend fun publish() {
-        val bitmap = bitmaps[backBitmap]
+        val frame = frames[backFrame]
         pad.pixels.rewind()
-        bitmap.copyPixelsFromBuffer(pad.pixels)
-        backBitmap = 1 - backBitmap
-        withContext(Dispatchers.Main) { padImage = bitmap.asImageBitmap() }
+        frame.write(pad.pixels)
+        backFrame = 1 - backFrame
+        withContext(Dispatchers.Main) { padImage = frame }
     }
 
     companion object {

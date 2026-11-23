@@ -10,6 +10,7 @@ import com.mobyle.nanquim.document.command.CommandContext
 import com.mobyle.nanquim.document.command.CommandRegistry
 import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
+import com.mobyle.nanquim.document.command.TextKey
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +53,7 @@ class ControlChannel(
     private val context: CommandContext,
     private val host: AutomationHost,
     val token: String = newToken(),
-    private val title: (Int) -> String = { "" },
+    private val title: (TextKey) -> String = { "" },
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val commandLock = Mutex()
@@ -243,7 +244,7 @@ class ControlChannel(
     private fun CommandSpec.toJson(availability: Availability?): JsonObject =
         buildJsonObject {
             put("id", id)
-            put("title", title(titleRes))
+            put("title", title(titleKey))
             put("category", category.name)
             put("undoable", undoable)
             put("available", availability == null || availability == Availability.Enabled)

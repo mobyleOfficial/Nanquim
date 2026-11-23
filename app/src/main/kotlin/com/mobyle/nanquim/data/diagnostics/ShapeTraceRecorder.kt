@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.mobyle.nanquim.document.shape.ShapeTrace
 import com.mobyle.nanquim.document.shape.ShapeTraceSet
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -80,12 +81,12 @@ class ShapeTraceRecorder(
     fun counts(): Map<String, Int> = ShapeTraceSet.LABELS.associateWith { label -> traces.count { it.label == label } }
 
     suspend fun export(
-        contentResolver: ContentResolver,
-        uri: Uri,
+        files: ExternalFiles,
+        uri: String,
     ) {
         val text = ShapeTraceSet.encode(snapshot())
         withContext(io) {
-            val stream = checkNotNull(contentResolver.openOutputStream(uri, "wt")) { "Cannot open $uri for writing" }
+            val stream = checkNotNull(files.openOutput(uri)) { "Cannot open $uri for writing" }
             stream.bufferedWriter(Charsets.UTF_8).use { it.write(text) }
         }
     }

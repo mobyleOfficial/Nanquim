@@ -1,9 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import android.content.ContentResolver
-import android.net.Uri
-import android.provider.OpenableColumns
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -13,8 +9,10 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.layer.LayerOperationException
 import com.mobyle.nanquim.domain.canvas.CanvasSession
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonNull
@@ -36,7 +34,7 @@ object VideoCommandIds {
 fun registerVideoCommands(
     registry: CommandRegistry,
     canvas: CanvasSession,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
 ) {
     val artwork: (AppState) -> Availability = { state ->
         if (state.hasOpenDocument) Availability.Enabled else Availability.Disabled("No open document")
@@ -44,13 +42,13 @@ fun registerVideoCommands(
 
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec>,
         handler: suspend (JsonObject) -> CommandResult,
     ) = registry.register(
         CommandSpec(
             id = id,
-            titleRes = titleRes,
+            titleKey = titleKey,
             category = CommandCategory.Layer,
             parameters = parameters,
             undoable = true,
@@ -66,19 +64,15 @@ fun registerVideoCommands(
 
     fun JsonObject.layerId(): Int? = (this["layerId"] as? JsonPrimitive)?.intOrNull ?: canvas.documentSession?.state?.activeLayerId
 
-    register(VideoCommandIds.IMPORT, R.string.command_video_import, listOf(ParameterSpec("uri", ParameterType.String))) { arguments ->
+    register(VideoCommandIds.IMPORT, TextKey("command_video_import"), listOf(ParameterSpec("uri", ParameterType.String))) { arguments ->
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No document")
-        val uri = Uri.parse((arguments["uri"] as? JsonPrimitive)?.contentOrNull.orEmpty())
-        if (uri.scheme !=
-            ContentResolver.SCHEME_CONTENT
-        ) {
+        val uri = (arguments["uri"] as? JsonPrimitive)?.contentOrNull.orEmpty()
+        if (!files.accepts(uri)) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
         val name =
             withContext(Dispatchers.IO) {
-                contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
-                    if (cursor.moveToFirst()) cursor.getString(0) else null
-                }
+                files.displayName(uri)
             } ?: "Video"
         val imported =
             canvas.videoLayers.import(uri, name)
@@ -93,7 +87,7 @@ fun registerVideoCommands(
     }
     register(
         VideoCommandIds.SET_TIME,
-        R.string.command_video_set_time,
+        TextKey("command_video_set_time"),
         listOf(
             ParameterSpec("layerId", ParameterType.Integer, JsonNull),
             ParameterSpec("timeMicroseconds", ParameterType.Integer),
@@ -110,7 +104,7 @@ fun registerVideoCommands(
     }
     register(
         VideoCommandIds.RASTERIZE,
-        R.string.command_video_rasterize,
+        TextKey("command_video_rasterize"),
         listOf(ParameterSpec("layerId", ParameterType.Integer, JsonNull)),
     ) { arguments ->
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No document")

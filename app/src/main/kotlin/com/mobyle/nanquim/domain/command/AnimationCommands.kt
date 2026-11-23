@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.animation.OnionBlend
 import com.mobyle.nanquim.document.animation.PlaybackMode
 import com.mobyle.nanquim.document.animation.frames
@@ -13,6 +12,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import kotlinx.serialization.json.JsonArray
@@ -45,13 +45,13 @@ fun registerAnimationCommands(
 
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         handler: suspend (JsonObject) -> CommandResult,
     ) = registry.register(
         CommandSpec(
             id = id,
-            titleRes = titleRes,
+            titleKey = titleKey,
             category = CommandCategory.Animation,
             parameters = parameters,
             undoable = true,
@@ -75,7 +75,7 @@ fun registerAnimationCommands(
 
     register(
         AnimationCommandIds.SET_ENABLED,
-        R.string.command_animation_set_enabled,
+        TextKey("command_animation_set_enabled"),
         listOf(ParameterSpec("enabled", ParameterType.Boolean)),
     ) {
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No document")
@@ -84,7 +84,7 @@ fun registerAnimationCommands(
     }
     register(
         AnimationCommandIds.SET_SETTINGS,
-        R.string.command_animation_set_settings,
+        TextKey("command_animation_set_settings"),
         listOf(
             optional("playback", ParameterType.String),
             optional("framesPerSecond", ParameterType.Integer),
@@ -136,7 +136,7 @@ fun registerAnimationCommands(
     }
     register(
         AnimationCommandIds.SET_HOLD,
-        R.string.command_animation_set_hold,
+        TextKey("command_animation_set_hold"),
         listOf(
             ParameterSpec("layerId", ParameterType.Integer),
             ParameterSpec("holdFrames", ParameterType.Integer),
@@ -158,7 +158,7 @@ fun registerAnimationCommands(
     }
     register(
         AnimationCommandIds.GO_TO_FRAME,
-        R.string.command_animation_go_to_frame,
+        TextKey("command_animation_go_to_frame"),
         listOf(ParameterSpec("index", ParameterType.Integer)),
     ) { arguments ->
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No document")
@@ -171,10 +171,10 @@ fun registerAnimationCommands(
 
     fun registerPlayback(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         action: () -> Unit,
     ) = registry.register(
-        CommandSpec(id = id, titleRes = titleRes, category = CommandCategory.Animation, undoable = false, availability = document),
+        CommandSpec(id = id, titleKey = titleKey, category = CommandCategory.Animation, undoable = false, availability = document),
     ) { _, _ ->
         if (canvas.documentSession
                 ?.state
@@ -187,10 +187,10 @@ fun registerAnimationCommands(
             CommandResult.Success()
         }
     }
-    registerPlayback(AnimationCommandIds.PLAY, R.string.command_animation_play) { canvas.playback.play() }
-    registerPlayback(AnimationCommandIds.PAUSE, R.string.command_animation_pause) { canvas.playback.stop() }
-    registerPlayback(AnimationCommandIds.TOGGLE_PLAYBACK, R.string.command_animation_toggle_playback) { canvas.playback.toggle() }
-    register(AnimationCommandIds.ADD_FRAME, R.string.command_animation_add_frame) {
+    registerPlayback(AnimationCommandIds.PLAY, TextKey("command_animation_play")) { canvas.playback.play() }
+    registerPlayback(AnimationCommandIds.PAUSE, TextKey("command_animation_pause")) { canvas.playback.stop() }
+    registerPlayback(AnimationCommandIds.TOGGLE_PLAYBACK, TextKey("command_animation_toggle_playback")) { canvas.playback.toggle() }
+    register(AnimationCommandIds.ADD_FRAME, TextKey("command_animation_add_frame")) {
         val session = canvas.documentSession ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No document")
         session.currentFrameId?.let(session::select)
         val id = session.newLayer()

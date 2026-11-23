@@ -3,13 +3,13 @@ package com.mobyle.nanquim.presentation.diagnostics
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalResources
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.presentation.common.rememberToast
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun DiagnosticsRoute(viewModel: DiagnosticsViewModel = hiltViewModel()) {
+fun DiagnosticsRoute(viewModel: DiagnosticsViewModel = koinViewModel()) {
     val exported = rememberExportNotice(R.string.diagnostics_export_done)
     DiagnosticsScreen(
         collector = viewModel.collector,
@@ -27,12 +27,12 @@ fun DiagnosticsRoute(viewModel: DiagnosticsViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun LatencyTestRoute(viewModel: LatencyTestViewModel = hiltViewModel()) {
+fun LatencyTestRoute(viewModel: LatencyTestViewModel = koinViewModel()) {
     LatencyTestScreen(engine = viewModel.engine, onBack = viewModel::back)
 }
 
 @Composable
-fun ShapeTracesRoute(viewModel: ShapeTracesViewModel = hiltViewModel()) {
+fun ShapeTracesRoute(viewModel: ShapeTracesViewModel = koinViewModel()) {
     val exported = rememberExportNotice(R.string.shape_traces_export_done)
     ShapeTraceScreen(
         recorder = viewModel.recorder,
@@ -44,7 +44,7 @@ fun ShapeTracesRoute(viewModel: ShapeTracesViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun TouchSessionsRoute(viewModel: TouchSessionsViewModel = hiltViewModel()) {
+fun TouchSessionsRoute(viewModel: TouchSessionsViewModel = koinViewModel()) {
     val exported = rememberExportNotice(R.string.touch_sessions_export_done)
     TouchSessionScreen(
         recorder = viewModel.recorder,

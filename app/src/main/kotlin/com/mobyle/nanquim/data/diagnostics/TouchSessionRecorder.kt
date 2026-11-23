@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import com.mobyle.nanquim.domain.canvas.input.TouchEvent
 import com.mobyle.nanquim.domain.canvas.input.TouchSession
 import com.mobyle.nanquim.domain.canvas.input.TouchSessionSet
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,12 +83,12 @@ class TouchSessionRecorder(
     fun counts(): Map<String, Int> = TouchSessionSet.LABELS.associateWith { label -> sessions.count { it.label == label } }
 
     suspend fun export(
-        contentResolver: ContentResolver,
-        uri: Uri,
+        files: ExternalFiles,
+        uri: String,
     ) {
         val text = TouchSessionSet.encode(snapshot())
         withContext(io) {
-            val stream = checkNotNull(contentResolver.openOutputStream(uri, "wt")) { "Cannot open $uri for writing" }
+            val stream = checkNotNull(files.openOutput(uri)) { "Cannot open $uri for writing" }
             stream.bufferedWriter(Charsets.UTF_8).use { it.write(text) }
         }
     }

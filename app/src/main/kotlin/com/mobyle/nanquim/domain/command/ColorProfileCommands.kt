@@ -1,9 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import android.content.ContentResolver
-import android.provider.OpenableColumns
-import androidx.core.net.toUri
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.color.ColorProfileEntry
 import com.mobyle.nanquim.data.color.ColorProfileException
 import com.mobyle.nanquim.data.color.ColorProfileLibrary
@@ -16,7 +12,9 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.CanvasSession
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import com.mobyle.nanquim.engine.ColorProfiles
 import com.mobyle.nanquim.formats.nanquim.NanquimManifest
 import kotlinx.coroutines.Dispatchers
@@ -45,11 +43,11 @@ fun registerColorProfileCommands(
     registry: CommandRegistry,
     library: ColorProfileLibrary,
     canvas: CanvasSession,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         category: CommandCategory = CommandCategory.Color,
         needsArtwork: Boolean = false,
@@ -57,7 +55,7 @@ fun registerColorProfileCommands(
     ) = registry.register(
         CommandSpec(
             id = id,
-            titleRes = titleRes,
+            titleKey = titleKey,
             category = category,
             parameters = parameters,
             undoable = false,
@@ -93,7 +91,7 @@ fun registerColorProfileCommands(
         return entry to null
     }
 
-    register(ColorProfileCommandIds.LIST, R.string.command_color_profile_list) {
+    register(ColorProfileCommandIds.LIST, TextKey("command_color_profile_list")) {
         CommandResult.Success(
             buildJsonObject {
                 put(
@@ -123,27 +121,25 @@ fun registerColorProfileCommands(
     }
     register(
         ColorProfileCommandIds.IMPORT,
-        R.string.command_color_profile_import,
+        TextKey("command_color_profile_import"),
         listOf(ParameterSpec("uri", ParameterType.String)),
     ) { arguments ->
         val uri =
             arguments
                 .getValue("uri")
                 .jsonPrimitive.content
-                .toUri()
-        if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
+        if (!files.accepts(uri)) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
         val (bytes, fileName) =
             try {
                 withContext(Dispatchers.IO) {
                     val name =
-                        contentResolver
-                            .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
-                            ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+                        files
+                            .displayName(uri)
                             ?.substringBeforeLast('.')
                             .orEmpty()
-                    val input = contentResolver.openInputStream(uri) ?: throw IOException("Cannot read $uri")
+                    val input = files.openInput(uri) ?: throw IOException("Cannot read $uri")
                     val bytes = input.use { it.readNBytesLimited(ColorProfiles.MAXIMUM_BYTES + 1) }
                     bytes to name
                 }
@@ -161,7 +157,7 @@ fun registerColorProfileCommands(
             }
         CommandResult.Success(describe(entry))
     }
-    register(ColorProfileCommandIds.DELETE, R.string.command_color_profile_delete, listOf(profileId)) { arguments ->
+    register(ColorProfileCommandIds.DELETE, TextKey("command_color_profile_delete"), listOf(profileId)) { arguments ->
         if (library.delete(arguments.getValue("profileId").jsonPrimitive.content)) {
             CommandResult.Success()
         } else {
@@ -170,7 +166,7 @@ fun registerColorProfileCommands(
     }
     register(
         ColorProfileCommandIds.ASSIGN,
-        R.string.canvas_assign_profile,
+        TextKey("canvas_assign_profile"),
         listOf(profileId),
         CommandCategory.Canvas,
         needsArtwork = true,
@@ -183,7 +179,7 @@ fun registerColorProfileCommands(
     }
     register(
         ColorProfileCommandIds.SET_CMYK,
-        R.string.canvas_set_cmyk_profile,
+        TextKey("canvas_set_cmyk_profile"),
         listOf(ParameterSpec("profileId", ParameterType.String, JsonNull)),
         CommandCategory.Canvas,
         needsArtwork = true,
@@ -206,7 +202,7 @@ fun registerColorProfileCommands(
     }
     register(
         ColorProfileCommandIds.CONVERT,
-        R.string.canvas_convert_profile,
+        TextKey("canvas_convert_profile"),
         listOf(profileId),
         CommandCategory.Canvas,
         needsArtwork = true,

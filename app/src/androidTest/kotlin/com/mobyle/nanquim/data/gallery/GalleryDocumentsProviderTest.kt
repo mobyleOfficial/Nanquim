@@ -21,7 +21,7 @@ import java.util.zip.ZipInputStream
 @RunWith(AndroidJUnit4::class)
 class GalleryDocumentsProviderTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val app = AppEntryPoint.from(context)
+    private val app = AppEntryPoint
     private val authority = GalleryDocumentsProvider.authorityOf(context)
     private val resolver = context.contentResolver
 
@@ -82,7 +82,8 @@ class GalleryDocumentsProviderTest {
         resolver.openAssetFileDescriptor(uri, "r")!!.close()
         assertNotNull(
             BitmapFactory.decodeFile(
-                app.artworkStorage()
+                app
+                    .artworkStorage()
                     .folderOf(artwork.id)
                     .resolve("thumbnail.png")
                     .path,

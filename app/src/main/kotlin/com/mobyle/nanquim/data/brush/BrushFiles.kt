@@ -6,10 +6,12 @@ import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.brush.library.BrushGroup
 import com.mobyle.nanquim.document.brush.BrushPackage
 import com.mobyle.nanquim.document.brush.BrushPackageIo
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import com.mobyle.nanquim.formats.interchange.ProcreateBrush
 import com.mobyle.nanquim.formats.interchange.ProcreateBrushSet
 import java.io.ByteArrayInputStream
 import java.io.IOException
+import java.io.InputStream
 import java.util.zip.ZipInputStream
 
 enum class BrushFileKind {
@@ -57,11 +59,13 @@ object BrushFiles {
     }
 
     fun read(
-        contentResolver: ContentResolver,
-        uri: Uri,
-    ): ByteArray {
-        val stream = contentResolver.openInputStream(uri) ?: throw IOException("Cannot open $uri")
-        return stream.use { input ->
+        files: ExternalFiles,
+        uri: String,
+    ): ByteArray = read(files.openInput(uri) ?: throw IOException("Cannot open $uri"))
+
+    /** Reads and closes [stream], refusing a file larger than a brush can be. */
+    fun read(stream: InputStream): ByteArray =
+        stream.use { input ->
             val output = java.io.ByteArrayOutputStream()
             val buffer = ByteArray(64 * 1024)
             while (true) {
@@ -72,7 +76,6 @@ object BrushFiles {
             }
             output.toByteArray()
         }
-    }
 
     fun fileName(
         name: String,

@@ -31,7 +31,7 @@ import java.io.File
 class RecentArtworkWidgetTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context = instrumentation.targetContext
-    private val app = AppEntryPoint.from(context)
+    private val app = AppEntryPoint
     private val manager = AppWidgetManager.getInstance(context)
     private lateinit var host: AppWidgetHost
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID

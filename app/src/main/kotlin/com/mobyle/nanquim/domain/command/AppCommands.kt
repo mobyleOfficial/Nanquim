@@ -1,11 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import android.content.ContentResolver
-import android.net.Uri
-import androidx.core.net.toUri
-import androidx.work.WorkManager
-import com.mobyle.nanquim.BuildConfig
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.core.navigation.AppDestination
 import com.mobyle.nanquim.core.navigation.AppNavigator
 import com.mobyle.nanquim.data.adjust.GradientLibrary
@@ -28,7 +22,11 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.CanvasSession
+import com.mobyle.nanquim.domain.platform.ExternalFiles
+import com.mobyle.nanquim.domain.platform.ShareSheet
+import com.mobyle.nanquim.domain.platform.TimelapseExporter
 import com.mobyle.nanquim.domain.settings.models.Renderer
 import com.mobyle.nanquim.domain.settings.models.ThemeMode
 import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
@@ -89,28 +87,29 @@ fun createAppCommandRegistry(
     palettes: PaletteLibrary,
     colorProfiles: ColorProfileLibrary,
     fonts: FontLibrary,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
     diagnosticsExporter: DiagnosticsExporter,
     shapeTraces: ShapeTraceRecorder,
     touchSessions: TouchSessionRecorder,
     brushGroupName: (BrushGroup) -> String,
     stampBrushName: () -> String,
-    clipboardImage: () -> Uri? = { null },
-    workManager: WorkManager? = null,
+    clipboardImage: () -> String? = { null },
+    timelapseExporter: TimelapseExporter? = null,
+    developerTools: Boolean = false,
 ): CommandRegistry {
     val registry = CommandRegistry()
     canvasSession.closeBrushLibrary = {
         brushUi.libraryTool = null
         brushUi.previewBrushId = null
     }
-    registerCanvasCommands(registry, canvasSession, developerTools = BuildConfig.DEVELOPER_TOOLS)
+    registerCanvasCommands(registry, canvasSession, developerTools = developerTools)
     registerDocumentCommands(registry, canvasSession)
     registerSelectionCommands(registry, canvasSession)
     registerTransformCommands(registry, canvasSession)
     registerAdjustmentCommands(registry, canvasSession)
-    registerGradientCommands(registry, canvasSession, gradients, contentResolver, shareSheet, cacheDirectory)
+    registerGradientCommands(registry, canvasSession, gradients, files, shareSheet, cacheDirectory)
     registerCanvasSizeCommands(registry, canvasSession)
-    registerColorProfileCommands(registry, colorProfiles, canvasSession, contentResolver)
+    registerColorProfileCommands(registry, colorProfiles, canvasSession, files)
     registerGuideCommands(registry, canvasSession)
     registerQuickShapeCommands(registry, canvasSession, brushUi.inputSettings)
     registerGestureCommands(registry, brushUi.inputSettings)
@@ -118,18 +117,18 @@ fun createAppCommandRegistry(
     registerKeyboardCommands(registry, keyboardShortcuts)
     registerCanvasInfoCommands(registry, canvasSession)
     registerMacroCommands(registry, macros)
-    registerReferenceCommands(registry, canvasSession, contentResolver)
-    registerFontCommands(registry, fonts, contentResolver)
+    registerReferenceCommands(registry, canvasSession, files)
+    registerFontCommands(registry, fonts, files)
     registerTextCommands(registry, canvasSession)
     registerAnimationCommands(registry, canvasSession)
-    registerVideoCommands(registry, canvasSession, contentResolver)
-    registerTimelapseCommands(registry, canvasSession, appSettings, workManager, cacheDirectory, contentResolver, shareSheet)
+    registerVideoCommands(registry, canvasSession, files)
+    registerTimelapseCommands(registry, canvasSession, appSettings, timelapseExporter, cacheDirectory, files, shareSheet)
     registerToolCommands(registry, canvasSession)
     val brushImportReport: (List<ImportWarning>) -> Unit = { warnings -> transfer.report = TransferReport(export = false, warnings) }
     registerPaletteCommands(
         registry,
         palettes,
-        contentResolver,
+        files,
         shareSheet,
         cacheDirectory,
         onImportReport = brushImportReport,
@@ -140,7 +139,7 @@ fun createAppCommandRegistry(
         session = canvasSession,
         ui = brushUi,
         navigator = navigator,
-        contentResolver = contentResolver,
+        files = files,
         shareSheet = shareSheet,
         cacheDirectory = cacheDirectory,
         groupName = brushGroupName,
@@ -162,36 +161,37 @@ fun createAppCommandRegistry(
         transfer,
         gallery,
         canvasSession,
-        contentResolver,
+        files,
         shareSheet,
         cacheDirectory,
         brushUi,
         brushImportReport,
+        developerTools,
     )
 
     fun registerNavigation(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         destination: AppDestination,
-    ) = registry.register(CommandSpec(id = id, titleRes = titleRes, category = CommandCategory.Settings, undoable = false)) { _, _ ->
+    ) = registry.register(CommandSpec(id = id, titleKey = titleKey, category = CommandCategory.Settings, undoable = false)) { _, _ ->
         navigator.open(destination)
         CommandResult.Success()
     }
 
-    registerNavigation(AppCommandIds.SETTINGS_OPEN, R.string.command_settings_open, AppDestination.Settings)
-    registerNavigation(AppCommandIds.DIAGNOSTICS_OPEN, R.string.command_diagnostics_open, AppDestination.Diagnostics)
-    registerNavigation(AppCommandIds.DIAGNOSTICS_LATENCY_TEST, R.string.command_diagnostics_latency_test, AppDestination.LatencyTest)
-    registerNavigation(AppCommandIds.SHAPE_TRACES_OPEN, R.string.command_diagnostics_shape_traces, AppDestination.ShapeTraces)
-    registerNavigation(AppCommandIds.TOUCH_SESSIONS_OPEN, R.string.command_diagnostics_touch_sessions, AppDestination.TouchSessions)
-    registerNavigation(AppCommandIds.ABOUT_OPEN, R.string.command_settings_about, AppDestination.About)
-    registerNavigation(AppCommandIds.SUPPORT_OPEN, R.string.command_settings_support, AppDestination.Support)
-    registerNavigation(GestureCommandIds.OPEN, R.string.command_settings_gestures_open, AppDestination.GestureSettings)
-    registerNavigation(KeyboardCommandIds.OPEN, R.string.command_keyboard_shortcuts_open, AppDestination.KeyboardShortcuts)
+    registerNavigation(AppCommandIds.SETTINGS_OPEN, TextKey("command_settings_open"), AppDestination.Settings)
+    registerNavigation(AppCommandIds.DIAGNOSTICS_OPEN, TextKey("command_diagnostics_open"), AppDestination.Diagnostics)
+    registerNavigation(AppCommandIds.DIAGNOSTICS_LATENCY_TEST, TextKey("command_diagnostics_latency_test"), AppDestination.LatencyTest)
+    registerNavigation(AppCommandIds.SHAPE_TRACES_OPEN, TextKey("command_diagnostics_shape_traces"), AppDestination.ShapeTraces)
+    registerNavigation(AppCommandIds.TOUCH_SESSIONS_OPEN, TextKey("command_diagnostics_touch_sessions"), AppDestination.TouchSessions)
+    registerNavigation(AppCommandIds.ABOUT_OPEN, TextKey("command_settings_about"), AppDestination.About)
+    registerNavigation(AppCommandIds.SUPPORT_OPEN, TextKey("command_settings_support"), AppDestination.Support)
+    registerNavigation(GestureCommandIds.OPEN, TextKey("command_settings_gestures_open"), AppDestination.GestureSettings)
+    registerNavigation(KeyboardCommandIds.OPEN, TextKey("command_keyboard_shortcuts_open"), AppDestination.KeyboardShortcuts)
 
     registry.register(
         CommandSpec(
             id = AppCommandIds.SETTINGS_THEME,
-            titleRes = R.string.command_settings_theme,
+            titleKey = TextKey("command_settings_theme"),
             category = CommandCategory.Settings,
             parameters = listOf(ParameterSpec("mode", ParameterType.Enumeration, allowedValues = ThemeMode.entries.map { it.id })),
             undoable = false,
@@ -204,7 +204,7 @@ fun createAppCommandRegistry(
     registry.register(
         CommandSpec(
             id = AppCommandIds.SETTINGS_PROJECTED_CANVAS,
-            titleRes = R.string.command_settings_projected_canvas,
+            titleKey = TextKey("command_settings_projected_canvas"),
             category = CommandCategory.Settings,
             parameters = listOf(ParameterSpec("enabled", ParameterType.Boolean)),
             undoable = false,
@@ -217,7 +217,7 @@ fun createAppCommandRegistry(
     registry.register(
         CommandSpec(
             id = AppCommandIds.SETTINGS_CONFIRM_EXIT,
-            titleRes = R.string.command_settings_confirm_exit,
+            titleKey = TextKey("command_settings_confirm_exit"),
             category = CommandCategory.Settings,
             parameters = listOf(ParameterSpec("enabled", ParameterType.Boolean)),
             undoable = false,
@@ -230,7 +230,7 @@ fun createAppCommandRegistry(
     registry.register(
         CommandSpec(
             id = AppCommandIds.SETTINGS_RENDERER,
-            titleRes = R.string.command_settings_renderer,
+            titleKey = TextKey("command_settings_renderer"),
             category = CommandCategory.Settings,
             parameters =
                 listOf(
@@ -252,7 +252,7 @@ fun createAppCommandRegistry(
     registry.register(
         CommandSpec(
             id = AppCommandIds.SETTINGS_CLEAR_CACHE,
-            titleRes = R.string.command_settings_clear_cache,
+            titleKey = TextKey("command_settings_clear_cache"),
             category = CommandCategory.Settings,
             undoable = false,
         ),
@@ -264,7 +264,7 @@ fun createAppCommandRegistry(
     registry.register(
         CommandSpec(
             id = AppCommandIds.DIAGNOSTICS_EXPORT,
-            titleRes = R.string.command_diagnostics_export,
+            titleKey = TextKey("command_diagnostics_export"),
             category = CommandCategory.Settings,
             parameters = listOf(ParameterSpec("uri", ParameterType.String)),
             undoable = false,
@@ -274,8 +274,7 @@ fun createAppCommandRegistry(
             arguments
                 .getValue("uri")
                 .jsonPrimitive.content
-                .toUri()
-        if (uri.scheme != "content") {
+        if (!files.accepts(uri)) {
             CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         } else {
             diagnosticsExporter.export(uri)
@@ -283,8 +282,8 @@ fun createAppCommandRegistry(
         }
     }
 
-    registerShapeTraceCommands(registry, shapeTraces, contentResolver)
-    registerTouchSessionCommands(registry, touchSessions, contentResolver)
+    registerShapeTraceCommands(registry, shapeTraces, files)
+    registerTouchSessionCommands(registry, touchSessions, files)
 
     return registry
 }
@@ -292,12 +291,12 @@ fun createAppCommandRegistry(
 private fun registerShapeTraceCommands(
     registry: CommandRegistry,
     shapeTraces: ShapeTraceRecorder,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
 ) {
     registry.register(
         CommandSpec(
             id = AppCommandIds.SHAPE_TRACES_EXPORT,
-            titleRes = R.string.command_diagnostics_shape_traces_export,
+            titleKey = TextKey("command_diagnostics_shape_traces_export"),
             category = CommandCategory.Settings,
             parameters = listOf(ParameterSpec("uri", ParameterType.String)),
             undoable = false,
@@ -307,19 +306,18 @@ private fun registerShapeTraceCommands(
             arguments
                 .getValue("uri")
                 .jsonPrimitive.content
-                .toUri()
-        if (uri.scheme != "content") {
+        if (!files.accepts(uri)) {
             CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         } else {
             shapeTraces.load()
-            shapeTraces.export(contentResolver, uri)
+            shapeTraces.export(files, uri)
             CommandResult.Success(buildJsonObject { put("count", shapeTraces.traces.size) })
         }
     }
     registry.register(
         CommandSpec(
             id = AppCommandIds.SHAPE_TRACES_REMOVE_LAST,
-            titleRes = R.string.command_diagnostics_shape_traces_remove_last,
+            titleKey = TextKey("command_diagnostics_shape_traces_remove_last"),
             category = CommandCategory.Settings,
             undoable = false,
         ),
@@ -334,7 +332,7 @@ private fun registerShapeTraceCommands(
     registry.register(
         CommandSpec(
             id = AppCommandIds.SHAPE_TRACES_CLEAR,
-            titleRes = R.string.command_diagnostics_shape_traces_clear,
+            titleKey = TextKey("command_diagnostics_shape_traces_clear"),
             category = CommandCategory.Settings,
             undoable = false,
         ),
@@ -348,12 +346,12 @@ private fun registerShapeTraceCommands(
 private fun registerTouchSessionCommands(
     registry: CommandRegistry,
     touchSessions: TouchSessionRecorder,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
 ) {
     registry.register(
         CommandSpec(
             id = AppCommandIds.TOUCH_SESSIONS_EXPORT,
-            titleRes = R.string.command_diagnostics_touch_sessions_export,
+            titleKey = TextKey("command_diagnostics_touch_sessions_export"),
             category = CommandCategory.Settings,
             parameters = listOf(ParameterSpec("uri", ParameterType.String)),
             undoable = false,
@@ -363,19 +361,18 @@ private fun registerTouchSessionCommands(
             arguments
                 .getValue("uri")
                 .jsonPrimitive.content
-                .toUri()
-        if (uri.scheme != "content") {
+        if (!files.accepts(uri)) {
             CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         } else {
             touchSessions.load()
-            touchSessions.export(contentResolver, uri)
+            touchSessions.export(files, uri)
             CommandResult.Success(buildJsonObject { put("count", touchSessions.sessions.size) })
         }
     }
     registry.register(
         CommandSpec(
             id = AppCommandIds.TOUCH_SESSIONS_REMOVE_LAST,
-            titleRes = R.string.command_diagnostics_touch_sessions_remove_last,
+            titleKey = TextKey("command_diagnostics_touch_sessions_remove_last"),
             category = CommandCategory.Settings,
             undoable = false,
         ),
@@ -390,7 +387,7 @@ private fun registerTouchSessionCommands(
     registry.register(
         CommandSpec(
             id = AppCommandIds.TOUCH_SESSIONS_CLEAR,
-            titleRes = R.string.command_diagnostics_touch_sessions_clear,
+            titleKey = TextKey("command_diagnostics_touch_sessions_clear"),
             category = CommandCategory.Settings,
             undoable = false,
         ),

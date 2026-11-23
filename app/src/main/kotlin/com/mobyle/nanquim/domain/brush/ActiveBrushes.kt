@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.brush
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.data.brush.library.BrushTool
 import com.mobyle.nanquim.data.brush.library.SliderState
 import com.mobyle.nanquim.document.brush.BrushDocument
 import com.mobyle.nanquim.document.brush.BrushPackage
+import com.mobyle.nanquim.domain.platform.Logger
 import com.mobyle.nanquim.engine.BrushData
 import com.mobyle.nanquim.engine.Engine
 import com.mobyle.nanquim.engine.StrokeTool
@@ -183,7 +183,7 @@ class ActiveBrushes(
         message: String,
         exception: Exception?,
     ) {
-        Log.e(TAG, message, exception)
+        Logger.e(TAG, message, exception)
         lastError = exception?.message?.let { "$message: $it" } ?: message
     }
 

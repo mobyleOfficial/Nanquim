@@ -43,7 +43,6 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.domain.command.KeyboardCommandIds
 import com.mobyle.nanquim.domain.keyboard.KeyChord
@@ -54,9 +53,10 @@ import com.mobyle.nanquim.presentation.common.ScreenHeader
 import com.mobyle.nanquim.presentation.keyboard.KeyboardInput
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun KeyboardShortcutsRoute(viewModel: KeyboardShortcutsViewModel = hiltViewModel()) {
+fun KeyboardShortcutsRoute(viewModel: KeyboardShortcutsViewModel = koinViewModel()) {
     val resources = LocalResources.current
     KeyboardShortcutsScreen(
         settings = viewModel.settings,

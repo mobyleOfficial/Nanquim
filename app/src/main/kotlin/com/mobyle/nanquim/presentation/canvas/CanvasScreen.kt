@@ -75,7 +75,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.brush.library.BrushTool
@@ -105,13 +104,14 @@ import com.mobyle.nanquim.presentation.common.LocalWindowLayout
 import com.mobyle.nanquim.presentation.common.rememberToast
 import com.mobyle.nanquim.presentation.gallery.rememberGalleryFailureNotice
 import com.mobyle.nanquim.presentation.theme.LocalDarkTheme
+import org.koin.compose.viewmodel.koinViewModel
 
 /** The export sheet and the image picker belong to the activity's shell, which the gallery shares; it passes them in. */
 @Composable
 fun CanvasRoute(
     onShare: () -> Unit,
     onAddImage: () -> Unit,
-    viewModel: CanvasViewModel = hiltViewModel(),
+    viewModel: CanvasViewModel = koinViewModel(),
 ) {
     val resources = LocalResources.current
     val toast = rememberToast()

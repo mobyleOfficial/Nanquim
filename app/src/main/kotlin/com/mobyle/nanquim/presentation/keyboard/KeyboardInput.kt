@@ -10,6 +10,7 @@ import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.keyboard.KeyChord
 import com.mobyle.nanquim.domain.keyboard.KeyboardShortcuts
 import com.mobyle.nanquim.domain.keyboard.ShortcutAction
+import com.mobyle.nanquim.presentation.common.getString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.intOrNull
@@ -64,7 +65,7 @@ class KeyboardInput(
                         },
                     )
                 else -> null
-            } ?: registry.find(action.commandId)?.let { resources.getString(it.titleRes) } ?: action.commandId
+            } ?: registry.find(action.commandId)?.let { resources.getString(it.titleKey) } ?: action.commandId
         }
 
         fun shortcutGroup(

@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.layer.CanvasAnchor
 import com.mobyle.nanquim.document.layer.CanvasOperation
 import com.mobyle.nanquim.document.layer.LayerOperationException
@@ -49,14 +49,14 @@ fun registerCanvasSizeCommands(
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         undoable: Boolean = true,
         action: (JsonObject) -> JsonObject?,
     ) = registry.register(
         CommandSpec(
             id = id,
-            titleRes = titleRes,
+            titleKey = titleKey,
             category = CommandCategory.Canvas,
             parameters = parameters,
             undoable = undoable,
@@ -75,7 +75,7 @@ fun registerCanvasSizeCommands(
 
     register(
         CanvasSizeCommandIds.CROP,
-        R.string.canvas_crop,
+        TextKey("canvas_crop"),
         listOf("x", "y", "width", "height").map { ParameterSpec(it, ParameterType.Integer) },
     ) { arguments ->
         canvas.canvasOperation(
@@ -85,7 +85,7 @@ fun registerCanvasSizeCommands(
     }
     register(
         CanvasSizeCommandIds.RESIZE,
-        R.string.canvas_size,
+        TextKey("canvas_size"),
         listOf(
             ParameterSpec("width", ParameterType.Integer, minimum = 1.0),
             ParameterSpec("height", ParameterType.Integer, minimum = 1.0),
@@ -107,24 +107,24 @@ fun registerCanvasSizeCommands(
     }
     register(
         CanvasSizeCommandIds.ROTATE,
-        R.string.canvas_rotate_right,
+        TextKey("canvas_rotate_right"),
         listOf(ParameterSpec("quarterTurns", ParameterType.Integer, minimum = -3.0, maximum = 3.0)),
     ) { arguments ->
         canvas.canvasOperation(CanvasOperation.Rotate(arguments.int("quarterTurns")))
         null
     }
-    register(CanvasSizeCommandIds.FLIP_HORIZONTAL, R.string.canvas_flip_horizontal) { _ ->
+    register(CanvasSizeCommandIds.FLIP_HORIZONTAL, TextKey("canvas_flip_horizontal")) { _ ->
         canvas.canvasOperation(CanvasOperation.Flip(horizontal = true))
         null
     }
-    register(CanvasSizeCommandIds.FLIP_VERTICAL, R.string.canvas_flip_vertical) { _ ->
+    register(CanvasSizeCommandIds.FLIP_VERTICAL, TextKey("canvas_flip_vertical")) { _ ->
         canvas.canvasOperation(CanvasOperation.Flip(horizontal = false))
         null
     }
     registry.register(
         CommandSpec(
             id = CanvasSizeCommandIds.COLOR_DEPTH,
-            titleRes = R.string.canvas_color_depth,
+            titleKey = TextKey("canvas_color_depth"),
             category = CommandCategory.Canvas,
             parameters =
                 listOf(ParameterSpec("bitsPerChannel", ParameterType.Integer, minimum = 8.0, maximum = 16.0)),
@@ -143,7 +143,7 @@ fun registerCanvasSizeCommands(
             CommandResult.Success(buildJsonObject { put("bitsPerChannel", format.bitsPerChannel) })
         }
     }
-    register(CanvasSizeCommandIds.INFO, R.string.command_canvas_info, undoable = false) { _ ->
+    register(CanvasSizeCommandIds.INFO, TextKey("command_canvas_info"), undoable = false) { _ ->
         val state = canvas.document!!
         buildJsonObject {
             put("width", state.widthPx)

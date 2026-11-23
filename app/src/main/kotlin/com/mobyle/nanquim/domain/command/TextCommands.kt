@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
@@ -9,6 +8,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.layer.LayerOperationException
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import kotlinx.serialization.json.JsonArray
@@ -51,7 +51,7 @@ fun registerTextCommands(
 
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         availability: (com.mobyle.nanquim.document.command.AppState) -> Availability = editing,
         undoable: Boolean = false,
@@ -59,7 +59,7 @@ fun registerTextCommands(
     ) = registry.register(
         CommandSpec(
             id = id,
-            titleRes = titleRes,
+            titleKey = titleKey,
             category = CommandCategory.Text,
             parameters = parameters,
             undoable = undoable,
@@ -74,7 +74,7 @@ fun registerTextCommands(
 
     register(
         TextCommandIds.PLACE,
-        R.string.command_text_place,
+        TextKey("command_text_place"),
         listOf(ParameterSpec("x", ParameterType.Number), ParameterSpec("y", ParameterType.Number)),
         document,
     ) { arguments ->
@@ -89,7 +89,7 @@ fun registerTextCommands(
     }
     register(
         TextCommandIds.EDIT,
-        R.string.command_text_edit,
+        TextKey("command_text_edit"),
         listOf(ParameterSpec("layerId", ParameterType.Integer)),
         document,
     ) { arguments ->
@@ -105,25 +105,25 @@ fun registerTextCommands(
         editor.edit(id)
         CommandResult.Success()
     }
-    register(TextCommandIds.INSERT, R.string.command_text_insert, listOf(ParameterSpec("text", ParameterType.String)), undoable = true) {
+    register(TextCommandIds.INSERT, TextKey("command_text_insert"), listOf(ParameterSpec("text", ParameterType.String)), undoable = true) {
         editor.insert(it.getValue("text").jsonPrimitive.content)
         CommandResult.Success(buildJsonObject { put("layerId", editor.editing?.layerId?.let(::JsonPrimitive) ?: JsonNull) })
     }
     register(
         TextCommandIds.SELECT,
-        R.string.command_text_select,
+        TextKey("command_text_select"),
         listOf(ParameterSpec("start", ParameterType.Integer), ParameterSpec("end", ParameterType.Integer)),
     ) {
         editor.setSelection(it.getValue("start").jsonPrimitive.intOrNull ?: 0, it.getValue("end").jsonPrimitive.intOrNull ?: 0)
         CommandResult.Success()
     }
-    register(TextCommandIds.DELETE_BACKWARD, R.string.command_text_delete_backward, undoable = true) {
+    register(TextCommandIds.DELETE_BACKWARD, TextKey("command_text_delete_backward"), undoable = true) {
         editor.deleteBackward()
         CommandResult.Success()
     }
     register(
         TextCommandIds.SET_STYLE,
-        R.string.command_text_set_style,
+        TextKey("command_text_set_style"),
         listOf(
             optional("fontId", ParameterType.String),
             optional("sizePt", ParameterType.Number),
@@ -162,7 +162,7 @@ fun registerTextCommands(
     }
     register(
         TextCommandIds.SET_PARAGRAPH,
-        R.string.command_text_set_paragraph,
+        TextKey("command_text_set_paragraph"),
         listOf(
             optional("alignment", ParameterType.String),
             optional("lineHeight", ParameterType.Number),
@@ -187,7 +187,7 @@ fun registerTextCommands(
     }
     register(
         TextCommandIds.SET_BOX,
-        R.string.command_text_set_box,
+        TextKey("command_text_set_box"),
         listOf(
             ParameterSpec("mode", ParameterType.String),
             optional("width", ParameterType.Number),
@@ -207,13 +207,13 @@ fun registerTextCommands(
         editor.setBox(JsonObject(changes))
         CommandResult.Success()
     }
-    register(TextCommandIds.DONE, R.string.command_text_done) {
+    register(TextCommandIds.DONE, TextKey("command_text_done")) {
         editor.finish()
         CommandResult.Success()
     }
     register(
         TextCommandIds.RASTERIZE,
-        R.string.command_text_rasterize,
+        TextKey("command_text_rasterize"),
         listOf(ParameterSpec("layerId", ParameterType.Integer)),
         document,
         undoable = true,

@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.formats.nanquim.ArtistInfo
 import kotlinx.serialization.json.JsonArray
@@ -38,7 +38,7 @@ fun registerCanvasInfoCommands(
     registry.register(
         CommandSpec(
             CanvasInfoCommandIds.SHOW,
-            R.string.command_canvas_info_show,
+            TextKey("command_canvas_info_show"),
             CommandCategory.Canvas,
             listOf(ParameterSpec("visible", ParameterType.Boolean, JsonNull)),
             undoable = false,
@@ -51,7 +51,7 @@ fun registerCanvasInfoCommands(
     registry.register(
         CommandSpec(
             CanvasInfoCommandIds.GET,
-            R.string.command_canvas_info_get,
+            TextKey("command_canvas_info_get"),
             CommandCategory.Canvas,
             undoable = false,
             availability = requiresArtwork,
@@ -62,7 +62,7 @@ fun registerCanvasInfoCommands(
     registry.register(
         CommandSpec(
             CanvasInfoCommandIds.SET_ARTIST,
-            R.string.command_canvas_set_artist,
+            TextKey("command_canvas_set_artist"),
             CommandCategory.Canvas,
             listOf(ParameterSpec("name", ParameterType.String, JsonNull), ParameterSpec("signature", ParameterType.Array, JsonNull)),
             undoable = false,

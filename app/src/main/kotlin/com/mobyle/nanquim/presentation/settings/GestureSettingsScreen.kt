@@ -34,7 +34,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.domain.canvas.input.Gesture
 import com.mobyle.nanquim.domain.canvas.input.GestureAction
@@ -48,10 +47,11 @@ import com.mobyle.nanquim.presentation.common.ScreenHeader
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 
 @Composable
-fun GestureSettingsRoute(viewModel: GestureSettingsViewModel = hiltViewModel()) {
+fun GestureSettingsRoute(viewModel: GestureSettingsViewModel = koinViewModel()) {
     GestureSettingsScreen(inputSettings = viewModel.inputSettings, onCommand = viewModel::command, onBack = viewModel::back)
 }
 

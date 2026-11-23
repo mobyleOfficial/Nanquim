@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.shape.RecognizedShape
 import com.mobyle.nanquim.document.shape.ShapeHandle
 import com.mobyle.nanquim.domain.canvas.CanvasSession
@@ -51,7 +51,7 @@ fun registerQuickShapeCommands(
     registry.register(
         CommandSpec(
             id = QuickShapeCommandIds.APPLY_TO_LAST_STROKE,
-            titleRes = R.string.command_shape_snap_apply,
+            titleKey = TextKey("command_shape_snap_apply"),
             category = CommandCategory.Canvas,
             undoable = true,
             availability = requiresDocument,
@@ -66,7 +66,7 @@ fun registerQuickShapeCommands(
     registry.register(
         CommandSpec(
             id = QuickShapeCommandIds.HAPTICS,
-            titleRes = R.string.command_settings_haptics,
+            titleKey = TextKey("command_settings_haptics"),
             category = CommandCategory.Settings,
             parameters = listOf(ParameterSpec("enabled", ParameterType.Boolean)),
             undoable = false,
@@ -78,7 +78,7 @@ fun registerQuickShapeCommands(
     registry.register(
         CommandSpec(
             id = QuickShapeCommandIds.PALM_SUPPORT,
-            titleRes = R.string.command_settings_palm_support,
+            titleKey = TextKey("command_settings_palm_support"),
             category = CommandCategory.Settings,
             parameters =
                 listOf(ParameterSpec("level", ParameterType.Enumeration, allowedValues = PalmSupport.entries.map { it.id })),
@@ -92,7 +92,7 @@ fun registerQuickShapeCommands(
     registry.register(
         CommandSpec(
             id = QuickShapeCommandIds.UNDO_GESTURE,
-            titleRes = R.string.command_settings_undo_gesture,
+            titleKey = TextKey("command_settings_undo_gesture"),
             category = CommandCategory.Settings,
             parameters =
                 listOf(
@@ -114,7 +114,7 @@ fun registerQuickShapeCommands(
     registry.register(
         CommandSpec(
             id = QuickShapeCommandIds.FINGER_PAINTING,
-            titleRes = R.string.command_settings_finger_painting,
+            titleKey = TextKey("command_settings_finger_painting"),
             category = CommandCategory.Settings,
             parameters = listOf(ParameterSpec("enabled", ParameterType.Boolean)),
             undoable = false,
@@ -126,7 +126,7 @@ fun registerQuickShapeCommands(
     registry.register(
         CommandSpec(
             id = QuickShapeCommandIds.SETTINGS,
-            titleRes = R.string.command_settings_quick_shape,
+            titleKey = TextKey("command_settings_quick_shape"),
             category = CommandCategory.Settings,
             parameters =
                 listOf(
@@ -167,7 +167,7 @@ private fun registerShapeEditCommands(
     registry.register(
         CommandSpec(
             id = QuickShapeCommandIds.EDIT,
-            titleRes = R.string.command_shape_snap_edit,
+            titleKey = TextKey("command_shape_snap_edit"),
             category = CommandCategory.Canvas,
             undoable = false,
             availability = requiresDocument,
@@ -176,7 +176,7 @@ private fun registerShapeEditCommands(
     registry.register(
         CommandSpec(
             id = QuickShapeCommandIds.MOVE_HANDLE,
-            titleRes = R.string.command_shape_snap_move_handle,
+            titleKey = TextKey("command_shape_snap_move_handle"),
             category = CommandCategory.Canvas,
             parameters =
                 listOf(
@@ -194,7 +194,7 @@ private fun registerShapeEditCommands(
     registry.register(
         CommandSpec(
             id = QuickShapeCommandIds.END_EDIT,
-            titleRes = R.string.command_shape_snap_end_edit,
+            titleKey = TextKey("command_shape_snap_end_edit"),
             category = CommandCategory.Canvas,
             undoable = false,
             availability = requiresDocument,

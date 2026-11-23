@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.color.CmykConversion
 import com.mobyle.nanquim.document.color.CmykInks
 import com.mobyle.nanquim.document.color.ColorHarmony
@@ -15,6 +14,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.CanvasSession
 import com.mobyle.nanquim.domain.canvas.ColorPanelMode
 import com.mobyle.nanquim.domain.canvas.input.CanvasTool
@@ -84,7 +84,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.TOOL_SELECT,
-            titleRes = R.string.command_tool_select,
+            titleKey = TextKey("command_tool_select"),
             category = CommandCategory.Brush,
             parameters = listOf(ParameterSpec("tool", ParameterType.Enumeration, allowedValues = TOOLS)),
             undoable = false,
@@ -108,7 +108,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.BRUSH_SET_SIZE,
-            titleRes = R.string.command_brush_set_size,
+            titleKey = TextKey("command_brush_set_size"),
             category = CommandCategory.Brush,
             parameters =
                 listOf(
@@ -125,7 +125,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.BRUSH_STEP_SIZE,
-            titleRes = R.string.command_brush_step_size,
+            titleKey = TextKey("command_brush_step_size"),
             category = CommandCategory.Brush,
             parameters = listOf(ParameterSpec("steps", ParameterType.Integer, minimum = -20.0, maximum = 20.0)),
             undoable = false,
@@ -139,7 +139,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.BRUSH_SET_OPACITY,
-            titleRes = R.string.command_brush_set_opacity,
+            titleKey = TextKey("command_brush_set_opacity"),
             category = CommandCategory.Brush,
             parameters = listOf(ParameterSpec("opacity", ParameterType.Number, minimum = 0.0, maximum = 1.0)),
             undoable = false,
@@ -160,14 +160,14 @@ fun registerToolCommands(
         } +
             ParameterSpec("hue", ParameterType.Number, defaultValue = JsonNull, minimum = 0.0, maximum = 360.0) +
             ParameterSpec("hex", ParameterType.String, defaultValue = JsonNull)
-    for ((id, titleRes, secondary) in listOf(
-        Triple(ToolCommandIds.COLOR_SET_PRIMARY, R.string.command_color_set_primary, false),
-        Triple(ToolCommandIds.COLOR_SET_SECONDARY, R.string.command_color_set_secondary, true),
+    for ((id, titleKey, secondary) in listOf(
+        Triple(ToolCommandIds.COLOR_SET_PRIMARY, TextKey("command_color_set_primary"), false),
+        Triple(ToolCommandIds.COLOR_SET_SECONDARY, TextKey("command_color_set_secondary"), true),
     )) {
         registry.register(
             CommandSpec(
                 id = id,
-                titleRes = titleRes,
+                titleKey = titleKey,
                 category = CommandCategory.Color,
                 parameters = colorParameters,
                 undoable = false,
@@ -199,7 +199,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.COLOR_SWAP,
-            titleRes = R.string.command_color_swap,
+            titleKey = TextKey("command_color_swap"),
             category = CommandCategory.Color,
             undoable = false,
         ),
@@ -210,7 +210,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.COLOR_HISTORY_LIST,
-            titleRes = R.string.command_color_history_list,
+            titleKey = TextKey("command_color_history_list"),
             category = CommandCategory.Color,
             undoable = false,
         ),
@@ -222,7 +222,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.COLOR_HISTORY_CLEAR,
-            titleRes = R.string.command_color_history_clear,
+            titleKey = TextKey("command_color_history_clear"),
             category = CommandCategory.Color,
             undoable = false,
         ),
@@ -234,7 +234,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.COLOR_PANEL_OPEN,
-            titleRes = R.string.command_color_panel_open,
+            titleKey = TextKey("command_color_panel_open"),
             category = CommandCategory.Color,
             parameters = listOf(ParameterSpec("mode", ParameterType.Enumeration, defaultValue = JsonNull, allowedValues = panelModes)),
             undoable = false,
@@ -248,7 +248,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.COLOR_PANEL_CLOSE,
-            titleRes = R.string.command_color_panel_close,
+            titleKey = TextKey("command_color_panel_close"),
             category = CommandCategory.Color,
             undoable = false,
         ),
@@ -259,7 +259,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.COLOR_PANEL_TOGGLE,
-            titleRes = R.string.command_color_panel_toggle,
+            titleKey = TextKey("command_color_panel_toggle"),
             category = CommandCategory.Color,
             undoable = false,
         ),
@@ -270,7 +270,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.COLOR_PANEL_SET_MODE,
-            titleRes = R.string.command_color_panel_set_mode,
+            titleKey = TextKey("command_color_panel_set_mode"),
             category = CommandCategory.Color,
             parameters = listOf(ParameterSpec("mode", ParameterType.Enumeration, allowedValues = panelModes)),
             undoable = false,
@@ -282,7 +282,7 @@ fun registerToolCommands(
     registry.register(
         CommandSpec(
             id = ToolCommandIds.COLOR_PANEL_SET_HARMONY,
-            titleRes = R.string.command_color_panel_set_harmony,
+            titleKey = TextKey("command_color_panel_set_harmony"),
             category = CommandCategory.Color,
             parameters =
                 listOf(ParameterSpec("harmony", ParameterType.Enumeration, allowedValues = ColorHarmony.entries.map { it.id })),
@@ -293,15 +293,15 @@ fun registerToolCommands(
         CommandResult.Success()
     }
 
-    for ((id, tool, titleRes) in listOf(
-        Triple(ToolCommandIds.TOOL_PAINT_STROKE_PATH, StrokeTool.Paint, R.string.command_tool_paint_stroke_path),
-        Triple(ToolCommandIds.TOOL_ERASE_STROKE_PATH, StrokeTool.Erase, R.string.command_tool_erase_stroke_path),
-        Triple(ToolCommandIds.TOOL_SMUDGE_STROKE_PATH, StrokeTool.Smudge, R.string.command_tool_smudge_stroke_path),
+    for ((id, tool, titleKey) in listOf(
+        Triple(ToolCommandIds.TOOL_PAINT_STROKE_PATH, StrokeTool.Paint, TextKey("command_tool_paint_stroke_path")),
+        Triple(ToolCommandIds.TOOL_ERASE_STROKE_PATH, StrokeTool.Erase, TextKey("command_tool_erase_stroke_path")),
+        Triple(ToolCommandIds.TOOL_SMUDGE_STROKE_PATH, StrokeTool.Smudge, TextKey("command_tool_smudge_stroke_path")),
     )) {
         registry.register(
             CommandSpec(
                 id = id,
-                titleRes = titleRes,
+                titleKey = titleKey,
                 category = CommandCategory.Brush,
                 parameters = listOf(ParameterSpec("samples", ParameterType.Array)),
                 undoable = false,

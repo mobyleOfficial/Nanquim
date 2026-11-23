@@ -14,93 +14,78 @@ import com.mobyle.nanquim.domain.diagnostics.StylusObservationRecorder
 import com.mobyle.nanquim.domain.settings.models.Renderer
 import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.engine.Engine
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import javax.inject.Inject
 
-@HiltViewModel
-class DiagnosticsViewModel
-    @Inject
-    constructor(
-        val collector: DiagnosticsCollector,
-        val recorder: StylusObservationRecorder,
-        private val appSettings: AppSettingsRepository,
-        private val dispatcher: CommandDispatcher,
-        private val navigator: AppNavigator,
-    ) : ViewModel() {
-        val selectedRenderer: Renderer get() = appSettings.renderer
-        val activeRenderer: Renderer? get() = appSettings.activeRenderer
-        val rendererFellBack: Boolean get() = appSettings.rendererFellBack
+class DiagnosticsViewModel(
+    val collector: DiagnosticsCollector,
+    val recorder: StylusObservationRecorder,
+    private val appSettings: AppSettingsRepository,
+    private val dispatcher: CommandDispatcher,
+    private val navigator: AppNavigator,
+) : ViewModel() {
+    val selectedRenderer: Renderer get() = appSettings.renderer
+    val activeRenderer: Renderer? get() = appSettings.activeRenderer
+    val rendererFellBack: Boolean get() = appSettings.rendererFellBack
 
-        fun selectRenderer(renderer: Renderer) =
-            dispatcher.dispatch(AppCommandIds.SETTINGS_RENDERER, buildJsonObject { put("renderer", renderer.id) })
+    fun selectRenderer(renderer: Renderer) =
+        dispatcher.dispatch(AppCommandIds.SETTINGS_RENDERER, buildJsonObject { put("renderer", renderer.id) })
 
-        fun export(
-            uri: Uri,
-            onResult: (CommandResult) -> Unit,
-        ) = dispatcher.dispatch(AppCommandIds.DIAGNOSTICS_EXPORT, buildJsonObject { put("uri", uri.toString()) }, onResult)
+    fun export(
+        uri: Uri,
+        onResult: (CommandResult) -> Unit,
+    ) = dispatcher.dispatch(AppCommandIds.DIAGNOSTICS_EXPORT, buildJsonObject { put("uri", uri.toString()) }, onResult)
 
-        fun openLatencyTest() = dispatcher.dispatch(AppCommandIds.DIAGNOSTICS_LATENCY_TEST)
+    fun openLatencyTest() = dispatcher.dispatch(AppCommandIds.DIAGNOSTICS_LATENCY_TEST)
 
-        fun openShapeTraces() = dispatcher.dispatch(AppCommandIds.SHAPE_TRACES_OPEN)
+    fun openShapeTraces() = dispatcher.dispatch(AppCommandIds.SHAPE_TRACES_OPEN)
 
-        fun openTouchSessions() = dispatcher.dispatch(AppCommandIds.TOUCH_SESSIONS_OPEN)
+    fun openTouchSessions() = dispatcher.dispatch(AppCommandIds.TOUCH_SESSIONS_OPEN)
 
-        fun back() = navigator.back()
-    }
+    fun back() = navigator.back()
+}
 
-@HiltViewModel
-class LatencyTestViewModel
-    @Inject
-    constructor(
-        val engine: Engine,
-        private val navigator: AppNavigator,
-    ) : ViewModel() {
-        fun back() = navigator.back()
-    }
+class LatencyTestViewModel(
+    val engine: Engine,
+    private val navigator: AppNavigator,
+) : ViewModel() {
+    fun back() = navigator.back()
+}
 
-@HiltViewModel
-class ShapeTracesViewModel
-    @Inject
-    constructor(
-        val recorder: ShapeTraceRecorder,
-        private val dispatcher: CommandDispatcher,
-        private val navigator: AppNavigator,
-    ) : ViewModel() {
-        fun removeLast() = dispatcher.dispatch(AppCommandIds.SHAPE_TRACES_REMOVE_LAST)
+class ShapeTracesViewModel(
+    val recorder: ShapeTraceRecorder,
+    private val dispatcher: CommandDispatcher,
+    private val navigator: AppNavigator,
+) : ViewModel() {
+    fun removeLast() = dispatcher.dispatch(AppCommandIds.SHAPE_TRACES_REMOVE_LAST)
 
-        fun clear() = dispatcher.dispatch(AppCommandIds.SHAPE_TRACES_CLEAR)
+    fun clear() = dispatcher.dispatch(AppCommandIds.SHAPE_TRACES_CLEAR)
 
-        fun export(
-            uri: Uri,
-            onResult: (CommandResult) -> Unit,
-        ) = dispatcher.dispatch(AppCommandIds.SHAPE_TRACES_EXPORT, buildJsonObject { put("uri", uri.toString()) }, onResult)
+    fun export(
+        uri: Uri,
+        onResult: (CommandResult) -> Unit,
+    ) = dispatcher.dispatch(AppCommandIds.SHAPE_TRACES_EXPORT, buildJsonObject { put("uri", uri.toString()) }, onResult)
 
-        fun back() = navigator.back()
-    }
+    fun back() = navigator.back()
+}
 
-@HiltViewModel
-class TouchSessionsViewModel
-    @Inject
-    constructor(
-        @ApplicationContext context: Context,
-        val recorder: TouchSessionRecorder,
-        private val dispatcher: CommandDispatcher,
-        private val navigator: AppNavigator,
-    ) : ViewModel() {
-        /** The screen's horizontal density, to turn the recorded touches into physical sizes. */
-        val xdpi: Float = context.resources.displayMetrics.xdpi
+class TouchSessionsViewModel(
+    context: Context,
+    val recorder: TouchSessionRecorder,
+    private val dispatcher: CommandDispatcher,
+    private val navigator: AppNavigator,
+) : ViewModel() {
+    /** The screen's horizontal density, to turn the recorded touches into physical sizes. */
+    val xdpi: Float = context.resources.displayMetrics.xdpi
 
-        fun removeLast() = dispatcher.dispatch(AppCommandIds.TOUCH_SESSIONS_REMOVE_LAST)
+    fun removeLast() = dispatcher.dispatch(AppCommandIds.TOUCH_SESSIONS_REMOVE_LAST)
 
-        fun clear() = dispatcher.dispatch(AppCommandIds.TOUCH_SESSIONS_CLEAR)
+    fun clear() = dispatcher.dispatch(AppCommandIds.TOUCH_SESSIONS_CLEAR)
 
-        fun export(
-            uri: Uri,
-            onResult: (CommandResult) -> Unit,
-        ) = dispatcher.dispatch(AppCommandIds.TOUCH_SESSIONS_EXPORT, buildJsonObject { put("uri", uri.toString()) }, onResult)
+    fun export(
+        uri: Uri,
+        onResult: (CommandResult) -> Unit,
+    ) = dispatcher.dispatch(AppCommandIds.TOUCH_SESSIONS_EXPORT, buildJsonObject { put("uri", uri.toString()) }, onResult)
 
-        fun back() = navigator.back()
-    }
+    fun back() = navigator.back()
+}

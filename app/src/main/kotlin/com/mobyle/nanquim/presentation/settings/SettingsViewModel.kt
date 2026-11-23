@@ -16,54 +16,49 @@ import com.mobyle.nanquim.domain.settings.models.StorageUsage
 import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
 import com.mobyle.nanquim.domain.settings.repositories.StorageRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
-import javax.inject.Inject
 
 /** The settings themselves stay in [InputSettingsRepository] and [AppSettingsRepository]; this holds what only the screen needs. */
-@HiltViewModel
-class SettingsViewModel
-    @Inject
-    constructor(
-        val inputSettings: InputSettingsRepository,
-        val appSettings: AppSettingsRepository,
-        private val storage: StorageRepository,
-        private val galleryAds: GalleryAds,
-        private val dispatcher: CommandDispatcher,
-        private val navigator: AppNavigator,
-    ) : ViewModel() {
-        var storageUsage by mutableStateOf<StorageUsage?>(null)
-            private set
+class SettingsViewModel(
+    val inputSettings: InputSettingsRepository,
+    val appSettings: AppSettingsRepository,
+    private val storage: StorageRepository,
+    private val galleryAds: GalleryAds,
+    private val dispatcher: CommandDispatcher,
+    private val navigator: AppNavigator,
+) : ViewModel() {
+    var storageUsage by mutableStateOf<StorageUsage?>(null)
+        private set
 
-        val adsAvailable: Boolean get() = BuildConfig.ADS_ENABLED
+    val adsAvailable: Boolean get() = BuildConfig.ADS_ENABLED
 
-        /** Whether the consent rules where the person lives require a way back to the ad choices form. */
-        val adChoicesAvailable: Boolean get() = galleryAds.privacyOptionsRequired
+    /** Whether the consent rules where the person lives require a way back to the ad choices form. */
+    val adChoicesAvailable: Boolean get() = galleryAds.privacyOptionsRequired
 
-        init {
-            refreshStorageUsage()
-        }
-
-        fun command(
-            commandId: String,
-            arguments: JsonObject,
-            onOpenFailed: () -> Unit,
-        ) = dispatcher.dispatchFeedback(commandId, arguments, onOpenFailed)
-
-        fun clearCache() {
-            dispatcher.dispatch(AppCommandIds.SETTINGS_CLEAR_CACHE) { refreshStorageUsage() }
-        }
-
-        fun showAdChoices(activity: Activity) = galleryAds.showPrivacyOptions(activity)
-
-        fun openDiagnostics() = dispatcher.dispatch(AppCommandIds.DIAGNOSTICS_OPEN)
-
-        fun back() = navigator.back()
-
-        private fun refreshStorageUsage() {
-            viewModelScope.launch { storageUsage = withContext(Dispatchers.IO) { storage.usage() } }
-        }
+    init {
+        refreshStorageUsage()
     }
+
+    fun command(
+        commandId: String,
+        arguments: JsonObject,
+        onOpenFailed: () -> Unit,
+    ) = dispatcher.dispatchFeedback(commandId, arguments, onOpenFailed)
+
+    fun clearCache() {
+        dispatcher.dispatch(AppCommandIds.SETTINGS_CLEAR_CACHE) { refreshStorageUsage() }
+    }
+
+    fun showAdChoices(activity: Activity) = galleryAds.showPrivacyOptions(activity)
+
+    fun openDiagnostics() = dispatcher.dispatch(AppCommandIds.DIAGNOSTICS_OPEN)
+
+    fun back() = navigator.back()
+
+    private fun refreshStorageUsage() {
+        viewModelScope.launch { storageUsage = withContext(Dispatchers.IO) { storage.usage() } }
+    }
+}

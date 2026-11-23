@@ -6,31 +6,26 @@ import com.mobyle.nanquim.core.navigation.AppNavigator
 import com.mobyle.nanquim.domain.brush.BrushEditorSession
 import com.mobyle.nanquim.domain.command.CommandDispatcher
 import com.mobyle.nanquim.domain.settings.repositories.InputSettingsRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.serialization.json.JsonObject
-import javax.inject.Inject
 
 /** The edit itself lives in [BrushUiState.editor], so the brush commands (and the canvas behind) see the same one. */
-@HiltViewModel
-class BrushEditorViewModel
-    @Inject
-    constructor(
-        private val brushUi: BrushUiState,
-        private val inputSettings: InputSettingsRepository,
-        private val dispatcher: CommandDispatcher,
-        private val navigator: AppNavigator,
-    ) : ViewModel() {
-        val editor: BrushEditorSession? get() = brushUi.editor
+class BrushEditorViewModel(
+    private val brushUi: BrushUiState,
+    private val inputSettings: InputSettingsRepository,
+    private val dispatcher: CommandDispatcher,
+    private val navigator: AppNavigator,
+) : ViewModel() {
+    val editor: BrushEditorSession? get() = brushUi.editor
 
-        val stylusRollReported: Boolean get() = inputSettings.stylusRollReported
+    val stylusRollReported: Boolean get() = inputSettings.stylusRollReported
 
-        fun command(
-            commandId: String,
-            arguments: JsonObject,
-        ) = dispatcher.dispatch(commandId, arguments)
+    fun command(
+        commandId: String,
+        arguments: JsonObject,
+    ) = dispatcher.dispatch(commandId, arguments)
 
-        /** Nothing to edit (the edit ended elsewhere): leave the screen. */
-        fun leave() {
-            if (navigator.current == AppDestination.BrushEditor) navigator.back()
-        }
+    /** Nothing to edit (the edit ended elsewhere): leave the screen. */
+    fun leave() {
+        if (navigator.current == AppDestination.BrushEditor) navigator.back()
     }
+}

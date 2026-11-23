@@ -135,7 +135,7 @@ class WidgetArtwork(
             context: Context,
             appWidgetId: Int,
         ): WidgetArtwork? {
-            val app = AppEntryPoint.from(context)
+            val app = AppEntryPoint
             val artworks = app.galleryDatabase().dao().artworks()
             val chosen = WidgetChoices.chosen(context, appWidgetId)
             val artwork = artworks.firstOrNull { it.id == chosen } ?: artworks.maxByOrNull { it.modifiedAt } ?: return null

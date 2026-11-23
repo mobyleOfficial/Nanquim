@@ -1,9 +1,9 @@
 package com.mobyle.nanquim.domain.command
 
-import android.util.Log
 import com.mobyle.nanquim.document.command.CommandContext
 import com.mobyle.nanquim.document.command.CommandRegistry
 import com.mobyle.nanquim.document.command.CommandResult
+import com.mobyle.nanquim.domain.platform.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
@@ -21,7 +21,7 @@ class CommandDispatcher(
         scope.launch {
             val result = registry.execute(context, commandId, arguments)
             if (result is CommandResult.Failure) {
-                Log.w(LOG_TAG, "Command $commandId failed (${result.code}): ${result.message}")
+                Logger.w(LOG_TAG, "Command $commandId failed (${result.code}): ${result.message}")
             }
             onResult(result)
         }

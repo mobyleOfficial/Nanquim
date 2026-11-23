@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.guide.GridGuide
 import com.mobyle.nanquim.document.guide.GuideSettings
 import com.mobyle.nanquim.document.guide.GuideType
@@ -53,7 +53,7 @@ fun registerGuideCommands(
     registry.register(
         CommandSpec(
             id = GuideCommandIds.SET,
-            titleRes = R.string.command_guide_set,
+            titleKey = TextKey("command_guide_set"),
             category = CommandCategory.View,
             parameters =
                 listOf(
@@ -118,7 +118,7 @@ fun registerGuideCommands(
     registry.register(
         CommandSpec(
             id = GuideCommandIds.TOGGLE,
-            titleRes = R.string.command_guide_toggle,
+            titleKey = TextKey("command_guide_toggle"),
             category = CommandCategory.View,
             parameters = listOf(ParameterSpec("visible", ParameterType.Boolean, JsonNull)),
             undoable = false,
@@ -151,21 +151,23 @@ private fun registerPerspectiveCommands(
 
     fun spec(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec>,
-    ) = CommandSpec(id, titleRes, CommandCategory.View, parameters, undoable = false, availability = requiresDocument)
-    registry.register(spec(GuideCommandIds.PERSPECTIVE_ADD, R.string.command_guide_perspective_add, coordinates)) { _, arguments ->
+    ) = CommandSpec(id, titleKey, CommandCategory.View, parameters, undoable = false, availability = requiresDocument)
+    registry.register(spec(GuideCommandIds.PERSPECTIVE_ADD, TextKey("command_guide_perspective_add"), coordinates)) { _, arguments ->
         val result = apply(canvas.guides.perspective.adding(VanishingPoint(number(arguments, "x"), number(arguments, "y"))))
         if (result is CommandResult.Success) canvas.selectVanishingPoint(canvas.guides.perspective.points.lastIndex)
         result
     }
     registry.register(
-        spec(GuideCommandIds.PERSPECTIVE_MOVE, R.string.command_guide_perspective_move, listOf(index) + coordinates),
+        spec(GuideCommandIds.PERSPECTIVE_MOVE, TextKey("command_guide_perspective_move"), listOf(index) + coordinates),
     ) { _, arguments ->
         val point = VanishingPoint(number(arguments, "x"), number(arguments, "y"))
         apply(canvas.guides.perspective.moving(number(arguments, "index").toInt(), point))
     }
-    registry.register(spec(GuideCommandIds.PERSPECTIVE_REMOVE, R.string.command_guide_perspective_remove, listOf(index))) { _, arguments ->
+    registry.register(
+        spec(GuideCommandIds.PERSPECTIVE_REMOVE, TextKey("command_guide_perspective_remove"), listOf(index)),
+    ) { _, arguments ->
         val result = apply(canvas.guides.perspective.removing(number(arguments, "index").toInt()))
         if (result is CommandResult.Success) canvas.selectVanishingPoint(null)
         result

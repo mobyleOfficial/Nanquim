@@ -1,15 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import android.content.ContentResolver
-import androidx.core.net.toUri
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import androidx.work.workDataOf
-import com.mobyle.nanquim.R
-import com.mobyle.nanquim.data.media.TimelapseExportWorker
 import com.mobyle.nanquim.data.media.TimelapseLength
 import com.mobyle.nanquim.data.transfer.ArtworkTransfer
 import com.mobyle.nanquim.document.command.AppState
@@ -21,13 +11,15 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.CanvasSession
+import com.mobyle.nanquim.domain.platform.ExternalFiles
+import com.mobyle.nanquim.domain.platform.ShareSheet
+import com.mobyle.nanquim.domain.platform.TimelapseExporter
 import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 import com.mobyle.nanquim.formats.nanquim.TimelapseResolution
 import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -48,9 +40,9 @@ fun registerTimelapseCommands(
     registry: CommandRegistry,
     canvas: CanvasSession,
     settings: AppSettingsRepository,
-    workManager: WorkManager?,
+    timelapseExporter: TimelapseExporter?,
     cacheDirectory: File,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
     shareSheet: ShareSheet,
 ) {
     val artwork: (AppState) -> Availability = { state ->
@@ -62,7 +54,7 @@ fun registerTimelapseCommands(
     registry.register(
         CommandSpec(
             id = TimelapseCommandIds.SET_ENABLED,
-            titleRes = R.string.command_timelapse_set_enabled,
+            titleKey = TextKey("command_timelapse_set_enabled"),
             category = CommandCategory.Canvas,
             parameters =
                 listOf(
@@ -82,7 +74,7 @@ fun registerTimelapseCommands(
     registry.register(
         CommandSpec(
             id = TimelapseCommandIds.SET_SETTINGS,
-            titleRes = R.string.command_timelapse_set_settings,
+            titleKey = TextKey("command_timelapse_set_settings"),
             category = CommandCategory.Canvas,
             parameters =
                 listOf(
@@ -111,7 +103,7 @@ fun registerTimelapseCommands(
     registry.register(
         CommandSpec(
             id = TimelapseCommandIds.REPLAY,
-            titleRes = R.string.command_timelapse_replay,
+            titleKey = TextKey("command_timelapse_replay"),
             category = CommandCategory.Canvas,
             parameters = listOf(ParameterSpec("open", ParameterType.Boolean, JsonPrimitive(true))),
             undoable = false,
@@ -132,7 +124,7 @@ fun registerTimelapseCommands(
     registry.register(
         CommandSpec(
             id = TimelapseCommandIds.EXPORT,
-            titleRes = R.string.command_timelapse_export,
+            titleKey = TextKey("command_timelapse_export"),
             category = CommandCategory.Export,
             parameters =
                 listOf(
@@ -156,7 +148,7 @@ fun registerTimelapseCommands(
         ),
     ) { _, arguments ->
         val open = canvas.artwork ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No artwork")
-        val manager = workManager ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No WorkManager")
+        val exporter = timelapseExporter ?: return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No timelapse exporter")
         canvas.timelapse.flush()
         val segments = canvas.timelapse.segmentsOf(open.folder)
         if (segments.isEmpty()) return@register CommandResult.Failure(CommandErrorCode.Unavailable, "No timelapse recorded")
@@ -174,34 +166,17 @@ fun registerTimelapseCommands(
             } else {
                 emptyList()
             }
-        val request =
-            OneTimeWorkRequestBuilder<TimelapseExportWorker>()
-                .setInputData(
-                    workDataOf(
-                        TimelapseExportWorker.KEY_SEGMENTS to segments.map { it.path }.toTypedArray(),
-                        TimelapseExportWorker.KEY_OUTPUT to output.path,
-                        TimelapseExportWorker.KEY_LENGTH to
-                            ((arguments["length"] as? JsonPrimitive)?.contentOrNull ?: TimelapseLength.Full.id),
-                        TimelapseExportWorker.KEY_CARD_LINES to cards.toTypedArray(),
-                    ),
-                ).setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .build()
-        manager.enqueueUniqueWork(EXPORT_WORK, ExistingWorkPolicy.REPLACE, request)
-        val finished = manager.getWorkInfoByIdFlow(request.id).filterNotNull().first { it.state.isFinished }
-        if (finished.state !=
-            WorkInfo.State.SUCCEEDED
-        ) {
+        val length = (arguments["length"] as? JsonPrimitive)?.contentOrNull ?: TimelapseLength.Full.id
+        if (!exporter.export(segments, output, length, cards)) {
             return@register CommandResult.Failure(CommandErrorCode.HandlerFailed, "Timelapse export failed")
         }
-        val uri = (arguments["uri"] as? JsonPrimitive)?.contentOrNull?.toUri()
+        val uri = (arguments["uri"] as? JsonPrimitive)?.contentOrNull
         if (uri != null) {
-            if (uri.scheme !=
-                ContentResolver.SCHEME_CONTENT
-            ) {
+            if (!files.accepts(uri)) {
                 return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
             }
             withContext(Dispatchers.IO) {
-                contentResolver.openOutputStream(uri, "wt")?.use { stream -> output.inputStream().use { it.copyTo(stream) } }
+                files.openOutput(uri)?.use { stream -> output.inputStream().use { it.copyTo(stream) } }
             }
         } else {
             shareSheet.share(listOf(output), "video/mp4")
@@ -211,7 +186,7 @@ fun registerTimelapseCommands(
     registry.register(
         CommandSpec(
             id = TimelapseCommandIds.NEW_CANVASES,
-            titleRes = R.string.command_timelapse_new_canvases,
+            titleKey = TextKey("command_timelapse_new_canvases"),
             category = CommandCategory.Settings,
             parameters = listOf(ParameterSpec("enabled", ParameterType.Boolean)),
             undoable = false,
@@ -221,5 +196,3 @@ fun registerTimelapseCommands(
         CommandResult.Success()
     }
 }
-
-private const val EXPORT_WORK = "timelapse-export"

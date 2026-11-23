@@ -1,7 +1,5 @@
 package com.mobyle.nanquim.domain.canvas
 
-import android.content.ContentResolver
-import android.os.SystemClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -73,6 +71,7 @@ import com.mobyle.nanquim.domain.canvas.selection.SelectionMode
 import com.mobyle.nanquim.domain.canvas.transform.LiftedContent
 import com.mobyle.nanquim.domain.canvas.transform.TransformEditor
 import com.mobyle.nanquim.domain.color.ProfileCmykConversion
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import com.mobyle.nanquim.domain.text.TextEditor
 import com.mobyle.nanquim.engine.AdjustmentFilter
 import com.mobyle.nanquim.engine.AffineTransform
@@ -120,6 +119,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.math.roundToInt
+import kotlin.time.TimeSource
 
 data class ToolSettings(
     val sizeSlider: Float,
@@ -221,7 +221,7 @@ class CanvasSession(
     private val layerNames: LayerNames,
     private val scope: CoroutineScope,
     val persistence: DocumentPersistence,
-    contentResolver: ContentResolver,
+    externalFiles: ExternalFiles,
 ) {
     var timelapseReplay: List<java.io.File>? by mutableStateOf(null)
 
@@ -234,7 +234,7 @@ class CanvasSession(
         timelapse.attach(open.folder, settings)
     }
 
-    val videoLayers = VideoLayers(engine, scope, contentResolver) { artwork?.folder }
+    val videoLayers = VideoLayers(engine, scope, externalFiles) { artwork?.folder }
 
     val viewport = CanvasViewportController(engine)
 
@@ -255,15 +255,14 @@ class CanvasSession(
 
     var onSnapped: () -> Unit = {}
 
-    suspend fun compositePicture(maxSide: Int): android.graphics.Bitmap? {
+    /** The whole picture, flattened and scaled to fit [maxSide]; null without an open document or when rendering fails. */
+    suspend fun compositePreview(maxSide: Int): SceneRender? {
         if (documentSession == null) return null
         val render =
             suspendCancellableCoroutine { continuation ->
                 engine.requestCompositePreview(maxSide) { continuation.resume(it) }
             }
-        if (render.error != null || render.width == 0) return null
-        return com.mobyle.nanquim.data.transfer.RgbaImages
-            .premultipliedToBitmap(render.width, render.height, render.pixels)
+        return render.takeIf { it.error == null && it.width != 0 }
     }
 
     val engineFailure: StateFlow<EngineEvent.Error?> get() = engine.unrecoverableError
@@ -976,9 +975,11 @@ class CanvasSession(
 
     private val editingTime = EditingTime()
 
+    private val clockStart = TimeSource.Monotonic.markNow()
+
     private fun noteEdit() {
         val open = artwork ?: return
-        val seconds = editingTime.edit(SystemClock.uptimeMillis())
+        val seconds = editingTime.edit(clockStart.elapsedNow().inWholeMilliseconds)
         if (seconds > 0) open.info = open.info.copy(timeSpentSeconds = open.info.timeSpentSeconds + seconds)
     }
 

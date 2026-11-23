@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.feedback.FeedbackActions
 import com.mobyle.nanquim.document.command.CommandCategory
 import com.mobyle.nanquim.document.command.CommandErrorCode
@@ -9,6 +8,7 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.feedback.AppInfo
 import com.mobyle.nanquim.domain.feedback.AppLinks
 import com.mobyle.nanquim.domain.feedback.FeedbackChannel
@@ -47,7 +47,7 @@ fun registerFeedbackCommands(
 ) {
     fun spec(
         id: String,
-        title: Int,
+        title: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
     ) = CommandSpec(id, title, CommandCategory.Settings, parameters, undoable = false)
 
@@ -56,22 +56,22 @@ fun registerFeedbackCommands(
         what: String,
     ): CommandResult = if (opened) CommandResult.Success() else CommandResult.Failure(CommandErrorCode.HandlerFailed, "No app opens $what")
 
-    registry.register(spec(FeedbackCommandIds.RATE, R.string.command_settings_rate)) { _, _ ->
+    registry.register(spec(FeedbackCommandIds.RATE, TextKey("command_settings_rate"))) { _, _ ->
         result(actions.openStoreListing(), "the Play Store")
     }
-    registry.register(spec(FeedbackCommandIds.SHARE_APP, R.string.command_settings_share_app)) { _, _ ->
+    registry.register(spec(FeedbackCommandIds.SHARE_APP, TextKey("command_settings_share_app"))) { _, _ ->
         result(actions.shareText(texts.shareApp()), "a share sheet")
     }
-    registry.register(spec(FeedbackCommandIds.PRIVACY_POLICY_OPEN, R.string.command_settings_privacy_policy)) { _, _ ->
+    registry.register(spec(FeedbackCommandIds.PRIVACY_POLICY_OPEN, TextKey("command_settings_privacy_policy"))) { _, _ ->
         result(actions.openUrl(AppLinks.PRIVACY_POLICY), AppLinks.PRIVACY_POLICY)
     }
-    registry.register(spec(FeedbackCommandIds.TERMS_OPEN, R.string.command_settings_terms)) { _, _ ->
+    registry.register(spec(FeedbackCommandIds.TERMS_OPEN, TextKey("command_settings_terms"))) { _, _ ->
         result(actions.openUrl(AppLinks.TERMS), AppLinks.TERMS)
     }
     registry.register(
         spec(
             FeedbackCommandIds.REPORT,
-            R.string.command_settings_feedback_report,
+            TextKey("command_settings_feedback_report"),
             listOf(
                 ParameterSpec("kind", ParameterType.Enumeration, allowedValues = FeedbackKind.entries.map { it.id }),
                 ParameterSpec("channel", ParameterType.Enumeration, allowedValues = FeedbackChannel.entries.map { it.id }),
@@ -89,7 +89,7 @@ fun registerFeedbackCommands(
     registry.register(
         spec(
             FeedbackCommandIds.USAGE_STATISTICS,
-            R.string.command_settings_usage_statistics,
+            TextKey("command_settings_usage_statistics"),
             listOf(ParameterSpec("enabled", ParameterType.Boolean)),
         ),
     ) { _, arguments ->
@@ -101,7 +101,7 @@ fun registerFeedbackCommands(
     registry.register(
         spec(
             FeedbackCommandIds.GALLERY_ADS,
-            R.string.command_settings_gallery_ads,
+            TextKey("command_settings_gallery_ads"),
             listOf(ParameterSpec("enabled", ParameterType.Boolean)),
         ),
     ) { _, arguments ->

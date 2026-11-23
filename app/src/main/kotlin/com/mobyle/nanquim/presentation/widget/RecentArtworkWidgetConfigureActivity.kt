@@ -44,20 +44,16 @@ import com.mobyle.nanquim.data.document.ArtworkStorage
 import com.mobyle.nanquim.data.gallery.ArtworkEntity
 import com.mobyle.nanquim.data.gallery.GalleryDatabase
 import com.mobyle.nanquim.presentation.theme.NanquimTheme
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 import java.io.File
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class RecentArtworkWidgetConfigureActivity : ComponentActivity() {
-    @Inject
-    lateinit var galleryDatabase: GalleryDatabase
+    private val galleryDatabase: GalleryDatabase by inject()
 
-    @Inject
-    lateinit var artworkStorage: ArtworkStorage
+    private val artworkStorage: ArtworkStorage by inject()
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 

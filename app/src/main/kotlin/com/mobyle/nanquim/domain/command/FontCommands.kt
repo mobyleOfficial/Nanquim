@@ -1,8 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import android.content.ContentResolver
-import androidx.core.net.toUri
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.text.FontEntry
 import com.mobyle.nanquim.data.text.FontImportFailure
 import com.mobyle.nanquim.data.text.FontImportResult
@@ -15,6 +12,8 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
@@ -33,15 +32,15 @@ object FontCommandIds {
 fun registerFontCommands(
     registry: CommandRegistry,
     library: FontLibrary,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
         handler: suspend (JsonObject) -> CommandResult,
     ) = registry.register(
-        CommandSpec(id = id, titleRes = titleRes, category = CommandCategory.Text, parameters = parameters, undoable = false),
+        CommandSpec(id = id, titleKey = titleKey, category = CommandCategory.Text, parameters = parameters, undoable = false),
     ) { _, arguments -> handler(arguments) }
 
     fun FontEntry.json() =
@@ -63,24 +62,23 @@ fun registerFontCommands(
             put("embeddable", info.embeddable)
         }
 
-    register(FontCommandIds.LIST, R.string.command_fonts_list) {
+    register(FontCommandIds.LIST, TextKey("command_fonts_list")) {
         library.awaitLoaded()
         CommandResult.Success(buildJsonObject { putJsonArray("fonts") { library.fonts.forEach { add(it.json()) } } })
     }
-    register(FontCommandIds.IMPORT, R.string.command_fonts_import, listOf(ParameterSpec("uri", ParameterType.String))) { arguments ->
+    register(FontCommandIds.IMPORT, TextKey("command_fonts_import"), listOf(ParameterSpec("uri", ParameterType.String))) { arguments ->
         val uri =
             arguments
                 .getValue("uri")
                 .jsonPrimitive.content
-                .toUri()
-        if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
+        if (!files.accepts(uri)) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
         library.awaitLoaded()
         val bytes =
             try {
                 withContext(Dispatchers.IO) {
-                    val input = contentResolver.openInputStream(uri) ?: throw IOException("Cannot read $uri")
+                    val input = files.openInput(uri) ?: throw IOException("Cannot read $uri")
                     input.use { stream ->
                         val read = stream.readAtMost(FontLibrary.MAXIMUM_FONT_BYTES + 1)
                         read.takeIf { it.size <= FontLibrary.MAXIMUM_FONT_BYTES }
@@ -103,7 +101,7 @@ fun registerFontCommands(
                 )
         }
     }
-    register(FontCommandIds.DELETE, R.string.command_fonts_delete, listOf(ParameterSpec("fontId", ParameterType.String))) { arguments ->
+    register(FontCommandIds.DELETE, TextKey("command_fonts_delete"), listOf(ParameterSpec("fontId", ParameterType.String))) { arguments ->
         val id = arguments.getValue("fontId").jsonPrimitive.content
         if (library.delete(id)) {
             CommandResult.Success()

@@ -47,51 +47,48 @@ import com.mobyle.nanquim.presentation.keyboard.KeyboardInput
 import com.mobyle.nanquim.presentation.shell.LaunchState
 import com.mobyle.nanquim.presentation.shell.NanquimApp
 import com.mobyle.nanquim.presentation.theme.NanquimTheme
-import dagger.Lazy
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 /**
  * Hosts [NanquimApp] and does what needs the activity itself: launch intents, the window, the hardware keyboard, the
  * second display, saving when it leaves the screen. The heavy objects are injected lazily so they are created in the
  * same order, and no sooner, than the screens ask for them.
  */
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject lateinit var launchState: LaunchState
+    private val launchState: LaunchState by inject()
 
-    @Inject lateinit var navigator: AppNavigator
+    private val navigator: AppNavigator by inject()
 
-    @Inject lateinit var controlChannelHost: ControlChannelHost
+    private val controlChannelHost: ControlChannelHost by inject()
 
-    @Inject lateinit var telemetry: Telemetry
+    private val telemetry: Telemetry by inject()
 
-    @Inject lateinit var appSettings: Lazy<AppSettingsRepository>
+    private val appSettings = inject<AppSettingsRepository>()
 
-    @Inject lateinit var gallery: Lazy<Gallery>
+    private val gallery = inject<Gallery>()
 
-    @Inject lateinit var help: Lazy<Help>
+    private val help = inject<Help>()
 
-    @Inject lateinit var sampleArtworks: Lazy<SampleArtworks>
+    private val sampleArtworks = inject<SampleArtworks>()
 
-    @Inject lateinit var canvasSession: Lazy<CanvasSession>
+    private val canvasSession = inject<CanvasSession>()
 
-    @Inject lateinit var resumeState: Lazy<ResumeState>
+    private val resumeState = inject<ResumeState>()
 
-    @Inject lateinit var reviewPrompt: Lazy<ReviewPrompt>
+    private val reviewPrompt = inject<ReviewPrompt>()
 
-    @Inject lateinit var galleryAds: Lazy<GalleryAds>
+    private val galleryAds = inject<GalleryAds>()
 
-    @Inject lateinit var keyboardShortcutSettings: Lazy<KeyboardShortcutsRepository>
+    private val keyboardShortcutSettings = inject<KeyboardShortcutsRepository>()
 
-    @Inject lateinit var commandDispatcher: Lazy<CommandDispatcher>
+    private val commandDispatcher = inject<CommandDispatcher>()
 
-    @Inject lateinit var engine: Lazy<Engine>
+    private val engine = inject<Engine>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_Nanquim)
@@ -103,7 +100,7 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             val darkTheme =
-                when (appSettings.get().themeMode) {
+                when (appSettings.value.themeMode) {
                     ThemeMode.System -> isSystemInDarkTheme()
                     ThemeMode.Light -> false
                     ThemeMode.Dark -> true
@@ -126,19 +123,19 @@ class MainActivity : ComponentActivity() {
         if (processStart && !openTestDocumentFromIntent(intent)) {
             val savedScreens = savedInstanceState?.getStringArrayList(STATE_SCREENS)
             lifecycleScope.launch {
-                val gallery = gallery.get()
-                val session = canvasSession.get()
+                val gallery = gallery.value
+                val session = canvasSession.value
                 val (screenWidth, screenHeight) = displayResolution()
                 gallery.seedPresets(screenWidth, screenHeight)
                 gallery.sync()
-                if (help.get().automatic) sampleArtworks.get().installOnce()
+                if (help.value.automatic) sampleArtworks.value.installOnce()
                 val requested = if (savedInstanceState == null) takeArtworkToOpen(intent) else null
                 if (requested != null) {
                     gallery.openFromOutside(requested)
                 } else if (session.documentSession == null && gallery.restoreLastOpen()) {
                     session.artwork
                         ?.id
-                        ?.let { resumeState.get().restore(session, it) }
+                        ?.let { resumeState.value.restore(session, it) }
                 }
                 savedScreens?.let { navigator.restore(it, artworkOpen = session.documentSession != null) }
             }
@@ -171,8 +168,8 @@ class MainActivity : ComponentActivity() {
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                val reviewPrompt = reviewPrompt.get()
-                val help = help.get()
+                val reviewPrompt = reviewPrompt.value
+                val help = help.value
                 snapshotFlow {
                     reviewPrompt.pending && navigator.current == AppDestination.Gallery && help.automatic
                 }.collect { ready ->
@@ -185,24 +182,24 @@ class MainActivity : ComponentActivity() {
         }
         controlChannelHost.start(intent?.getStringExtra(EXTRA_CONTROL_TOKEN))
         // Before the wait below: lifecycleScope starts it immediately, so the cards must already count as shown.
-        if (savedInstanceState == null) help.get().showWelcomeIfFirstLaunch()
+        if (savedInstanceState == null) help.value.showWelcomeIfFirstLaunch()
         if (savedInstanceState == null) incomingFileOf(intent)?.let { launchState.incomingFile = it }
         lifecycleScope.launch {
-            val help = help.get()
+            val help = help.value
             // Consent and ads wait for the introduction to end and the gallery to show, so nothing interrupts a first launch.
             snapshotFlow { !help.welcomeVisible && navigator.current == AppDestination.Gallery }.first { it }
             if (!help.automatic) return@launch
-            val galleryAds = galleryAds.get()
+            val galleryAds = galleryAds.value
             // The one-time note on ads (shown by NanquimApp) comes before any consent form or banner.
-            if (galleryAds.enabled) snapshotFlow { appSettings.get().adsNoticeSeen }.first { it }
+            if (galleryAds.enabled) snapshotFlow { appSettings.value.adsNoticeSeen }.first { it }
             galleryAds.start(this@MainActivity)
         }
     }
 
     private fun measureAppStart(activityCreatedAt: Long) {
         lifecycleScope.launch {
-            val gallery = gallery.get()
-            val session = canvasSession.get()
+            val gallery = gallery.value
+            val session = canvasSession.value
             snapshotFlow { gallery.loaded || session.documentShown }.first { it }
             suspendCancellableCoroutine { continuation ->
                 Choreographer.getInstance().postFrameCallback { continuation.resumeWith(Result.success(Unit)) }
@@ -238,9 +235,9 @@ class MainActivity : ComponentActivity() {
 
     private val keyboard by lazy {
         KeyboardInput(
-            session = canvasSession.get(),
-            shortcuts = { keyboardShortcutSettings.get().shortcuts },
-            dispatch = { commandId, arguments -> commandDispatcher.get().dispatch(commandId, arguments) },
+            session = canvasSession.value,
+            shortcuts = { keyboardShortcutSettings.value.shortcuts },
+            dispatch = { commandId, arguments -> commandDispatcher.value.dispatch(commandId, arguments) },
         )
     }
 
@@ -252,15 +249,15 @@ class MainActivity : ComponentActivity() {
         deviceId: Int,
     ) {
         super.onProvideKeyboardShortcuts(data, menu, deviceId)
-        val shortcuts = keyboardShortcutSettings.get().shortcuts
-        data += KeyboardInput.shortcutGroup(shortcuts, resources, commandDispatcher.get().registry)
+        val shortcuts = keyboardShortcutSettings.value.shortcuts
+        data += KeyboardInput.shortcutGroup(shortcuts, resources, commandDispatcher.value.registry)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         incomingFileOf(intent)?.let { launchState.incomingFile = it }
-        takeArtworkToOpen(intent)?.let { id -> lifecycleScope.launch { gallery.get().openFromOutside(id) } }
+        takeArtworkToOpen(intent)?.let { id -> lifecycleScope.launch { gallery.value.openFromOutside(id) } }
     }
 
     private fun takeArtworkToOpen(intent: Intent?): String? =
@@ -270,12 +267,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        val appSettings = appSettings.get()
+        val appSettings = appSettings.value
         projectedCanvas =
             ProjectedCanvas(
                 activity = this,
-                engine = engine.get(),
-                session = canvasSession.get(),
+                engine = engine.value,
+                session = canvasSession.value,
                 enabled = { appSettings.projectedCanvas },
                 scope = lifecycleScope,
             ).also { it.start() }
@@ -290,9 +287,9 @@ class MainActivity : ComponentActivity() {
         projectedCanvas?.stop()
         projectedCanvas = null
         super.onStop()
-        val session = canvasSession.get()
+        val session = canvasSession.value
         val state = session.artwork?.let { session.document }
-        resumeState.get().save(session)
+        resumeState.value.save(session)
         val startedAt = SystemClock.elapsedRealtime()
         session.persistence.saveNow(withThumbnail = true) { saved ->
             if (state != null) telemetry.artworkSavedInBackground(state, SystemClock.elapsedRealtime() - startedAt, saved)
@@ -307,7 +304,7 @@ class MainActivity : ComponentActivity() {
         if (parts.size != 3) return false
         navigator.showCanvas()
         val fill = intent.getIntExtra(EXTRA_TEST_FILL, CanvasSession.FILL_ALL_TILES)
-        commandDispatcher.get().dispatch(
+        commandDispatcher.value.dispatch(
             CanvasCommandIds.DEBUG_CREATE_TEST_DOCUMENT,
             buildJsonObject {
                 put("width", parts[0])

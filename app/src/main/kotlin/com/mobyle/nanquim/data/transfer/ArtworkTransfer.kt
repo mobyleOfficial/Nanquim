@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
 import com.mobyle.nanquim.data.brush.BrushFiles
 import com.mobyle.nanquim.data.color.ColorProfileLibrary
 import com.mobyle.nanquim.data.color.PaletteFileFormat
@@ -165,7 +166,30 @@ class ArtworkTransfer(
 
     var report: TransferReport? by mutableStateOf(null)
 
-    fun displayName(uri: Uri): String? =
+    // The URIs arrive as strings from the commands, which know no platform URI type.
+
+    fun displayName(uri: String): String? = displayName(uri.toUri())
+
+    fun isDocumentPackage(uri: String): Boolean = isDocumentPackage(uri.toUri())
+
+    fun interchangeFormatOf(uri: String): InterchangeFormat? = interchangeFormatOf(uri.toUri())
+
+    suspend fun importInterchange(
+        uri: String,
+        format: InterchangeFormat,
+    ): InterchangeImport = importInterchange(uri.toUri(), format)
+
+    suspend fun importDocument(uri: String): String = importDocument(uri.toUri())
+
+    suspend fun importImageAsArtwork(uri: String): String = importImageAsArtwork(uri.toUri())
+
+    suspend fun importImageAsLayer(uri: String): Int = importImageAsLayer(uri.toUri())
+
+    suspend fun isBrushFile(uri: String): Boolean = isBrushFile(uri.toUri())
+
+    suspend fun isPaletteFile(uri: String): Boolean = isPaletteFile(uri.toUri())
+
+    private fun displayName(uri: Uri): String? =
         contentResolver
             .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
             ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
@@ -176,7 +200,7 @@ class ArtworkTransfer(
             .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
             ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
 
-    fun isDocumentPackage(uri: Uri): Boolean {
+    private fun isDocumentPackage(uri: Uri): Boolean {
         val type = contentResolver.getType(uri)
         if (type == NanquimFileType.Document.mimeType) return true
         val name =
@@ -186,7 +210,7 @@ class ArtworkTransfer(
         return name != null && NanquimFileType.fromFileName(name) == NanquimFileType.Document
     }
 
-    fun interchangeFormatOf(uri: Uri): InterchangeFormat? {
+    private fun interchangeFormatOf(uri: Uri): InterchangeFormat? {
         if (fileNameOf(uri)?.endsWith(".${InterchangeFormat.Procreate.extension}", ignoreCase = true) == true) {
             return InterchangeFormat.Procreate
         }
@@ -207,7 +231,7 @@ class ArtworkTransfer(
         }
     }
 
-    suspend fun importInterchange(
+    private suspend fun importInterchange(
         uri: Uri,
         format: InterchangeFormat,
     ): InterchangeImport {
@@ -340,7 +364,7 @@ class ArtworkTransfer(
         return canvasSession.colorProfiles.documentProfile(named.key)
     }
 
-    suspend fun importDocument(uri: Uri): String {
+    private suspend fun importDocument(uri: Uri): String {
         val id = storage.newId()
         val staging = storage.stagingFolder(id)
         withContext(Dispatchers.IO) {
@@ -368,7 +392,7 @@ class ArtworkTransfer(
         return id
     }
 
-    suspend fun importImageAsArtwork(uri: Uri): String {
+    private suspend fun importImageAsArtwork(uri: Uri): String {
         val (width, height) =
             withContext(Dispatchers.IO) { images.size(uri) }
                 ?: throw GalleryException(GalleryError.Unreadable, uri.toString())
@@ -403,7 +427,7 @@ class ArtworkTransfer(
         return id
     }
 
-    suspend fun importImageAsLayer(uri: Uri): Int {
+    private suspend fun importImageAsLayer(uri: Uri): Int {
         if (interchangeFormatOf(uri) == InterchangeFormat.Tiff) return importTiffAsLayer(uri)
         val session = canvasSession.documentSession ?: throw GalleryException(GalleryError.NotFound, "No open artwork")
         val (width, height) =
@@ -480,7 +504,7 @@ class ArtworkTransfer(
     private fun interchangeHeader(uri: Uri): ByteArray? =
         runCatching { contentResolver.openInputStream(uri)?.use { it.readUpTo(ZIP_SIGNATURE.size) } }.getOrNull()
 
-    suspend fun isBrushFile(uri: Uri): Boolean =
+    private suspend fun isBrushFile(uri: Uri): Boolean =
         withContext(Dispatchers.IO) {
             val name = fileNameOf(uri)?.lowercase().orEmpty()
             val type = contentResolver.getType(uri)
@@ -497,13 +521,18 @@ class ArtworkTransfer(
                             ProcreateBrushSet.INDEX in names || procreateArchive
                     } else {
                         val isZip = interchangeHeader(uri)?.contentEquals(ZIP_SIGNATURE) == true
-                        isZip && runCatching { BrushFiles.kindOf(BrushFiles.read(contentResolver, uri)) != null }.getOrDefault(false)
+                        isZip &&
+                            runCatching {
+                                BrushFiles.kindOf(
+                                    BrushFiles.read(checkNotNull(contentResolver.openInputStream(uri))),
+                                ) != null
+                            }.getOrDefault(false)
                     }
                 }
             }
         }
 
-    suspend fun isPaletteFile(uri: Uri): Boolean =
+    private suspend fun isPaletteFile(uri: Uri): Boolean =
         withContext(Dispatchers.IO) {
             val name = fileNameOf(uri)?.lowercase().orEmpty()
             PaletteFileFormat.IMPORT_EXTENSIONS.any { name.endsWith(".$it") } ||

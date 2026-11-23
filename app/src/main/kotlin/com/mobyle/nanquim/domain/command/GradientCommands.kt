@@ -1,8 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import android.content.ContentResolver
-import androidx.core.net.toUri
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.adjust.GradientEntry
 import com.mobyle.nanquim.data.adjust.GradientLibrary
 import com.mobyle.nanquim.data.brush.BrushFiles
@@ -15,7 +12,10 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.domain.canvas.CanvasSession
+import com.mobyle.nanquim.domain.platform.ExternalFiles
+import com.mobyle.nanquim.domain.platform.ShareSheet
 import com.mobyle.nanquim.engine.AdjustmentFilter
 import com.mobyle.nanquim.formats.NanquimFileType
 import com.mobyle.nanquim.formats.gradient.GradientDefinition
@@ -59,17 +59,17 @@ fun registerGradientCommands(
     registry: CommandRegistry,
     canvas: CanvasSession,
     library: GradientLibrary,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
     shareSheet: ShareSheet,
     cacheDirectory: File,
 ) {
     fun register(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec>,
         handler: suspend (JsonObject) -> CommandResult,
     ) = registry.register(
-        CommandSpec(id = id, titleRes = titleRes, category = CommandCategory.Adjust, parameters = parameters, undoable = false),
+        CommandSpec(id = id, titleKey = titleKey, category = CommandCategory.Adjust, parameters = parameters, undoable = false),
     ) { _, arguments ->
         try {
             handler(arguments)
@@ -94,7 +94,7 @@ fun registerGradientCommands(
 
     register(
         GradientCommandIds.CREATE,
-        R.string.command_gradient_create,
+        TextKey("command_gradient_create"),
         listOf(ParameterSpec("name", ParameterType.String), ParameterSpec("stops", ParameterType.Array, JsonNull)),
     ) { arguments ->
         val stops =
@@ -104,7 +104,7 @@ fun registerGradientCommands(
     }
     register(
         GradientCommandIds.DUPLICATE,
-        R.string.command_gradient_duplicate,
+        TextKey("command_gradient_duplicate"),
         listOf(ParameterSpec("gradientId", ParameterType.String), ParameterSpec("name", ParameterType.String, JsonNull)),
     ) { arguments ->
         val source = library.entry(arguments.getValue("gradientId").jsonPrimitive.content) ?: return@register unknownGradient(arguments)
@@ -112,7 +112,7 @@ fun registerGradientCommands(
     }
     register(
         GradientCommandIds.UPDATE,
-        R.string.command_gradient_update,
+        TextKey("command_gradient_update"),
         listOf(
             ParameterSpec("gradientId", ParameterType.String),
             ParameterSpec("name", ParameterType.String, JsonNull),
@@ -130,7 +130,7 @@ fun registerGradientCommands(
     }
     register(
         GradientCommandIds.DELETE,
-        R.string.command_gradient_delete,
+        TextKey("command_gradient_delete"),
         listOf(ParameterSpec("gradientId", ParameterType.String)),
     ) { arguments ->
         val entry = library.entry(arguments.getValue("gradientId").jsonPrimitive.content) ?: return@register unknownGradient(arguments)
@@ -141,20 +141,19 @@ fun registerGradientCommands(
     }
     register(
         GradientCommandIds.IMPORT,
-        R.string.command_gradient_import,
+        TextKey("command_gradient_import"),
         listOf(ParameterSpec("uri", ParameterType.String)),
     ) { arguments ->
         val uri =
             arguments
                 .getValue("uri")
                 .jsonPrimitive.content
-                .toUri()
-        if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
+        if (!files.accepts(uri)) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
         val text =
             withContext(Dispatchers.IO) {
-                val input = contentResolver.openInputStream(uri) ?: throw IOException("Cannot read $uri")
+                val input = files.openInput(uri) ?: throw IOException("Cannot read $uri")
                 input.use { stream -> String(stream.readAtMost(MAXIMUM_FILE_BYTES + 1), Charsets.UTF_8) }
             }
         if (text.length >
@@ -166,7 +165,7 @@ fun registerGradientCommands(
     }
     register(
         GradientCommandIds.EXPORT,
-        R.string.command_gradient_export,
+        TextKey("command_gradient_export"),
         listOf(
             ParameterSpec("gradientId", ParameterType.String),
             ParameterSpec("uri", ParameterType.String, JsonNull),
@@ -174,8 +173,8 @@ fun registerGradientCommands(
         ),
     ) { arguments ->
         val entry = library.entry(arguments.getValue("gradientId").jsonPrimitive.content) ?: return@register unknownGradient(arguments)
-        val uri = arguments.optionalString("uri")?.toUri()
-        if (uri != null && uri.scheme != ContentResolver.SCHEME_CONTENT) {
+        val uri = arguments.optionalString("uri")
+        if (uri != null && !files.accepts(uri)) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
         val name = arguments.optionalString("name") ?: entry.definition.name
@@ -183,7 +182,7 @@ fun registerGradientCommands(
         val fileName = BrushFiles.fileName(name, NanquimFileType.Gradient.extension)
         withContext(Dispatchers.IO) {
             if (uri != null) {
-                val output = contentResolver.openOutputStream(uri, "wt") ?: throw IOException("Cannot write $uri")
+                val output = files.openOutput(uri) ?: throw IOException("Cannot write $uri")
                 output.use { it.write(bytes) }
             } else {
                 val folder = File(cacheDirectory, ArtworkTransfer.EXPORT_FOLDER).apply { mkdirs() }

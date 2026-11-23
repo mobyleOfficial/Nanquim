@@ -23,8 +23,8 @@ import kotlinx.coroutines.runBlocking
 import java.io.FileNotFoundException
 
 class GalleryDocumentsProvider : DocumentsProvider() {
-    // Not @AndroidEntryPoint: the system creates providers before Application.onCreate, so look the graph up on use.
-    private val app get() = AppEntryPoint.from(context!!)
+    // The system creates providers before Application.onCreate starts Koin, so look the graph up on use.
+    private val app = AppEntryPoint
 
     override fun onCreate(): Boolean = true
 
@@ -208,7 +208,8 @@ class GalleryDocumentsProvider : DocumentsProvider() {
         artwork: ArtworkEntity,
     ) {
         val hasThumbnail =
-            app.artworkStorage()
+            app
+                .artworkStorage()
                 .folderOf(artwork.id)
                 .resolve(THUMBNAIL)
                 .isFile

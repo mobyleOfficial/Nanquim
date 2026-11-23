@@ -1,8 +1,5 @@
 package com.mobyle.nanquim.domain.command
 
-import android.content.ContentResolver
-import androidx.core.net.toUri
-import com.mobyle.nanquim.R
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
 import com.mobyle.nanquim.document.command.CommandCategory
@@ -12,11 +9,13 @@ import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
+import com.mobyle.nanquim.document.command.TextKey
 import com.mobyle.nanquim.document.reference.ReferenceCorner
 import com.mobyle.nanquim.document.reference.ReferenceMode
 import com.mobyle.nanquim.document.reference.ReferenceSettings
 import com.mobyle.nanquim.document.reference.ReferenceView
 import com.mobyle.nanquim.domain.canvas.CanvasSession
+import com.mobyle.nanquim.domain.platform.ExternalFiles
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -41,22 +40,22 @@ private val requiresDocument: (AppState) -> Availability = { state ->
 fun registerReferenceCommands(
     registry: CommandRegistry,
     canvas: CanvasSession,
-    contentResolver: ContentResolver,
+    files: ExternalFiles,
 ) {
     val reference = canvas.reference
 
     fun spec(
         id: String,
-        titleRes: Int,
+        titleKey: TextKey,
         parameters: List<ParameterSpec> = emptyList(),
-    ) = CommandSpec(id, titleRes, CommandCategory.View, parameters, undoable = false, availability = requiresDocument)
+    ) = CommandSpec(id, titleKey, CommandCategory.View, parameters, undoable = false, availability = requiresDocument)
 
     fun state() = CommandResult.Success(reference.settings.toJson(reference.image != null))
 
     registry.register(
         spec(
             ReferenceCommandIds.TOGGLE,
-            R.string.command_reference_toggle,
+            TextKey("command_reference_toggle"),
             listOf(ParameterSpec("visible", ParameterType.Boolean, JsonNull)),
         ),
     ) { _, arguments ->
@@ -67,7 +66,7 @@ fun registerReferenceCommands(
     registry.register(
         spec(
             ReferenceCommandIds.SET,
-            R.string.command_reference_set,
+            TextKey("command_reference_set"),
             listOf(
                 ParameterSpec("mode", ParameterType.Enumeration, JsonNull, allowedValues = ReferenceMode.entries.map { it.id }),
                 ParameterSpec("opacity", ParameterType.Number, JsonNull, ReferenceSettings.MINIMUM_OPACITY.toDouble(), 1.0),
@@ -107,13 +106,17 @@ fun registerReferenceCommands(
         state()
     }
     registry.register(
-        spec(ReferenceCommandIds.IMPORT_IMAGE, R.string.command_reference_import_image, listOf(ParameterSpec("uri", ParameterType.String))),
+        spec(
+            ReferenceCommandIds.IMPORT_IMAGE,
+            TextKey("command_reference_import_image"),
+            listOf(ParameterSpec("uri", ParameterType.String)),
+        ),
     ) { _, arguments ->
-        val uri = (arguments.getValue("uri") as JsonPrimitive).content.toUri()
-        if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
+        val uri = (arguments.getValue("uri") as JsonPrimitive).content
+        if (!files.accepts(uri)) {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
-        reference.importImage(contentResolver, uri).fold(
+        reference.importImage(files, uri).fold(
             onSuccess = { state() },
             onFailure = { CommandResult.Failure(CommandErrorCode.InvalidArguments, "Cannot read the image: ${it.message}") },
         )
@@ -121,7 +124,7 @@ fun registerReferenceCommands(
     registry.register(
         spec(
             ReferenceCommandIds.PICK_COLOR,
-            R.string.command_reference_pick_color,
+            TextKey("command_reference_pick_color"),
             listOf(ParameterSpec("x", ParameterType.Number), ParameterSpec("y", ParameterType.Number)),
         ),
     ) { _, arguments ->

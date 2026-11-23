@@ -7,15 +7,19 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import androidx.camera.core.ImageProxy
 import com.mobyle.nanquim.document.color.PaletteExtractor
+import com.mobyle.nanquim.domain.platform.ExternalFiles
+import java.io.IOException
+import java.nio.ByteBuffer
 
 object PaletteImages {
     const val MAXIMUM_DECODED_SIDE = 1024
 
     fun decode(
-        contentResolver: ContentResolver,
-        uri: Uri,
-    ): Bitmap =
-        ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri)) { decoder, info, _ ->
+        files: ExternalFiles,
+        uri: String,
+    ): Bitmap {
+        val bytes = files.openInput(uri)?.use { it.readBytes() } ?: throw IOException("Cannot read $uri")
+        return ImageDecoder.decodeBitmap(ImageDecoder.createSource(ByteBuffer.wrap(bytes))) { decoder, info, _ ->
             val longer = maxOf(info.size.width, info.size.height)
             if (longer > MAXIMUM_DECODED_SIDE) {
                 val scale = MAXIMUM_DECODED_SIDE.toDouble() / longer
@@ -24,6 +28,7 @@ object PaletteImages {
             decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
             decoder.setTargetColorSpace(ColorSpace.get(ColorSpace.Named.SRGB))
         }
+    }
 
     fun cameraPixels(image: ImageProxy): Triple<Int, Int, IntArray> {
         val plane = image.planes[0]
