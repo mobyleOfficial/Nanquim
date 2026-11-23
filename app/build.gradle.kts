@@ -108,7 +108,8 @@ android {
         }
         release {
             signingConfig = signingConfigs.findByName("release")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             buildConfigField("boolean", "DEVELOPER_TOOLS", "false")
             val adsConfigured = admobAppId != null && galleryBannerId != null
