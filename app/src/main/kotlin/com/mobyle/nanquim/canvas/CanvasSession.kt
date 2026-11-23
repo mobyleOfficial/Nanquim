@@ -1803,6 +1803,8 @@ class CanvasSession(
         selectedVanishingPoint = null
         document = initial
         documentVersion++
+        layerThumbnails.reset()
+        if (layersPanelVisible || initial.animation?.enabled == true) layerThumbnails.invalidate(initial)
         if (!keepView) viewport.onCanvasChanged(initial.widthPx, initial.heightPx)
     }
 

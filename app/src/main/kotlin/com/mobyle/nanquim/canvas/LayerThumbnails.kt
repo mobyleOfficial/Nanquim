@@ -22,6 +22,22 @@ class LayerThumbnails(
     private var requestInFlight = false
     private var again = false
 
+    /** Bumped by [reset], so a strip requested for the previous artwork is dropped when it arrives. */
+    private var generation = 0
+
+    /**
+     * Forgets the images of the artwork that was open. Surface ids start over in every artwork, so its images would
+     * otherwise stand in for the new artwork's layers that share their ids.
+     */
+    fun reset() {
+        pending?.cancel()
+        pending = null
+        images.clear()
+        requestInFlight = false
+        again = false
+        generation++
+    }
+
     fun invalidate(state: DocumentState) {
         if (pending?.isActive == true) return
         pending =
@@ -43,11 +59,13 @@ class LayerThumbnails(
         if (surfaces.isEmpty()) return
         requestInFlight = true
         lastRequestMillis = System.currentTimeMillis()
+        val requestGeneration = generation
         engine.requestThumbnails(
             surfaces.map { it.first }.toIntArray(),
             surfaces.map { it.second }.toBooleanArray(),
             MAX_SIDE_PX,
         ) { render ->
+            if (requestGeneration != generation) return@requestThumbnails
             requestInFlight = false
             if (render.error == null && render.width > 0) {
                 val cellWidth = render.width / surfaces.size
