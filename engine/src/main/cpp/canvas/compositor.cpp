@@ -910,9 +910,10 @@ bool Compositor::prepareTile(TileCoordinate coordinate, int64_t& layerTiles) {
         LayerTileStore::Availability::Loading) {
       allResident = false;
     }
-    const std::optional<LayerId>& selection = core::required(strokePreview_).selection;
-    if (selection && tileStore_.ensureResident(LayerTileKey{*selection, coordinate}) ==
-                         LayerTileStore::Availability::Loading) {
+    // A layer override (adjustment or transform preview) has a surface but no stroke preview.
+    if (strokePreview_ && strokePreview_->selection &&
+        tileStore_.ensureResident(LayerTileKey{*strokePreview_->selection, coordinate}) ==
+            LayerTileStore::Availability::Loading) {
       allResident = false;
     }
   }
