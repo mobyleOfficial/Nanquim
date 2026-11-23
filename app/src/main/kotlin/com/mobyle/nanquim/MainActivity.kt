@@ -27,6 +27,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -89,8 +90,8 @@ import com.mobyle.nanquim.settings.ThemeMode
 import com.mobyle.nanquim.ui.brush.BrushEditorScreen
 import com.mobyle.nanquim.ui.canvas.CanvasScreen
 import com.mobyle.nanquim.ui.canvas.canvasSurroundColor
-import com.mobyle.nanquim.ui.common.ExitDialog
 import com.mobyle.nanquim.ui.common.AdsNoticeDialog
+import com.mobyle.nanquim.ui.common.ExitDialog
 import com.mobyle.nanquim.ui.common.ProvideWindowLayout
 import com.mobyle.nanquim.ui.diagnostics.DiagnosticsScreen
 import com.mobyle.nanquim.ui.diagnostics.LatencyTestScreen
@@ -529,12 +530,12 @@ private fun NanquimApp(application: NanquimApplication) {
             else -> confirmingExit = true
         }
     }
-    if (confirmingExit) {
     if (atGallery && application.galleryAds.enabled && application.help.automatic && !application.help.welcomeVisible &&
         !application.appSettings.adsNoticeSeen
     ) {
         AdsNoticeDialog(onDismiss = application.appSettings::markAdsNoticeSeen)
     }
+    if (confirmingExit) {
         ExitDialog(
             onExit = { dontAskAgain ->
                 confirmingExit = false
@@ -570,6 +571,8 @@ private fun NanquimApp(application: NanquimApplication) {
                     fadeOut(tween(SCREEN_FADE_OUT_MILLIS))
             }
         },
+        // The fade passes through transparency between screens; without this the black window background flashes through.
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         label = "screen",
     ) { destination ->
         when (destination) {
@@ -629,10 +632,10 @@ private fun NanquimApp(application: NanquimApplication) {
                         } else {
                             null
                         },
+                    adsAvailable = BuildConfig.ADS_ENABLED,
                 )
             AppDestination.Diagnostics ->
                 DiagnosticsScreen(
-                    adsAvailable = BuildConfig.ADS_ENABLED,
                     collector = application.diagnosticsCollector,
                     recorder = application.stylusObservationRecorder,
                     onBack = navigator::back,
