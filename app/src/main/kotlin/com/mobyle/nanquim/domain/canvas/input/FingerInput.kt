@@ -86,6 +86,7 @@ class FingerInput(
     private val support: () -> PalmSupport = { PalmSupport.DEFAULT },
     private val millimetresPerPixel: Float = 0f,
     private val bindings: () -> GestureBindings = { GestureBindings.defaults(undoFingers()) },
+    private val confirmNavigationMillis: Long = CONFIRM_NAVIGATION_MILLIS,
 ) {
     private val gestures =
         GestureArbiter(
@@ -107,6 +108,11 @@ class FingerInput(
 
     private var navigationStartMillis = 0L
     private var navigationPointers: Set<Int> = emptySet()
+
+    // A pinch moves the camera only after it has lasted a moment: a palm lands as two "fingers" and the system
+    // cancels it tens of milliseconds later, which would otherwise flash a zoom and snap it back.
+    private var navigationConfirmed = false
+    private var navigationStart: Pair<Point, Point>? = null
 
     private var lastFinger: Triple<Int, Float, Float>? = null
 
@@ -163,10 +169,15 @@ class FingerInput(
             TouchAction.Move ->
                 if (navigating && filtered.pointers.size >= 2) {
                     navigationDistance = point(filtered, 0).distance(point(filtered, 1))
-                    effects += FingerEffect.UpdateNavigation(point(filtered, 0), point(filtered, 1))
+                    if (!navigationConfirmed && filtered.timeMillis - navigationStartMillis >= confirmNavigationMillis) {
+                        effects += confirmNavigation()
+                    }
+                    if (navigationConfirmed) effects += FingerEffect.UpdateNavigation(point(filtered, 0), point(filtered, 1))
                 }
             TouchAction.PointerUp, TouchAction.Up ->
-                if (navigating) {
+                if (navigating && !navigationConfirmed) {
+                    navigating = false
+                } else if (navigating) {
                     navigating = false
                     val quickPinch =
                         !event.canceled && event.timeMillis - navigationStartMillis <= QUICK_PINCH_MILLIS &&
@@ -205,7 +216,16 @@ class FingerInput(
     ) {
         if (event.action == TouchAction.Down || event.action == TouchAction.PointerDown) {
             val pointer = event.actionPointer
-            if (pointer.tool == PointerTool.Finger) fingerDownMillis[pointer.id] = event.timeMillis
+            if (pointer.tool == PointerTool.Finger) {
+                fingerDownMillis[pointer.id] = event.timeMillis
+                // A contact that lands while the pen is near, or beside a palm already down, is the hand: it stays
+                // a palm until it lifts, so it cannot later pair with another contact into a pinch.
+                val handDown = !fingersAllowed(event.timeMillis) || palms.isNotEmpty()
+                if (handDown && support() != PalmSupport.Off) {
+                    palms += pointer.id
+                    gestures.cancel()
+                }
+            }
         }
         val threshold = support().thresholdMillimetres
         for (pointer in event.pointers) {
@@ -237,23 +257,31 @@ class FingerInput(
         fingerDownMillis.clear()
     }
 
-    fun beginNavigation(event: TouchEvent): FingerEffect {
+    fun beginNavigation(event: TouchEvent): List<FingerEffect> {
         navigating = true
+        navigationConfirmed = false
         navigationStartMillis = event.timeMillis
         navigationPointers =
             event.pointers
                 .take(2)
                 .map { it.id }
                 .toSet()
+        navigationStart = point(event, 0) to point(event, 1)
         navigationStartDistance = point(event, 0).distance(point(event, 1))
         navigationDistance = navigationStartDistance
-        return FingerEffect.BeginNavigation(point(event, 0), point(event, 1), event.timeMillis)
+        return if (confirmNavigationMillis <= 0) listOf(confirmNavigation()) else emptyList()
+    }
+
+    private fun confirmNavigation(): FingerEffect {
+        navigationConfirmed = true
+        val (first, second) = checkNotNull(navigationStart)
+        return FingerEffect.BeginNavigation(first, second, navigationStartMillis)
     }
 
     fun cancelNavigation(): FingerEffect? {
         if (!navigating) return null
         navigating = false
-        return FingerEffect.CancelNavigation
+        return if (navigationConfirmed) FingerEffect.CancelNavigation else null
     }
 
     fun cancelTaps() = gestures.cancel()
@@ -364,6 +392,8 @@ class FingerInput(
 
     private companion object {
         const val LATE_STYLUS_MILLIS = 300L
+
+        const val CONFIRM_NAVIGATION_MILLIS = 100L
 
         const val CLASSIFY_MILLIS = 100L
 

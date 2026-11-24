@@ -890,7 +890,7 @@ class CanvasSurfaceView(
                     session.pendingSelectionChanged()
                     selectionPointer = null
                     constrainPointer = null
-                    apply(fingers.beginNavigation(touchEvent(event)))
+                    fingers.beginNavigation(touchEvent(event)).forEach(::apply)
                     return
                 }
                 moveSelection(event, index)

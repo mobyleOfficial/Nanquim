@@ -61,4 +61,13 @@ class InputRoutingTest {
         assertFalse(palm.fingersAllowed(6299))
         assertTrue(palm.fingersAllowed(6300))
     }
+
+    @Test
+    fun `the default grace outlasts a hand landing just after the pen leaves`() {
+        val palm = PalmRejection()
+        palm.onStylusHover(hovering = true, timeMillis = 0)
+        palm.onStylusHover(hovering = false, timeMillis = 1000)
+        assertFalse(palm.fingersAllowed(1450))
+        assertTrue(palm.fingersAllowed(1500))
+    }
 }

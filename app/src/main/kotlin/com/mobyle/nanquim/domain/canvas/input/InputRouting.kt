@@ -122,6 +122,6 @@ class PalmRejection(
     }
 
     companion object {
-        const val DEFAULT_GRACE_MILLIS = 300L
+        const val DEFAULT_GRACE_MILLIS = 500L
     }
 }

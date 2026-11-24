@@ -18,10 +18,10 @@ class PalmTraceTest {
         val set = set("tab-s7-fe-palm-1.json")
         val (first, second) = set.sessions
         assertEquals(
-            TouchReplay.Outcome(strokes = 83, navigations = 3, cameraMoves = 39, canceledMoves = 7),
+            TouchReplay.Outcome(strokes = 83),
             replay(set, first),
         )
-        assertEquals(TouchReplay.Outcome(strokes = 22, navigations = 1), replay(set, second))
+        assertEquals(TouchReplay.Outcome(strokes = 22), replay(set, second))
         assertEquals(0, set.sessions.sumOf { replay(set, it, undoFingers = 1).undos })
     }
 
@@ -34,8 +34,8 @@ class PalmTraceTest {
             set.sessions.map {
                 TouchReplay(FingerInput(millimetresPerPixel = set.millimetres(1f), bindings = { bindings })).replay(it.events)
             }
-        assertEquals(listOf(2, 0), outcomes.map { it.fingerStrokes })
+        assertEquals(listOf(0, 0), outcomes.map { it.fingerStrokes })
         assertEquals(listOf(0, 0), outcomes.map { it.actions.values.sum() + it.undos + it.redos + it.eyedroppers })
-        assertEquals(listOf(39, 0), outcomes.map { it.cameraMoves })
+        assertEquals(listOf(0, 0), outcomes.map { it.cameraMoves })
     }
 }
