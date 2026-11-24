@@ -248,6 +248,22 @@ class TouchReplayTest {
     }
 
     @Test
+    fun aLowerPalmSupportLetsAPinchFollowThePenSooner() {
+        val session =
+            Script().apply {
+                hover(-100, TouchAction.HoverEnter, 300f, 300f)
+                hover(0, TouchAction.HoverExit, 300f, 300f)
+                down(250, finger(0, 500f, 500f))
+                down(260, finger(1, 700f, 500f))
+                for (step in 1..20) move(260L + step * 16, finger(0, 500f - step * 10, 500f), finger(1, 700f + step * 10, 500f))
+                up(600, 0)
+                up(610, 1)
+            }
+        assertEquals(TouchReplay.Outcome(), replay(session.events))
+        assertEquals(1, replay(session.events, PalmSupport.Low).navigations)
+    }
+
+    @Test
     fun aContactBesideAPalmIsPartOfTheHand() {
         val session =
             Script().apply {

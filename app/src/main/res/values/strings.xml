@@ -647,7 +647,7 @@
     <string name="settings_quick_shape_delay_value">%1$d ms</string>
     <string name="command_settings_palm_support">Set palm support</string>
     <string name="settings_palm_support_title">Palm support</string>
-    <string name="settings_palm_support_hint">How readily a large touch is taken for a resting palm and ignored. Off ignores fingers only while the pen is near.</string>
+    <string name="settings_palm_support_hint">How readily a large touch is taken for a resting palm and ignored, and how long after the pen leaves before fingers count again. Lower lets a pinch work sooner after drawing. Off ignores fingers only while the pen is near.</string>
     <string name="settings_palm_support_off">Off</string>
     <string name="settings_palm_support_low">Low</string>
     <string name="settings_palm_support_medium">Medium</string>

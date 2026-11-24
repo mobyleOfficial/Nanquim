@@ -67,7 +67,9 @@ class InputRoutingTest {
         val palm = PalmRejection()
         palm.onStylusHover(hovering = true, timeMillis = 0)
         palm.onStylusHover(hovering = false, timeMillis = 1000)
-        assertFalse(palm.fingersAllowed(1450))
-        assertTrue(palm.fingersAllowed(1500))
+        assertFalse(palm.fingersAllowed(1349))
+        assertTrue(palm.fingersAllowed(1350))
+        assertTrue(palm.fingersAllowed(1200, graceMillis = PalmSupport.Low.graceMillis))
+        assertFalse(palm.fingersAllowed(1499, graceMillis = PalmSupport.High.graceMillis))
     }
 }

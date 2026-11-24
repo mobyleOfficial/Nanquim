@@ -122,7 +122,11 @@ class FingerInput(
     private val fingerDownMillis = mutableMapOf<Int, Long>()
     private var sizesReported = false
 
-    fun fingersAllowed(timeMillis: Long): Boolean = palmRejection.fingersAllowed(timeMillis)
+    fun fingersAllowed(timeMillis: Long): Boolean = palmRejection.fingersAllowed(timeMillis, support().graceMillis)
+
+    // Taps, holds and finger strokes wait longer than a pinch: right after the pen they are almost always the hand.
+    private fun oneFingerAllowed(timeMillis: Long): Boolean =
+        palmRejection.fingersAllowed(timeMillis, maxOf(support().graceMillis, ONE_FINGER_GRACE_MILLIS))
 
     fun isPalm(pointerId: Int): Boolean = pointerId in palms
 
@@ -324,7 +328,7 @@ class FingerInput(
         when (event.action) {
             TouchAction.Down, TouchAction.PointerDown -> {
                 val pointer = event.actionPointer
-                if (pointer.tool == PointerTool.Finger && fingersAllowed(event.timeMillis)) {
+                if (pointer.tool == PointerTool.Finger && oneFingerAllowed(event.timeMillis)) {
                     lastFinger = Triple(pointer.id, pointer.x, pointer.y)
                     gestures.fingerDown(pointer.id, pointer.x, pointer.y, event.timeMillis)?.let { recognized(it, effects) }
                 } else {
@@ -355,7 +359,7 @@ class FingerInput(
                 val pointer = event.actionPointer
                 drawAttempt =
                     Triple(pointer.id, pointer.x, pointer.y).takeIf {
-                        pointer.tool == PointerTool.Finger && fingersAllowed(event.timeMillis) && !palmRejection.stylusUsed
+                        pointer.tool == PointerTool.Finger && oneFingerAllowed(event.timeMillis) && !palmRejection.stylusUsed
                     }
             }
             TouchAction.Move -> {
@@ -395,6 +399,8 @@ class FingerInput(
 
         const val CONFIRM_NAVIGATION_MILLIS = 100L
 
+        const val ONE_FINGER_GRACE_MILLIS = 500L
+
         const val CLASSIFY_MILLIS = 100L
 
         const val DRAW_ATTEMPT_MILLIMETRES = 12f
@@ -408,11 +414,14 @@ class FingerInput(
 enum class PalmSupport(
     val id: String,
     val thresholdMillimetres: Float?,
+    // How long after the pen leaves before fingers count again. A hand landing as the pen lifts arrives up to a third
+    // of a second later on a Tab S7 FE, looking just like a pinch; Medium is the shortest wait that still ignores it.
+    val graceMillis: Long,
 ) {
-    Off("off", null),
-    Low("low", 20f),
-    Medium("medium", 15f),
-    High("high", 11f),
+    Off("off", null, 200L),
+    Low("low", 20f, 200L),
+    Medium("medium", 15f, PalmRejection.DEFAULT_GRACE_MILLIS),
+    High("high", 11f, 500L),
     ;
 
     companion object {
