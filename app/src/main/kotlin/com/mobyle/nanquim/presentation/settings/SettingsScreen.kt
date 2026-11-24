@@ -178,6 +178,23 @@ fun SettingsScreen(
                     onValueChange = { onCommand(BrushCommandIds.SETTINGS_SMOOTHING, JsonObject(mapOf("amount" to JsonPrimitive(it)))) },
                     modifier = Modifier.semantics { contentDescription = smoothingLabel },
                 )
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .toggleable(
+                            value = inputSettings.fingerPainting,
+                            role = Role.Switch,
+                            onValueChange = {
+                                onCommand(QuickShapeCommandIds.FINGER_PAINTING, JsonObject(mapOf("enabled" to JsonPrimitive(it))))
+                            },
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(stringResource(R.string.settings_touch_mode), modifier = Modifier.weight(1f))
+                    Switch(checked = inputSettings.fingerPainting, onCheckedChange = null)
+                }
+                Text(stringResource(R.string.settings_touch_mode_hint), style = MaterialTheme.typography.bodySmall)
                 HorizontalDivider()
                 QuickShapeSettings(inputSettings, onCommand)
                 HorizontalDivider()

@@ -128,6 +128,7 @@ val canvasModule =
                 it.palmSupport = { inputSettings.palmSupport }
                 it.hapticsEnabled = { inputSettings.hapticsEnabled }
                 it.gestureConfiguration = { inputSettings.gestures }
+                it.touchModeOn = { inputSettings.fingerPainting }
                 it.fontLibrary = get()
                 it.restoreColors(appSettings.colors)
                 val colorSaves = Channel<ColorState>(Channel.CONFLATED)

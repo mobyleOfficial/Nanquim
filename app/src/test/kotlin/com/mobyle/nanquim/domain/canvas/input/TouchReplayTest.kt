@@ -372,6 +372,43 @@ class TouchReplayTest {
     }
 
     @Test
+    fun oneFingerDrawingIsNoticedOnlyWhenFingersDoNotPaint() {
+        val drag =
+            Script().apply {
+                down(0, finger(0, 500f, 500f))
+                for (step in 1..20) move(step * 16L, finger(0, 500f + step * 10, 500f))
+                up(400, 0)
+            }
+        assertEquals(1, replayWith(drag.events, GestureBindings.defaults()).drawAttempts)
+        assertEquals(0, replayWith(drag.events, GestureBindings.defaults(fingerPainting = true)).drawAttempts)
+        val short =
+            Script().apply {
+                down(0, finger(0, 500f, 500f))
+                move(30, finger(0, 530f, 500f))
+                up(60, 0)
+            }
+        assertEquals(0, replayWith(short.events, GestureBindings.defaults()).drawAttempts)
+        val pinch =
+            Script().apply {
+                down(0, finger(0, 500f, 500f))
+                down(10, finger(1, 800f, 500f))
+                for (step in 1..20) move(10L + step * 16, finger(0, 500f - step * 10, 500f), finger(1, 800f + step * 10, 500f))
+                up(400, 0)
+                up(410, 1)
+            }
+        assertEquals(0, replayWith(pinch.events, GestureBindings.defaults()).drawAttempts)
+        val afterPen =
+            Script().apply {
+                down(0, stylus(300f, 300f))
+                up(200, STYLUS_ID)
+                down(1000, finger(0, 500f, 500f))
+                for (step in 1..20) move(1000L + step * 16, finger(0, 500f + step * 10, 500f))
+                up(1400, 0)
+            }
+        assertEquals(0, replayWith(afterPen.events, GestureBindings.defaults()).drawAttempts)
+    }
+
+    @Test
     fun thePenCanStopFingerStrokes() {
         val penThenFinger =
             Script().apply {

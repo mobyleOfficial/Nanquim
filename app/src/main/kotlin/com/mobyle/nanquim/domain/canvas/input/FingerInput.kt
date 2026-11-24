@@ -75,6 +75,9 @@ sealed interface FingerEffect {
         val pointerId: Int,
         val action: GestureAction,
     ) : FingerEffect
+
+    /** One finger dragged across the canvas as if drawing while nothing paints with a finger. */
+    data object OneFingerDrawAttempt : FingerEffect
 }
 
 class FingerInput(
@@ -106,6 +109,8 @@ class FingerInput(
     private var navigationPointers: Set<Int> = emptySet()
 
     private var lastFinger: Triple<Int, Float, Float>? = null
+
+    private var drawAttempt: Triple<Int, Float, Float>? = null
 
     private val palms = mutableSetOf<Int>()
     private val fingerDownMillis = mutableMapOf<Int, Long>()
@@ -147,6 +152,7 @@ class FingerInput(
         val fingersOnly = event.pointers.filter { it.id !in palms }
         val filtered = event.copy(pointers = fingersOnly, actionIndex = fingersOnly.indexOfFirst { it.id == actionPointer.id })
         trackTaps(filtered, effects)
+        watchDrawAttempt(filtered, effects)
         when (filtered.action) {
             TouchAction.PointerDown ->
                 if (filtered.pointers.size == 2 && filtered.allFingers && fingersAllowed(filtered.timeMillis)) {
@@ -312,6 +318,35 @@ class FingerInput(
         }
     }
 
+    private fun watchDrawAttempt(
+        event: TouchEvent,
+        effects: MutableList<FingerEffect>,
+    ) {
+        when (event.action) {
+            TouchAction.Down -> {
+                val pointer = event.actionPointer
+                drawAttempt =
+                    Triple(pointer.id, pointer.x, pointer.y).takeIf {
+                        pointer.tool == PointerTool.Finger && fingersAllowed(event.timeMillis) && !palmRejection.stylusUsed
+                    }
+            }
+            TouchAction.Move -> {
+                val (id, x, y) = drawAttempt ?: return
+                val pointer = event.pointers.singleOrNull()
+                if (pointer == null || pointer.id != id || navigating || palmRejection.stylusUsed) {
+                    drawAttempt = null
+                    return
+                }
+                val distance = kotlin.math.hypot(pointer.x - x, pointer.y - y)
+                val needed = if (millimetresPerPixel > 0f) DRAW_ATTEMPT_MILLIMETRES / millimetresPerPixel else DRAW_ATTEMPT_PX
+                if (distance < needed) return
+                drawAttempt = null
+                if (bindings().actionOf(Gesture.FingerDrag) == GestureAction.None) effects += FingerEffect.OneFingerDrawAttempt
+            }
+            else -> drawAttempt = null
+        }
+    }
+
     private fun recognized(
         recognized: GestureArbiter.Recognized,
         effects: MutableList<FingerEffect>,
@@ -331,6 +366,9 @@ class FingerInput(
         const val LATE_STYLUS_MILLIS = 300L
 
         const val CLASSIFY_MILLIS = 100L
+
+        const val DRAW_ATTEMPT_MILLIMETRES = 12f
+        const val DRAW_ATTEMPT_PX = 80f
 
         const val QUICK_PINCH_MILLIS = 350L
         const val QUICK_PINCH_RATIO = 0.6

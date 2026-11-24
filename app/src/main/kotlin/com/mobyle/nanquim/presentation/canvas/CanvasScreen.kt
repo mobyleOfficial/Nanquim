@@ -88,6 +88,7 @@ import com.mobyle.nanquim.domain.command.AnimationCommandIds
 import com.mobyle.nanquim.domain.command.BrushCommandIds
 import com.mobyle.nanquim.domain.command.CanvasCommandIds
 import com.mobyle.nanquim.domain.command.DocumentCommandIds
+import com.mobyle.nanquim.domain.command.QuickShapeCommandIds
 import com.mobyle.nanquim.domain.command.ReferenceCommandIds
 import com.mobyle.nanquim.domain.command.SliderNames
 import com.mobyle.nanquim.domain.command.TimelapseCommandIds
@@ -241,6 +242,7 @@ private fun CanvasScreenContent(
         engine.setViewportStyle(ViewportStyle(surround, surround, surround))
     }
     DisplayColorEffect(engine, session)
+    if (session.touchModePromptVisible) TouchModePrompt(session, onCommand)
     session.rasterizePrompt?.let {
         AlertDialog(
             onDismissRequest = { session.answerRasterizePrompt(false) },
@@ -719,6 +721,27 @@ private fun MissingFontsDialog(
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.dialog_ok)) } },
+    )
+}
+
+@Composable
+private fun TouchModePrompt(
+    session: CanvasSession,
+    onCommand: (String, Map<String, Any?>) -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = { session.answerTouchModePrompt(false) },
+        title = { Text(stringResource(R.string.touch_mode_prompt_title)) },
+        text = { Text(stringResource(R.string.touch_mode_prompt_message)) },
+        confirmButton = {
+            TextButton(onClick = {
+                session.answerTouchModePrompt(true)
+                onCommand(QuickShapeCommandIds.FINGER_PAINTING, mapOf("enabled" to true))
+            }) { Text(stringResource(R.string.touch_mode_prompt_yes)) }
+        },
+        dismissButton = {
+            TextButton(onClick = { session.answerTouchModePrompt(false) }) { Text(stringResource(R.string.touch_mode_prompt_no)) }
+        },
     )
 }
 

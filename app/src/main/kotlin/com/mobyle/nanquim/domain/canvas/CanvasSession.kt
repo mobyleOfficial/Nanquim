@@ -355,6 +355,24 @@ class CanvasSession(
 
     fun gestureBindings(): GestureBindings = gestureConfiguration().bindings
 
+    var touchModeOn: () -> Boolean = { false }
+
+    /** Asks whether to turn touch mode on after someone tried drawing with one finger while it was off. */
+    var touchModePromptVisible: Boolean by mutableStateOf(false)
+        private set
+
+    private var touchModeDeclined = false
+
+    fun offerTouchMode() {
+        if (touchModePromptVisible || touchModeDeclined || touchModeOn()) return
+        touchModePromptVisible = true
+    }
+
+    fun answerTouchModePrompt(accepted: Boolean) {
+        touchModePromptVisible = false
+        if (!accepted) touchModeDeclined = true
+    }
+
     var quickMenu: QuickMenuAnchor? by mutableStateOf(null)
 
     var modifierHeld: Boolean by mutableStateOf(false)

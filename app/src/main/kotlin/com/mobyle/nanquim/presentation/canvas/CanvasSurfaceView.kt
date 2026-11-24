@@ -278,6 +278,7 @@ class CanvasSurfaceView(
                 }
             is FingerEffect.Gesture -> perform(effect.action, effect.x, effect.y)
             is FingerEffect.BeginFingerStroke -> beginFingerStroke(effect.pointerId, effect.action)
+            FingerEffect.OneFingerDrawAttempt -> if (strokeRoute(GestureAction.Paint) != null) session.offerTouchMode()
         }
     }
 

@@ -13,6 +13,7 @@ class TouchReplay(
         val eyedroppers: Int = 0,
         val actions: Map<GestureAction, Int> = emptyMap(),
         val fingerStrokes: Int = 0,
+        val drawAttempts: Int = 0,
     ) {
         val gestureEffects: Int get() = cameraMoves + undos + redos + eyedroppers + actions.values.sum() + fingerStrokes
     }
@@ -108,6 +109,7 @@ class TouchReplay(
                     fingers.cancelTaps()
                     outcome.copy(strokes = outcome.strokes + 1, fingerStrokes = outcome.fingerStrokes + 1)
                 }
+                FingerEffect.OneFingerDrawAttempt -> outcome.copy(drawAttempts = outcome.drawAttempts + 1)
             }
     }
 
