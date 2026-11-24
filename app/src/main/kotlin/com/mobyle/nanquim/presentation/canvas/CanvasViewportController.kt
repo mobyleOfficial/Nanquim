@@ -153,6 +153,18 @@ class CanvasViewportController(
 
     private fun besidePan(point: Point) = Point(point.x + SYNTHETIC_SPREAD_PX, point.y)
 
+    /** Moves the artwork on screen by (-dx, -dy) pixels, so what was at the view's center plus (dx, dy) ends up at its center. */
+    fun panBy(
+        dx: Double,
+        dy: Double,
+        animate: Boolean = true,
+    ) {
+        val current = camera ?: return
+        val inverse = screenToCanvas() ?: return
+        val center = inverse.apply(Point(viewWidth / 2 + dx, viewHeight / 2 + dy))
+        setCamera(current.copy(centerX = center.x, centerY = center.y), animate)
+    }
+
     fun cancelTwoFingerGesture() {
         val canceled = gesture ?: return
         gesture = null
