@@ -24,7 +24,9 @@ Image solid(std::array<double, 4> left, std::array<double, 4> right) {
   return image;
 }
 
-Image gray(double left, double right) { return solid({left, left, left, 1}, {right, right, right, 1}); }
+Image gray(double left, double right) {
+  return solid({left, left, left, 1}, {right, right, right, 1});
+}
 
 LayerTreeNode raster(canvas::LayerId id, BlendMode blend = BlendMode::Normal, float opacity = 1) {
   LayerTreeNode node;
@@ -81,10 +83,10 @@ TEST(ReferenceCompositorTest, PassThroughGroupOpacityMultipliesChildren) {
   Composer composer;
   composer.surfaces[1] = solid({1, 0, 0, 1}, {0, 0, 1, 1});
   composer.surfaces[2] = solid({0, 1, 0, 0.5}, {0, 1, 0, 1});
-  const Image throughGroup = composer.compose(
-      treeOf({group(9, {raster(1), raster(2)}, BlendMode::PassThrough, 0.5F)}));
-  const Image direct = composer.compose(treeOf({raster(1, BlendMode::Normal, 0.5F),
-                                                raster(2, BlendMode::Normal, 0.5F)}));
+  const Image throughGroup =
+      composer.compose(treeOf({group(9, {raster(1), raster(2)}, BlendMode::PassThrough, 0.5F)}));
+  const Image direct = composer.compose(
+      treeOf({raster(1, BlendMode::Normal, 0.5F), raster(2, BlendMode::Normal, 0.5F)}));
   for (size_t index = 0; index < direct.rgba.size(); ++index) {
     EXPECT_NEAR(throughGroup.rgba[index], direct.rgba[index], kTolerance) << index;
   }

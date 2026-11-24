@@ -42,11 +42,11 @@ struct Converter {
     if (!id) {
       return std::nullopt;
     }
-    Json engine{{"id", *id},
-                {"opacity", node.value("opacity", 1.0)},
-                {"blend", node.value("blend", std::string(type == "group" ? "passThrough"
-                                                                          : "normal"))},
-                {"hidden", node.value("hidden", false)}};
+    Json engine{
+        {"id", *id},
+        {"opacity", node.value("opacity", 1.0)},
+        {"blend", node.value("blend", std::string(type == "group" ? "passThrough" : "normal"))},
+        {"hidden", node.value("hidden", false)}};
     if (type == "group") {
       engine["type"] = "group";
       Json children = Json::array();
@@ -151,8 +151,8 @@ std::optional<DocumentManifest> parseDocumentManifest(std::string_view jsonText,
     error = "invalid canvas size";
     return std::nullopt;
   }
-  const std::optional<canvas::PixelFormat> pixelFormat = canvas::parsePixelFormat(
-      canvasValue.value("pixelFormat", std::string("rgba8_premul_srgb")));
+  const std::optional<canvas::PixelFormat> pixelFormat =
+      canvas::parsePixelFormat(canvasValue.value("pixelFormat", std::string("rgba8_premul_srgb")));
   if (canvasValue.value("tileSize", canvas::kTileSizePixels) != canvas::kTileSizePixels ||
       !pixelFormat) {
     error = "unsupported tile size or pixel format";
@@ -226,32 +226,31 @@ std::string writeDocumentManifest(const canvas::LayerTree& tree, int32_t width, 
   for (const canvas::LayerTreeNode& node : tree.layers) {
     layers.push_back(manifestNode(node, uuids));
   }
-  Json manifest{
-      {"format", "nanquim"},
-      {"version", kSupportedManifestVersion},
-      {"minReaderVersion", 1},
-      {"app", {{"name", "nanquim-cli"}, {"version", "0"}}},
-      {"id", uuidForId(0)},
-      {"name", documentName},
-      {"canvas",
-       {{"width", width},
-        {"height", height},
-        {"dpi", 132},
-        {"unit", "px"},
-        {"tileSize", canvas::kTileSizePixels},
-        {"pixelFormat", std::string(canvas::pixelFormatName(tree.pixelFormat))},
-        {"colorProfile", {{"name", "sRGB IEC61966-2.1"}, {"icc", nullptr}}}}},
-      {"background",
-       {{"color", Json::array({tree.background[0], tree.background[1], tree.background[2],
-                               tree.background[3]})},
-        {"hidden", tree.backgroundHidden}}},
-      {"activeLayerId", tree.activeLayer ? Json(uuids.count(*tree.activeLayer) != 0
-                                                    ? uuids.at(*tree.activeLayer)
-                                                    : uuidForId(*tree.activeLayer))
-                                         : Json(nullptr)},
-      {"referenceLayerId", nullptr},
-      {"layers", std::move(layers)},
-      {"extensions", Json::object()}};
+  Json manifest{{"format", "nanquim"},
+                {"version", kSupportedManifestVersion},
+                {"minReaderVersion", 1},
+                {"app", {{"name", "nanquim-cli"}, {"version", "0"}}},
+                {"id", uuidForId(0)},
+                {"name", documentName},
+                {"canvas",
+                 {{"width", width},
+                  {"height", height},
+                  {"dpi", 132},
+                  {"unit", "px"},
+                  {"tileSize", canvas::kTileSizePixels},
+                  {"pixelFormat", std::string(canvas::pixelFormatName(tree.pixelFormat))},
+                  {"colorProfile", {{"name", "sRGB IEC61966-2.1"}, {"icc", nullptr}}}}},
+                {"background",
+                 {{"color", Json::array({tree.background[0], tree.background[1], tree.background[2],
+                                         tree.background[3]})},
+                  {"hidden", tree.backgroundHidden}}},
+                {"activeLayerId", tree.activeLayer ? Json(uuids.count(*tree.activeLayer) != 0
+                                                              ? uuids.at(*tree.activeLayer)
+                                                              : uuidForId(*tree.activeLayer))
+                                                   : Json(nullptr)},
+                {"referenceLayerId", nullptr},
+                {"layers", std::move(layers)},
+                {"extensions", Json::object()}};
   return manifest.dump(2);
 }
 

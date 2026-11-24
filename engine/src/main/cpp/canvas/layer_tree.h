@@ -8,8 +8,8 @@
 #include <string>
 #include <vector>
 
-#include "canvas/pixel_format.h"
 #include "canvas/blend_mode.h"
+#include "canvas/pixel_format.h"
 
 namespace nanquim::canvas {
 

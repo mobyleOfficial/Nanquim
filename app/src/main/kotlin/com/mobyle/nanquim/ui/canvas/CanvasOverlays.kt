@@ -23,13 +23,13 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.EyedropperLoupe
 import com.mobyle.nanquim.canvas.HistoryToast
 import com.mobyle.nanquim.canvas.LayerSelectToast
 import com.mobyle.nanquim.canvas.SrgbColor
 import com.mobyle.nanquim.canvas.titleRes
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
@@ -70,7 +70,11 @@ fun LayerSelectToastView(
         tonalElevation = 6.dp,
         shadowElevation = 4.dp,
     ) {
-        Text(stringResource(R.string.layer_select_toast, toast.layerName), Modifier.padding(horizontal = 16.dp, vertical = 8.dp), style = MaterialTheme.typography.labelLarge)
+        Text(
+            stringResource(R.string.layer_select_toast, toast.layerName),
+            Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            style = MaterialTheme.typography.labelLarge,
+        )
     }
 }
 
@@ -89,8 +93,24 @@ fun EyedropperLoupeView(loupe: EyedropperLoupe) {
             val ring = size.minDimension * 0.18f
             val inset = ring / 2
             val arcSize = Size(size.width - ring, size.height - ring)
-            drawArc(sampled.toCompose(), 180f, 180f, useCenter = false, topLeft = Offset(inset, inset), size = arcSize, style = Stroke(ring))
-            drawArc(loupe.previous.toCompose(), 0f, 180f, useCenter = false, topLeft = Offset(inset, inset), size = arcSize, style = Stroke(ring))
+            drawArc(
+                sampled.toCompose(),
+                180f,
+                180f,
+                useCenter = false,
+                topLeft = Offset(inset, inset),
+                size = arcSize,
+                style = Stroke(ring),
+            )
+            drawArc(
+                loupe.previous.toCompose(),
+                0f,
+                180f,
+                useCenter = false,
+                topLeft = Offset(inset, inset),
+                size = arcSize,
+                style = Stroke(ring),
+            )
             drawCircle(Color.White, radius = size.minDimension / 2, style = Stroke(2f))
             drawCircle(Color.Black, radius = size.minDimension / 2 - ring - 1f, style = Stroke(2f))
         }

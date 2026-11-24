@@ -1,0 +1,121 @@
+name: Set up an Android release build
+description: >
+  Installs the Android/NDK, Java and Ruby toolchains and writes the signing,
+  Firebase and AdMob files from GitHub Secrets. Every file lands outside the
+  repository (in RUNNER_TEMP) or in a git-ignored path.
+
+inputs:
+  package-name:
+    description: Application id whose Firebase app id is read from google-services.json
+    required: true
+  keystore-base64:
+    description: Upload keystore (.jks), base64-encoded
+    required: true
+  keystore-password:
+    required: true
+  key-alias:
+    required: true
+  key-password:
+    required: true
+  google-services-json-base64:
+    description: app/google-services.json, base64-encoded
+    required: true
+  firebase-credentials-base64:
+    description: Service account JSON with the Firebase App Distribution Admin role, base64-encoded
+    required: true
+  admob-app-id:
+    description: AdMob app id. Leave empty to build without ads.
+    required: false
+    default: ""
+  admob-gallery-banner-id:
+    description: AdMob gallery banner unit id. Leave empty to build without ads.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "21"
+
+    - uses: gradle/actions/setup-gradle@v4
+
+    - name: Install Android SDK packages
+      shell: bash
+      run: |
+        chmod +x gradlew
+        ndk_version="$(sed -n 's/^ndk *= *"\(.*\)"/\1/p' gradle/libs.versions.toml)"
+        cmake_version="$(sed -n 's/^cmake *= *"\(.*\)"/\1/p' gradle/libs.versions.toml)"
+        compile_sdk="$(sed -n 's/^compileSdk *= *"\(.*\)"/\1/p' gradle/libs.versions.toml)"
+        # Composite actions run bash with pipefail: yes dies of SIGPIPE once sdkmanager stops reading, which must not
+        # fail the step. A failure of sdkmanager itself still does.
+        (yes || true) | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+        "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+          "platforms;android-${compile_sdk}" "ndk;${ndk_version}" "cmake;${cmake_version}"
+        sudo apt-get update && sudo apt-get install --yes ninja-build
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.2"
+        # Installs the gems from the Gemfile and caches them between runs.
+        bundler-cache: true
+
+    - name: Write signing, Firebase and AdMob files from secrets
+      shell: bash
+      env:
+        PACKAGE_NAME: ${{ inputs.package-name }}
+        KEYSTORE_BASE64: ${{ inputs.keystore-base64 }}
+        KEYSTORE_PASSWORD: ${{ inputs.keystore-password }}
+        KEY_ALIAS: ${{ inputs.key-alias }}
+        KEY_PASSWORD: ${{ inputs.key-password }}
+        GOOGLE_SERVICES_JSON_BASE64: ${{ inputs.google-services-json-base64 }}
+        FIREBASE_CREDENTIALS_BASE64: ${{ inputs.firebase-credentials-base64 }}
+        ADMOB_APP_ID: ${{ inputs.admob-app-id }}
+        ADMOB_GALLERY_BANNER_ID: ${{ inputs.admob-gallery-banner-id }}
+      run: |
+        set -euo pipefail
+        for name in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD GOOGLE_SERVICES_JSON_BASE64 FIREBASE_CREDENTIALS_BASE64; do
+          if [ -z "${!name}" ]; then
+            echo "::error::Secret for ${name} is empty - see the deploy workflow for the expected secret name"
+            exit 1
+          fi
+        done
+
+        keystore="$RUNNER_TEMP/upload-keystore.jks"
+        echo "$KEYSTORE_BASE64" | base64 --decode > "$keystore"
+        # keystore.properties is git-ignored; app/build.gradle.kts reads it for the release signing config.
+        {
+          echo "storeFile=$keystore"
+          echo "storePassword=$KEYSTORE_PASSWORD"
+          echo "keyAlias=$KEY_ALIAS"
+          echo "keyPassword=$KEY_PASSWORD"
+        } > keystore.properties
+
+        echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
+
+        credentials="$RUNNER_TEMP/firebase-credentials.json"
+        echo "$FIREBASE_CREDENTIALS_BASE64" | base64 --decode > "$credentials"
+        echo "FIREBASE_CREDENTIALS_PATH=$credentials" >> "$GITHUB_ENV"
+
+        # The Firebase app id comes from the same google-services.json the app is built with.
+        app_id="$(jq -r --arg package "$PACKAGE_NAME" \
+          '.client[] | select(.client_info.android_client_info.package_name == $package) | .client_info.mobilesdk_app_id' \
+          app/google-services.json)"
+        if [ -z "$app_id" ]; then
+          echo "::error::google-services.json has no Android app for ${PACKAGE_NAME}"
+          exit 1
+        fi
+        echo "FIREBASE_APP_ID=$app_id" >> "$GITHUB_ENV"
+
+        # app/build.gradle.kts reads the AdMob ids from local.properties (git-ignored); without both of them a
+        # release build ships with ads turned off.
+        if [ -n "$ADMOB_APP_ID" ] && [ -n "$ADMOB_GALLERY_BANNER_ID" ]; then
+          {
+            echo "admob.appId=$ADMOB_APP_ID"
+            echo "admob.galleryBannerId=$ADMOB_GALLERY_BANNER_ID"
+          } >> local.properties
+        elif [ -n "$ADMOB_APP_ID" ] || [ -n "$ADMOB_GALLERY_BANNER_ID" ]; then
+          echo "::warning::Only one of the AdMob ids is set - this build ships with ads turned off"
+        fi

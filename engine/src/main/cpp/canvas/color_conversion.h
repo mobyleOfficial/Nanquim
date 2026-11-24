@@ -55,8 +55,7 @@ inline void premultipliedSrgb8ToLinearHalf(const uint8_t* source, uint8_t* desti
 inline void premultipliedLinearToSrgb8(const float* linear, uint8_t* encoded) {
   const double alpha = std::fmin(std::fmax(static_cast<double>(linear[3]), 0.0), 1.0);
   for (size_t channel = 0; channel < 3; ++channel) {
-    const double color =
-        alpha > 0 ? std::fmin(std::fmax(linear[channel] / alpha, 0.0), 1.0) : 0.0;
+    const double color = alpha > 0 ? std::fmin(std::fmax(linear[channel] / alpha, 0.0), 1.0) : 0.0;
     encoded[channel] = static_cast<uint8_t>(std::lround(linearToSrgbValue(color) * alpha * 255.0));
   }
   encoded[3] = static_cast<uint8_t>(std::lround(alpha * 255.0));

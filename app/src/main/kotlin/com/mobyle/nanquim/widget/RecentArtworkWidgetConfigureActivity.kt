@@ -39,13 +39,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import com.mobyle.nanquim.NanquimApplication
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.gallery.ArtworkEntity
 import com.mobyle.nanquim.ui.theme.NanquimTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class RecentArtworkWidgetConfigureActivity : ComponentActivity() {

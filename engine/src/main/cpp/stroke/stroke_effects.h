@@ -16,8 +16,8 @@ std::vector<float> edgeBlurWeights(double sizePixels);
 
 double edgeAmount(double coverage, double blurred);
 
-RenderParameters effectiveRender(const RenderParameters& render, bool paintsLayerColors,
-                                 bool clone, bool selectionTarget, bool linearDocument = false);
+RenderParameters effectiveRender(const RenderParameters& render, bool paintsLayerColors, bool clone,
+                                 bool selectionTarget, bool linearDocument = false);
 
 double dualCoverage(DualBlend blend, double primary, double secondary);
 

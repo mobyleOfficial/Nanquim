@@ -13,6 +13,9 @@ enum class WelcomeCard {
     Brushes,
     Layers,
     Color,
+    QuickShape,
+    Animation,
+    Share,
 }
 
 class Help(
@@ -28,6 +31,13 @@ class Help(
     var tip: CanvasTool? by mutableStateOf(null)
         private set
 
+    /** The short tour of the canvas the first time an artwork opens; null when it is not showing. */
+    var tourStep: Int? by mutableStateOf(null)
+        private set
+
+    /** Told how the introduction ended: completed (the last card's button) or skipped, and on which card. */
+    var onWelcomeFinished: (completed: Boolean, card: Int) -> Unit = { _, _ -> }
+
     val welcomeSeen: Boolean get() = preferences.getBoolean(KEY_WELCOME_SEEN, false)
 
     fun showWelcomeIfFirstLaunch() {
@@ -37,16 +47,37 @@ class Help(
     fun showWelcome() {
         welcomeCard = 0
         welcomeVisible = true
+        tourStep = null
+        preferences.edit { remove(KEY_TOUR_SEEN) }
     }
 
-    fun finishWelcome() {
+    fun finishWelcome(completed: Boolean = false) {
+        val wasVisible = welcomeVisible
         welcomeVisible = false
         preferences.edit { putBoolean(KEY_WELCOME_SEEN, true) }
+        if (wasVisible) onWelcomeFinished(completed, welcomeCard)
+    }
+
+    /** Called when the canvas shows: starts the tour once, after the introduction. */
+    fun canvasShown() {
+        if (!automatic || welcomeVisible || tourStep != null || preferences.getBoolean(KEY_TOUR_SEEN, false)) return
+        tip = null
+        tourStep = 0
+    }
+
+    fun nextTourStep() {
+        val step = tourStep ?: return
+        if (step + 1 < TOUR_STEPS) tourStep = step + 1 else finishTour()
+    }
+
+    fun finishTour() {
+        tourStep = null
+        preferences.edit { putBoolean(KEY_TOUR_SEEN, true) }
     }
 
     fun toolSelected(tool: CanvasTool) {
         if (tip != null && tip != tool) tip = null
-        if (!automatic || tool !in TIPS || tipSeen(tool)) return
+        if (!automatic || tourStep != null || tool !in TIPS || tipSeen(tool)) return
         showTip(tool)
     }
 
@@ -73,6 +104,8 @@ class Help(
         const val PREFERENCES_NAME = "help"
         private const val KEY_WELCOME_SEEN = "welcomeSeen"
         private const val KEY_TIPS_SEEN = "tipsSeen"
+        private const val KEY_TOUR_SEEN = "tourSeen"
+        const val TOUR_STEPS = 3
 
         val TIPS =
             setOf(

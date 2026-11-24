@@ -1,5 +1,7 @@
 package com.mobyle.nanquim.formats.interchange
 
+import com.mobyle.nanquim.document.brush.BrushDocument
+import com.mobyle.nanquim.document.brush.BrushPackage
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -12,8 +14,6 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
-import com.mobyle.nanquim.document.brush.BrushDocument
-import com.mobyle.nanquim.document.brush.BrushPackage
 import kotlin.math.PI
 import kotlin.math.roundToInt
 

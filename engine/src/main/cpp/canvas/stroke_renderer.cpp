@@ -26,7 +26,7 @@ constexpr const char* kWorkingCopyPipeline = "workingCopy";
 constexpr const char* kMixSamplePipeline = "mixSample";
 constexpr const char* kMixApplyPipeline = "mixApply";
 constexpr const char* kGlazePipeline = "strokeGlaze";
-constexpr size_t kMixingStateBytes = 3 * 4 * sizeof(float) + 4 * sizeof(int32_t);
+constexpr size_t kMixingStateBytes = sizeof(float) * 3 * 4 + 4 * sizeof(int32_t);
 constexpr uint32_t kWorkingCopyImageBinding = 0;
 constexpr uint32_t kMixingStateBinding = 1;
 constexpr uint32_t kGlazeResultBinding = 0;
@@ -40,7 +40,7 @@ constexpr const char* kActiveStrokePipeline = "activeLayerStroke";
 constexpr int32_t kPollsBeforeReduction = 8;
 
 constexpr uint32_t kDabAttributes = 5;
-constexpr size_t kFloatsPerDab = kDabAttributes * 4;
+constexpr size_t kFloatsPerDab = size_t{kDabAttributes} * 4;
 constexpr size_t kInstanceStride = kFloatsPerDab * sizeof(float);
 constexpr uint32_t kShapeBinding = 1;
 constexpr uint32_t kGrainBinding = 2;
@@ -591,8 +591,8 @@ void StrokeRenderer::setParticles(bool enabled, bool useShape) {
   effects_.particles = enabled ? &particleBuffer_ : nullptr;
 }
 
-void StrokeRenderer::renderParticleDabs(const std::vector<stroke::Dab>& dabs,
-                                        int32_t canvasWidth, int32_t canvasHeight,
+void StrokeRenderer::renderParticleDabs(const std::vector<stroke::Dab>& dabs, int32_t canvasWidth,
+                                        int32_t canvasHeight,
                                         std::vector<TileCoordinate>& touchedTiles) {
   if (effects_.particles == nullptr || dabs.empty()) {
     return;
@@ -734,8 +734,7 @@ void StrokeRenderer::renderMixingDabs(const std::vector<stroke::Dab>& dabs, int3
     commands.barrier(gpu::rhi::kBarrierStorage);
     const int32_t firstX = std::max(0, static_cast<int32_t>(std::floor(dab.x - extent)));
     const int32_t firstY = std::max(0, static_cast<int32_t>(std::floor(dab.y - extent)));
-    const int32_t endX =
-        std::min(canvasWidth, static_cast<int32_t>(std::ceil(dab.x + extent)) + 1);
+    const int32_t endX = std::min(canvasWidth, static_cast<int32_t>(std::ceil(dab.x + extent)) + 1);
     const int32_t endY =
         std::min(canvasHeight, static_cast<int32_t>(std::ceil(dab.y + extent)) + 1);
     if (endX <= firstX || endY <= firstY) {
@@ -1117,11 +1116,10 @@ StrokeRenderer::CommitResult StrokeRenderer::commit(
     return CommitResult::Done;
   }
   updateEdgeMap(buffer_.tiles(), true);
-  const bool inPlace =
-      !options.selection && !effects_.any() && !mixing() &&
-      (options.maskTarget || options.erase ||
-       (!options.alphaLock &&
-        (options.blend == BlendMode::Normal || options.blend == BlendMode::Behind)));
+  const bool inPlace = !options.selection && !effects_.any() && !mixing() &&
+                       (options.maskTarget || options.erase ||
+                        (!options.alphaLock && (options.blend == BlendMode::Normal ||
+                                                options.blend == BlendMode::Behind)));
   std::vector<std::string> defines;
   if (options.maskTarget) {
     defines.emplace_back(kMaskTargetDefine);

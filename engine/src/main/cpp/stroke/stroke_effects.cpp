@@ -9,8 +9,8 @@ double edgeBlurRadiusPixels(double sizePixels) { return std::clamp(0.15 * sizePi
 
 std::vector<float> edgeBlurWeights(double sizePixels) {
   const double sigma = std::max(0.5, edgeBlurRadiusPixels(sizePixels) / 8.0);
-  const auto radius = std::clamp(static_cast<int32_t>(std::ceil(3.0 * sigma)), 1,
-                                 kMaximumEdgeBlurRadius);
+  const auto radius =
+      std::clamp(static_cast<int32_t>(std::ceil(3.0 * sigma)), 1, kMaximumEdgeBlurRadius);
   std::vector<double> weights(static_cast<size_t>(radius) + 1);
   double total = 0;
   for (int32_t tap = 0; tap <= radius; ++tap) {
@@ -29,8 +29,8 @@ double edgeAmount(double coverage, double blurred) {
   return coverage > 0 ? std::clamp(1.0 - blurred / coverage, 0.0, 1.0) : 0.0;
 }
 
-RenderParameters effectiveRender(const RenderParameters& render, bool paintsLayerColors,
-                                 bool clone, bool selectionTarget, bool linearDocument) {
+RenderParameters effectiveRender(const RenderParameters& render, bool paintsLayerColors, bool clone,
+                                 bool selectionTarget, bool linearDocument) {
   RenderParameters result = render;
   result.gammaCorrect = render.gammaCorrect && paintsLayerColors && !clone && !linearDocument;
   result.luminanceBlending = render.luminanceBlending && paintsLayerColors;

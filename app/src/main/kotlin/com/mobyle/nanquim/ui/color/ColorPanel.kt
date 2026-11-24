@@ -1,11 +1,10 @@
 package com.mobyle.nanquim.ui.color
 
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.horizontalScroll
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +41,9 @@ import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.canvas.ColorPanelMode
 import com.mobyle.nanquim.command.ToolCommandIds
 import com.mobyle.nanquim.document.color.ColorState
-import com.mobyle.nanquim.document.color.InkChannel
 import com.mobyle.nanquim.document.color.ColorValue
 import com.mobyle.nanquim.document.color.DiscZoom
+import com.mobyle.nanquim.document.color.InkChannel
 
 @Composable
 fun ColorPanel(

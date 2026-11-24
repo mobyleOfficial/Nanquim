@@ -55,7 +55,7 @@ class ByteReader {
       failed.fail();
       return failed;
     }
-    return ByteReader(bytes, static_cast<size_t>(count));
+    return {bytes, static_cast<size_t>(count)};
   }
 
   uint8_t u8() { return static_cast<uint8_t>(bigEndian(1)); }

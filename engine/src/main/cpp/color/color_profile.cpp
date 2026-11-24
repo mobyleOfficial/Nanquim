@@ -79,7 +79,8 @@ const std::array<float, 65536>& linearOfEncoded() {
   static const std::array<float, 65536> table = [] {
     std::array<float, 65536> values{};
     for (size_t code = 0; code < values.size(); ++code) {
-      values[code] = static_cast<float>(canvas::srgbToLinearValue(code / 65535.0));
+      values[code] =
+          static_cast<float>(canvas::srgbToLinearValue(static_cast<double>(code) / 65535.0));
     }
     return values;
   }();

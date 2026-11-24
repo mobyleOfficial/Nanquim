@@ -78,8 +78,8 @@ TEST(ReferenceDocument, WriteReadRoundTripIsExact) {
   EXPECT_EQ(loaded->surfaces.at(1).rgba, surfaces.at(1).rgba);
   EXPECT_EQ(loaded->surfaces.at(2).rgba, surfaces.at(2).rgba);
 
-  const auto originalComposite = composeLayerTree(
-      tree, width, height, [&surfaces](canvas::LayerId id) -> const Image* {
+  const auto originalComposite =
+      composeLayerTree(tree, width, height, [&surfaces](canvas::LayerId id) -> const Image* {
         auto found = surfaces.find(id);
         return found == surfaces.end() ? nullptr : &found->second;
       });

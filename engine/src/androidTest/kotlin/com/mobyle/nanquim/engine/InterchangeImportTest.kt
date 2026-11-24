@@ -1,6 +1,12 @@
 package com.mobyle.nanquim.engine
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.document.layer.BlendMode
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.addMask
+import com.mobyle.nanquim.document.layer.addRasterLayer
+import com.mobyle.nanquim.document.layer.setBlend
+import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -10,12 +16,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import com.mobyle.nanquim.document.layer.BlendMode
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.addMask
-import com.mobyle.nanquim.document.layer.addRasterLayer
-import com.mobyle.nanquim.document.layer.setBlend
-import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.File
@@ -237,7 +237,13 @@ class InterchangeImportTest(
         val info = ByteArrayOutputStream()
         DataOutputStream(info).use { out ->
             out.writeShort(layers.size)
-            val encoded = layers.map { layer -> layer.channels.map { (id, samples) -> id to rleChannel(samples, if (id == -2) layer.mask!! else layer.bounds) } }
+            val encoded =
+                layers.map { layer ->
+                    layer.channels.map { (id, samples) ->
+                        id to
+                            rleChannel(samples, if (id == -2) layer.mask!! else layer.bounds)
+                    }
+                }
             layers.forEachIndexed { index, layer ->
                 out.writeInt(layer.bounds.top)
                 out.writeInt(layer.bounds.left)

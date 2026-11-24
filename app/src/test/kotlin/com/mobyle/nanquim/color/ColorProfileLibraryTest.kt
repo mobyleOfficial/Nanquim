@@ -1,5 +1,8 @@
 package com.mobyle.nanquim.color
 
+import com.mobyle.nanquim.engine.ColorProfileInfo
+import com.mobyle.nanquim.engine.ColorProfileReadResult
+import com.mobyle.nanquim.engine.ProfileColorSpace
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -10,9 +13,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
-import com.mobyle.nanquim.engine.ColorProfileInfo
-import com.mobyle.nanquim.engine.ColorProfileReadResult
-import com.mobyle.nanquim.engine.ProfileColorSpace
 import java.io.File
 
 class ColorProfileLibraryTest {

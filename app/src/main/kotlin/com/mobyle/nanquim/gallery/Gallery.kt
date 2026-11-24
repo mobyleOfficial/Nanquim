@@ -3,12 +3,35 @@ package com.mobyle.nanquim.gallery
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
 import android.os.SystemClock
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.edit
+import com.mobyle.nanquim.canvas.CanvasSession
+import com.mobyle.nanquim.document.ArtworkReadResult
+import com.mobyle.nanquim.document.ArtworkStorage
+import com.mobyle.nanquim.document.DocumentPersistence
+import com.mobyle.nanquim.document.LoadedArtwork
+import com.mobyle.nanquim.document.OpenArtwork
+import com.mobyle.nanquim.document.layer.Background
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.PixelFormat
+import com.mobyle.nanquim.document.layer.RgbaColor
+import com.mobyle.nanquim.document.layer.addRasterLayer
+import com.mobyle.nanquim.document.session.LayerNames
+import com.mobyle.nanquim.engine.DocumentSaveResult
+import com.mobyle.nanquim.formats.nanquim.CanvasUnit
+import com.mobyle.nanquim.formats.nanquim.DocumentColorProfile
+import com.mobyle.nanquim.formats.nanquim.DocumentInfo
+import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
+import com.mobyle.nanquim.navigation.AppDestination
+import com.mobyle.nanquim.navigation.AppNavigator
+import com.mobyle.nanquim.telemetry.ArtworkOpenSource
+import com.mobyle.nanquim.telemetry.Telemetry
+import com.mobyle.nanquim.ui.transition.ArtworkTransitions
+import com.mobyle.nanquim.ui.transition.canvasRectOnScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,29 +49,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.document.ArtworkReadResult
-import com.mobyle.nanquim.document.ArtworkStorage
-import com.mobyle.nanquim.document.DocumentPersistence
-import com.mobyle.nanquim.document.LoadedArtwork
-import com.mobyle.nanquim.document.OpenArtwork
-import com.mobyle.nanquim.navigation.AppDestination
-import com.mobyle.nanquim.navigation.AppNavigator
-import com.mobyle.nanquim.telemetry.ArtworkOpenSource
-import com.mobyle.nanquim.telemetry.Telemetry
-import com.mobyle.nanquim.ui.transition.ArtworkTransitions
-import com.mobyle.nanquim.ui.transition.canvasRectOnScreen
-import com.mobyle.nanquim.document.layer.Background
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.PixelFormat
-import com.mobyle.nanquim.document.layer.RgbaColor
-import com.mobyle.nanquim.document.layer.addRasterLayer
-import com.mobyle.nanquim.document.session.LayerNames
-import com.mobyle.nanquim.engine.DocumentSaveResult
-import com.mobyle.nanquim.formats.nanquim.DocumentColorProfile
-import com.mobyle.nanquim.formats.nanquim.CanvasUnit
-import com.mobyle.nanquim.formats.nanquim.DocumentInfo
-import com.mobyle.nanquim.formats.nanquim.TimelapseSettings
 import java.io.File
 import java.time.Instant
 import java.util.UUID
@@ -419,7 +419,16 @@ class Gallery(
         return true
     }
 
-    private fun rememberOpen(id: String?) = preferences.edit(commit = true) { if (id == null) remove(KEY_OPEN_ARTWORK) else putString(KEY_OPEN_ARTWORK, id) }
+    private fun rememberOpen(id: String?) =
+        preferences.edit(commit = true) {
+            if (id ==
+                null
+            ) {
+                remove(KEY_OPEN_ARTWORK)
+            } else {
+                putString(KEY_OPEN_ARTWORK, id)
+            }
+        }
 
     private fun requireClosed(ids: Collection<String>): List<String> {
         val open = canvasSession.artwork?.id
@@ -449,7 +458,9 @@ class Gallery(
         for (id in expand(ids)) {
             val row = dao.artwork(id) ?: continue
             if (id == canvasSession.artwork?.id) saveAndWait(canvasSession.persistence)
-            val newId = withContext(Dispatchers.IO) { storage.duplicate(id, copyName(row.name), Instant.now()) } ?: throw GalleryException(GalleryError.WriteFailed, id)
+            val newId =
+                withContext(Dispatchers.IO) { storage.duplicate(id, copyName(row.name), Instant.now()) }
+                    ?: throw GalleryException(GalleryError.WriteFailed, id)
             val now = System.currentTimeMillis()
             dao.upsertArtwork(row.copy(id = newId, name = copyName(row.name), createdAt = now, modifiedAt = now))
             created += newId
@@ -518,7 +529,9 @@ class Gallery(
     ) {
         if (dao.presetCount() > 0 || preferences.getBoolean(KEY_PRESETS_SEEDED, false)) return
         BuiltInCanvasPresets.all(screenWidthPx, screenHeightPx).forEachIndexed { index, (key, size) ->
-            dao.upsertPreset(CanvasPresetEntity(UUID.randomUUID().toString(), null, key, size.width, size.height, size.unit.id, size.dpi, index))
+            dao.upsertPreset(
+                CanvasPresetEntity(UUID.randomUUID().toString(), null, key, size.width, size.height, size.unit.id, size.dpi, index),
+            )
         }
         preferences.edit { putBoolean(KEY_PRESETS_SEEDED, true) }
     }
@@ -535,7 +548,18 @@ class Gallery(
             } else {
                 dao.lastPresetPosition() + 1
             }
-        dao.upsertPreset(CanvasPresetEntity(existing?.id ?: UUID.randomUUID().toString(), name, null, size.width, size.height, size.unit.id, size.dpi, position))
+        dao.upsertPreset(
+            CanvasPresetEntity(
+                existing?.id ?: UUID.randomUUID().toString(),
+                name,
+                null,
+                size.width,
+                size.height,
+                size.unit.id,
+                size.dpi,
+                position,
+            ),
+        )
     }
 
     suspend fun deletePreset(id: String) = dao.deletePreset(id)

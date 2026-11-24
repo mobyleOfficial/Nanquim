@@ -67,7 +67,8 @@ ShaderProgram* ShaderVariantCache::get(const std::string& pipeline,
     return nullptr;
   }
   const bool compute = found->second.vertexSource == nullptr;
-  const std::string vertex = compute ? std::string() : withDefines(found->second.vertexSource, defines);
+  const std::string vertex =
+      compute ? std::string() : withDefines(found->second.vertexSource, defines);
   const std::string fragment = withDefines(found->second.fragmentSource, defines);
 
   std::string binaryPath;
@@ -86,10 +87,12 @@ ShaderProgram* ShaderVariantCache::get(const std::string& pipeline,
     }
   }
   if (!program) {
-    program = compute ? ShaderProgram::createCompute(fragment.c_str(), errorMessage,
-                                                     binariesSupported_)
-                      : ShaderProgram::create(vertex.c_str(), fragment.c_str(), errorMessage,
-                                              binariesSupported_);
+    markCompiling(key);
+    program = compute
+                  ? ShaderProgram::createCompute(fragment.c_str(), errorMessage, binariesSupported_)
+                  : ShaderProgram::create(vertex.c_str(), fragment.c_str(), errorMessage,
+                                          binariesSupported_);
+    clearCompiling();
     if (!program) {
       errorMessage = key + ": " + errorMessage;
       return nullptr;
@@ -142,6 +145,26 @@ void ShaderVariantCache::storeBinary(const std::string& path, const ShaderProgra
                  static_cast<std::streamsize>(binary.size()));
   }
   std::rename(temporaryPath.c_str(), path.c_str());
+}
+
+void ShaderVariantCache::markCompiling(const std::string& key) const {
+  // Logged before the driver sees the source, so a crash inside the compiler leaves the program
+  // name as the last engine line in logcat.
+  NANQUIM_LOG_INFO("Compiling shader %s on %s", key.c_str(), driverIdentity_.c_str());
+  if (binaryDirectory_.empty()) {
+    return;
+  }
+  const std::string path = binaryDirectory_ + "/" + kCompilingMarker;
+  if (std::FILE* file = std::fopen(path.c_str(), "w"); file != nullptr) {
+    std::fprintf(file, "%s\n%s\n", key.c_str(), driverIdentity_.c_str());
+    std::fclose(file);
+  }
+}
+
+void ShaderVariantCache::clearCompiling() const {
+  if (!binaryDirectory_.empty()) {
+    std::remove((binaryDirectory_ + "/" + kCompilingMarker).c_str());
+  }
 }
 
 }  // namespace nanquim::gpu::gles

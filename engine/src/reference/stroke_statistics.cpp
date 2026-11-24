@@ -21,7 +21,9 @@ constexpr double kNoInk = 0.02;
 class InkMap {
  public:
   explicit InkMap(const Rgba8Image& image)
-      : width_(image.width), height_(image.height), scale_(image.width / static_cast<double>(kSheetSize)) {
+      : width_(image.width),
+        height_(image.height),
+        scale_(image.width / static_cast<double>(kSheetSize)) {
     ink_.resize(static_cast<size_t>(width_) * static_cast<size_t>(height_));
     rgb_.resize(ink_.size() * 3);
     for (size_t index = 0; index < ink_.size(); ++index) {
@@ -54,13 +56,15 @@ class InkMap {
   }
 
   [[nodiscard]] const double* rgb(int32_t x, int32_t y) const {
-    return &rgb_[(static_cast<size_t>(y) * static_cast<size_t>(width_) + static_cast<size_t>(x)) * 3];
+    return &rgb_[(static_cast<size_t>(y) * static_cast<size_t>(width_) + static_cast<size_t>(x)) *
+                 3];
   }
 
   [[nodiscard]] std::vector<double> column(double sheetX, double y0, double y1) const {
     const auto x = static_cast<int32_t>(std::floor(sheetX * scale_));
     std::vector<double> values;
-    for (auto y = static_cast<int32_t>(std::floor(y0 * scale_)); y < static_cast<int32_t>(std::ceil(y1 * scale_)); ++y) {
+    for (auto y = static_cast<int32_t>(std::floor(y0 * scale_));
+         y < static_cast<int32_t>(std::ceil(y1 * scale_)); ++y) {
       values.push_back(pixel(x, y));
     }
     return values;
@@ -100,8 +104,10 @@ double edgeFalloff(const std::vector<double>& profile) {
   if (peak < kNoInk) {
     return 0;
   }
-  const auto low = std::find_if(profile.begin(), profile.end(), [peak](double v) { return v >= 0.1 * peak; });
-  const auto high = std::find_if(profile.begin(), profile.end(), [peak](double v) { return v >= 0.9 * peak; });
+  const auto low =
+      std::find_if(profile.begin(), profile.end(), [peak](double v) { return v >= 0.1 * peak; });
+  const auto high =
+      std::find_if(profile.begin(), profile.end(), [peak](double v) { return v >= 0.9 * peak; });
   return static_cast<double>(std::distance(low, high));
 }
 
@@ -158,7 +164,8 @@ void fft(std::vector<std::complex<double>>& values) {
   }
 }
 
-std::pair<double, double> spectrum(const InkMap& ink, int32_t centerX, int32_t centerY, int32_t size) {
+std::pair<double, double> spectrum(const InkMap& ink, int32_t centerX, int32_t centerY,
+                                   int32_t size) {
   std::vector<std::complex<double>> grid(static_cast<size_t>(size) * static_cast<size_t>(size));
   double mean = 0;
   for (int32_t y = 0; y < size; ++y) {
@@ -300,14 +307,18 @@ std::vector<StrokeStatistic> measureSheet(const Rgba8Image& image) {
       const double centerX = 160 + 160 * tap;
       double tapPeak = 0;
       std::vector<double> values;
-      for (auto y = static_cast<int32_t>((1360 - 78) * scale); y < static_cast<int32_t>((1360 + 78) * scale); ++y) {
-        for (auto x = static_cast<int32_t>((centerX - 78) * scale); x < static_cast<int32_t>((centerX + 78) * scale); ++x) {
+      for (auto y = static_cast<int32_t>((1360 - 78) * scale);
+           y < static_cast<int32_t>((1360 + 78) * scale); ++y) {
+        for (auto x = static_cast<int32_t>((centerX - 78) * scale);
+             x < static_cast<int32_t>((centerX + 78) * scale); ++x) {
           values.push_back(ink.pixel(x, y));
           tapPeak = std::max(tapPeak, ink.pixel(x, y));
         }
       }
-      const auto area = static_cast<double>(std::count_if(values.begin(), values.end(),
-                                                          [tapPeak](double v) { return tapPeak >= kNoInk && v >= tapPeak / 2; }));
+      const auto area =
+          static_cast<double>(std::count_if(values.begin(), values.end(), [tapPeak](double v) {
+            return tapPeak >= kNoInk && v >= tapPeak / 2;
+          }));
       diameter += 2 * std::sqrt(area / kPi) / scale;
       peak += tapPeak;
     }
@@ -316,8 +327,8 @@ std::vector<StrokeStatistic> measureSheet(const Rgba8Image& image) {
   }
   {
     const int32_t window = scale >= 0.5 ? 128 : 64;
-    const auto [frequency, anisotropy] =
-        spectrum(ink, static_cast<int32_t>(1025 * scale), static_cast<int32_t>(1660 * scale), window);
+    const auto [frequency, anisotropy] = spectrum(ink, static_cast<int32_t>(1025 * scale),
+                                                  static_cast<int32_t>(1660 * scale), window);
     statistics.push_back({"G.textureFrequency", frequency * scale, 0.01});
     statistics.push_back({"G.textureAnisotropy", anisotropy, 0.15});
     std::vector<double> widths;
@@ -331,7 +342,8 @@ std::vector<StrokeStatistic> measureSheet(const Rgba8Image& image) {
     std::vector<double> hues;
     double saturation = 0;
     for (auto y = static_cast<int32_t>(1280 * scale); y < static_cast<int32_t>(1440 * scale); ++y) {
-      for (auto x = static_cast<int32_t>(1048 * scale); x < static_cast<int32_t>(1984 * scale); ++x) {
+      for (auto x = static_cast<int32_t>(1048 * scale); x < static_cast<int32_t>(1984 * scale);
+           ++x) {
         if (ink.pixel(x, y) < 0.2) {
           continue;
         }
@@ -348,10 +360,13 @@ std::vector<StrokeStatistic> measureSheet(const Rgba8Image& image) {
       sine += std::sin(2 * kPi * hue);
       cosine += std::cos(2 * kPi * hue);
     }
-    const double length = hues.empty() ? 1 : std::hypot(sine, cosine) / static_cast<double>(hues.size());
-    const double deviation = std::sqrt(std::max(0.0, -2 * std::log(std::max(length, 1e-12)))) / (2 * kPi);
+    const double length =
+        hues.empty() ? 1 : std::hypot(sine, cosine) / static_cast<double>(hues.size());
+    const double deviation =
+        std::sqrt(std::max(0.0, -2 * std::log(std::max(length, 1e-12)))) / (2 * kPi);
     statistics.push_back({"I.hueDeviation", deviation, 0.02});
-    statistics.push_back({"I.saturation", hues.empty() ? 0 : saturation / static_cast<double>(hues.size()), 0.05});
+    statistics.push_back(
+        {"I.saturation", hues.empty() ? 0 : saturation / static_cast<double>(hues.size()), 0.05});
   }
   return statistics;
 }

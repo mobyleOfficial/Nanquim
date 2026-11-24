@@ -1,10 +1,10 @@
 #include "gpu/gles/egl_switch_probe.h"
 
 #include <GLES3/gl3.h>
-#include <time.h>
 
 #include <algorithm>
 #include <chrono>
+#include <ctime>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <thread>
@@ -35,7 +35,8 @@ json summary(std::vector<double> values) {
   }
   std::sort(values.begin(), values.end());
   const auto at = [&](double fraction) {
-    return values[std::min(values.size() - 1, static_cast<size_t>(fraction * values.size()))];
+    return values[std::min(values.size() - 1,
+                           static_cast<size_t>(fraction * static_cast<double>(values.size())))];
   };
   return json{{"count", values.size()},
               {"min", values.front()},

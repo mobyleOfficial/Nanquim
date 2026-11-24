@@ -1,11 +1,11 @@
 package com.mobyle.nanquim.brush
 
+import com.mobyle.nanquim.brush.library.BrushLibrary
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.brush.library.BrushLibrary
 
 class StampImportTest {
     private val transparent = 0

@@ -10,6 +10,9 @@ import android.os.Bundle
 import android.view.Display
 import android.widget.ImageView
 import androidx.compose.runtime.snapshotFlow
+import com.mobyle.nanquim.canvas.CanvasSession
+import com.mobyle.nanquim.document.RgbaImages
+import com.mobyle.nanquim.engine.Engine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -17,9 +20,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.document.RgbaImages
-import com.mobyle.nanquim.engine.Engine
 
 class ProjectedCanvas(
     private val activity: Activity,

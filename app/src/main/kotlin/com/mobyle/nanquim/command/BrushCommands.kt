@@ -3,23 +3,6 @@ package com.mobyle.nanquim.command
 import android.content.ContentResolver
 import android.net.Uri
 import androidx.core.net.toUri
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.boolean
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.double
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonPrimitive
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.brush.ActiveBrushes
 import com.mobyle.nanquim.brush.BrushAbout
@@ -36,9 +19,8 @@ import com.mobyle.nanquim.brush.library.BrushGroup
 import com.mobyle.nanquim.brush.library.BrushLibrary
 import com.mobyle.nanquim.brush.library.BrushTool
 import com.mobyle.nanquim.canvas.CanvasSession
-import com.mobyle.nanquim.gallery.ArtworkTransfer
-import com.mobyle.nanquim.navigation.AppDestination
-import com.mobyle.nanquim.navigation.AppNavigator
+import com.mobyle.nanquim.canvas.input.CanvasTool
+import com.mobyle.nanquim.canvas.input.GestureConfiguration
 import com.mobyle.nanquim.document.brush.InvalidBrushException
 import com.mobyle.nanquim.document.command.AppState
 import com.mobyle.nanquim.document.command.Availability
@@ -48,8 +30,6 @@ import com.mobyle.nanquim.document.command.CommandHandler
 import com.mobyle.nanquim.document.command.CommandRegistry
 import com.mobyle.nanquim.document.command.CommandResult
 import com.mobyle.nanquim.document.command.CommandSpec
-import com.mobyle.nanquim.canvas.input.CanvasTool
-import com.mobyle.nanquim.canvas.input.GestureConfiguration
 import com.mobyle.nanquim.document.command.ParameterSpec
 import com.mobyle.nanquim.document.command.ParameterType
 import com.mobyle.nanquim.document.layer.LayerOperationException
@@ -57,6 +37,26 @@ import com.mobyle.nanquim.engine.BrushPad
 import com.mobyle.nanquim.formats.NanquimFileType
 import com.mobyle.nanquim.formats.interchange.ImportJsonException
 import com.mobyle.nanquim.formats.interchange.ImportWarning
+import com.mobyle.nanquim.gallery.ArtworkTransfer
+import com.mobyle.nanquim.navigation.AppDestination
+import com.mobyle.nanquim.navigation.AppNavigator
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
 import java.io.IOException
 import java.time.Instant
@@ -130,7 +130,8 @@ private val toolParameter =
         allowedValues = ActiveBrushes.PAINTING_TOOLS.map { it.key },
         defaultValue = JsonPrimitive(BrushTool.Paint.key),
     )
-private val sliderParameter = ParameterSpec("slider", ParameterType.Enumeration, allowedValues = listOf(SliderNames.SIZE, SliderNames.OPACITY))
+private val sliderParameter =
+    ParameterSpec("slider", ParameterType.Enumeration, allowedValues = listOf(SliderNames.SIZE, SliderNames.OPACITY))
 private val textureSlotParameter =
     ParameterSpec("slot", ParameterType.Enumeration, allowedValues = TextureSlot.entries.map { it.name.lowercase() })
 
@@ -168,7 +169,11 @@ fun registerBrushCommands(
         R.string.command_brush_import,
         listOf(ParameterSpec("uri", ParameterType.String)),
     ) { _, arguments ->
-        val uri = arguments.getValue("uri").jsonPrimitive.content.toUri()
+        val uri =
+            arguments
+                .getValue("uri")
+                .jsonPrimitive.content
+                .toUri()
         if (uri.scheme != "content") {
             return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
         }
@@ -389,11 +394,23 @@ fun registerBrushCommands(
         R.string.command_brush_library_show_group,
         listOf(ParameterSpec("groupId", ParameterType.String, defaultValue = JsonPrimitive(""))),
     ) { _, arguments ->
-        ui.shownGroupId = arguments.getValue("groupId").jsonPrimitive.content.ifEmpty { null }
+        ui.shownGroupId =
+            arguments
+                .getValue("groupId")
+                .jsonPrimitive.content
+                .ifEmpty { null }
         CommandResult.Success()
     }
-    register(BrushCommandIds.GROUP_CREATE, R.string.command_brush_group_create, listOf(ParameterSpec("name", ParameterType.String))) { _, arguments ->
-        val name = arguments.getValue("name").jsonPrimitive.content.trim()
+    register(
+        BrushCommandIds.GROUP_CREATE,
+        R.string.command_brush_group_create,
+        listOf(ParameterSpec("name", ParameterType.String)),
+    ) { _, arguments ->
+        val name =
+            arguments
+                .getValue("name")
+                .jsonPrimitive.content
+                .trim()
         if (name.isEmpty()) return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "A group needs a name")
         val groupId = library.createGroup(name)
         ui.shownGroupId = groupId
@@ -404,7 +421,11 @@ fun registerBrushCommands(
         R.string.command_brush_group_rename,
         listOf(groupIdParameter, ParameterSpec("name", ParameterType.String)),
     ) { _, arguments ->
-        val name = arguments.getValue("name").jsonPrimitive.content.trim()
+        val name =
+            arguments
+                .getValue("name")
+                .jsonPrimitive.content
+                .trim()
         if (name.isEmpty()) return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "A group needs a name")
         library.renameGroup(arguments.getValue("groupId").jsonPrimitive.content, name)
         CommandResult.Success()
@@ -509,8 +530,16 @@ fun registerBrushCommands(
         availability = editorOpen,
     ) { _, arguments ->
         val editor = ui.editor ?: return@register editorClosed()
-        val uri = arguments.getValue("uri").jsonPrimitive.content.toUri()
-        if (uri.scheme != "content") return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
+        val uri =
+            arguments
+                .getValue("uri")
+                .jsonPrimitive.content
+                .toUri()
+        if (uri.scheme !=
+            "content"
+        ) {
+            return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "Only content:// URIs are accepted")
+        }
         val slot = arguments.textureSlot()
         val keepColors = slot == TextureSlot.Shape && editor.working.document.boolean("stamp.keepColors") == true
         val png =
@@ -776,8 +805,9 @@ fun registerBrushCommands(
     ) { _, arguments ->
         val points =
             arguments.getValue("points").jsonArray.map { point ->
-                val pair = (point as? JsonArray)?.takeIf { it.size == 2 }
-                    ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "points must be [[x, y], ...]")
+                val pair =
+                    (point as? JsonArray)?.takeIf { it.size == 2 }
+                        ?: return@register CommandResult.Failure(CommandErrorCode.InvalidArguments, "points must be [[x, y], ...]")
                 pair[0].jsonPrimitive.double.toFloat() to pair[1].jsonPrimitive.double.toFloat()
             }
         ui.inputSettings.updatePressureCurve(points)
@@ -789,7 +819,12 @@ fun registerBrushCommands(
         listOf(ParameterSpec("amount", ParameterType.Number, minimum = 0.0, maximum = 1.0)),
         category = CommandCategory.Settings,
     ) { _, arguments ->
-        ui.inputSettings.updateGlobalSmoothing(arguments.getValue("amount").jsonPrimitive.double.toFloat())
+        ui.inputSettings.updateGlobalSmoothing(
+            arguments
+                .getValue("amount")
+                .jsonPrimitive.double
+                .toFloat(),
+        )
         CommandResult.Success()
     }
 }

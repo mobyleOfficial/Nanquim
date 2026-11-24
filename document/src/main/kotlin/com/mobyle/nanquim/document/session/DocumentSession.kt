@@ -1,6 +1,5 @@
 package com.mobyle.nanquim.document.session
 
-import kotlinx.serialization.json.JsonObject
 import com.mobyle.nanquim.document.animation.AnimationSettings
 import com.mobyle.nanquim.document.animation.animationAppearance
 import com.mobyle.nanquim.document.animation.withAnimation
@@ -10,6 +9,7 @@ import com.mobyle.nanquim.document.history.UndoHistory
 import com.mobyle.nanquim.document.layer.Background
 import com.mobyle.nanquim.document.layer.BlendMode
 import com.mobyle.nanquim.document.layer.CanvasOperation
+import com.mobyle.nanquim.document.layer.ContentLayerPixelsException
 import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.LayerGroup
 import com.mobyle.nanquim.document.layer.LayerNode
@@ -18,18 +18,11 @@ import com.mobyle.nanquim.document.layer.RasterLayer
 import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.document.layer.SavedSelection
 import com.mobyle.nanquim.document.layer.TextLayerContent
-import com.mobyle.nanquim.document.layer.ContentLayerPixelsException
 import com.mobyle.nanquim.document.layer.VideoLayerContent
-import com.mobyle.nanquim.document.layer.addVideoLayer
-import com.mobyle.nanquim.document.layer.rasterizeVideo
-import com.mobyle.nanquim.document.layer.setVideoTime
-import com.mobyle.nanquim.document.layer.setPrivate
-import com.mobyle.nanquim.document.layer.addTextLayer
-import com.mobyle.nanquim.document.layer.rasterizeText
-import com.mobyle.nanquim.document.layer.setTextContent
-import com.mobyle.nanquim.document.layer.textModels
 import com.mobyle.nanquim.document.layer.addMask
 import com.mobyle.nanquim.document.layer.addRasterLayer
+import com.mobyle.nanquim.document.layer.addTextLayer
+import com.mobyle.nanquim.document.layer.addVideoLayer
 import com.mobyle.nanquim.document.layer.combineDown
 import com.mobyle.nanquim.document.layer.delete
 import com.mobyle.nanquim.document.layer.duplicate
@@ -40,6 +33,8 @@ import com.mobyle.nanquim.document.layer.mergeDown
 import com.mobyle.nanquim.document.layer.mergeLayers
 import com.mobyle.nanquim.document.layer.move
 import com.mobyle.nanquim.document.layer.nodeBelow
+import com.mobyle.nanquim.document.layer.rasterizeText
+import com.mobyle.nanquim.document.layer.rasterizeVideo
 import com.mobyle.nanquim.document.layer.removeMask
 import com.mobyle.nanquim.document.layer.rename
 import com.mobyle.nanquim.document.layer.setAlphaLock
@@ -53,10 +48,15 @@ import com.mobyle.nanquim.document.layer.setLocked
 import com.mobyle.nanquim.document.layer.setMaskEnabled
 import com.mobyle.nanquim.document.layer.setMaskInverted
 import com.mobyle.nanquim.document.layer.setOpacity
+import com.mobyle.nanquim.document.layer.setPrivate
 import com.mobyle.nanquim.document.layer.setReference
+import com.mobyle.nanquim.document.layer.setTextContent
+import com.mobyle.nanquim.document.layer.setVideoTime
+import com.mobyle.nanquim.document.layer.textModels
 import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import com.mobyle.nanquim.document.layer.ungroup
 import com.mobyle.nanquim.document.layer.withActiveLayer
+import kotlinx.serialization.json.JsonObject
 
 interface LayerNames {
     fun layer(number: Int): String
@@ -1007,7 +1007,13 @@ class DocumentSession(
         val tree =
             treeCache.getOrPut(key) {
                 val frames = state.animationAppearance(shownFrame, onion = playbackFrameId == null)
-                state.toEngineLayerTree(soloLayerId, frames, hideBackground = exportHidesBackground, hidePrivate = exportHidesPrivate).toString()
+                state
+                    .toEngineLayerTree(
+                        soloLayerId,
+                        frames,
+                        hideBackground = exportHidesBackground,
+                        hidePrivate = exportHidesPrivate,
+                    ).toString()
             }
         if (treeCache.size > MAXIMUM_CACHED_TREES) treeCache.clear()
         engine.setLayerTree(tree)

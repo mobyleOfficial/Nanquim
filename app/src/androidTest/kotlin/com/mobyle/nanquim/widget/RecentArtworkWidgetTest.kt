@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.glance.appwidget.updateAll
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.NanquimApplication
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
@@ -23,7 +24,6 @@ import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.mobyle.nanquim.NanquimApplication
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)

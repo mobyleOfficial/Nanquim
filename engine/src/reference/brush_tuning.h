@@ -3,10 +3,9 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
-
-#include <nlohmann/json.hpp>
 
 #include "png_file.h"
 #include "stroke/loaded_brush.h"

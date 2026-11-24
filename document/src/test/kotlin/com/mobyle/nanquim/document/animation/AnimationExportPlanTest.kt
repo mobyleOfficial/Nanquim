@@ -1,9 +1,9 @@
 package com.mobyle.nanquim.document.animation
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import com.mobyle.nanquim.document.layer.DocumentState
 import com.mobyle.nanquim.document.layer.addRasterLayer
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class AnimationExportPlanTest {
     private fun document(frames: Int): DocumentState {

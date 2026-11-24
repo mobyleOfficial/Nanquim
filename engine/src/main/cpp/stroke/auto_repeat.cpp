@@ -118,7 +118,7 @@ class Quilter {
     return true;
   }
 
-  AutoRepeatResult result() const {
+  [[nodiscard]] AutoRepeatResult result() const {
     AutoRepeatResult result;
     result.side = side_;
     result.pixels.resize(output_.values.size());
@@ -230,8 +230,8 @@ class Quilter {
     return best;
   }
 
-  std::vector<int32_t> seamThrough(const Plane& patch, const Rect& rect, bool vertical,
-                                   int32_t first, int32_t size) const {
+  [[nodiscard]] std::vector<int32_t> seamThrough(const Plane& patch, const Rect& rect,
+                                                 bool vertical, int32_t first, int32_t size) const {
     const int32_t length = vertical ? rect.height : rect.width;
     Plane total(size, length);
     for (int32_t a = 0; a < length; ++a) {
@@ -305,7 +305,7 @@ class Quilter {
     return total > 0 && filled * 2 > total;
   }
 
-  Plane maskFor(const Plane& patch, const Rect& rect) const {
+  [[nodiscard]] Plane maskFor(const Plane& patch, const Rect& rect) const {
     Plane mask(rect.width, rect.height, 1.0F);
     const int32_t strip = std::min(overlap_, std::min(rect.width, rect.height) / 2);
     if (strip >= 1) {
@@ -358,9 +358,15 @@ class Quilter {
     for (int32_t y = 0; y < height; ++y) {
       for (int32_t x = 0; x < width; ++x) {
         const float sx =
-            std::clamp((x + 0.5F) * plane.width / width - 0.5F, 0.0F, float(plane.width - 1));
+            std::clamp((static_cast<float>(x) + 0.5F) * static_cast<float>(plane.width) /
+                               static_cast<float>(width) -
+                           0.5F,
+                       0.0F, float(plane.width - 1));
         const float sy =
-            std::clamp((y + 0.5F) * plane.height / height - 0.5F, 0.0F, float(plane.height - 1));
+            std::clamp((static_cast<float>(y) + 0.5F) * static_cast<float>(plane.height) /
+                               static_cast<float>(height) -
+                           0.5F,
+                       0.0F, float(plane.height - 1));
         const auto x0 = int32_t(sx);
         const auto y0 = int32_t(sy);
         const int32_t x1 = std::min(x0 + 1, plane.width - 1);

@@ -9,9 +9,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.mobyle.nanquim.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.R
 import java.io.File
 
 class TimelapseExportWorker(
@@ -41,7 +41,8 @@ class TimelapseExportWorker(
 
     override suspend fun getForegroundInfo(): ForegroundInfo = foregroundInfo(0f)
 
-    private fun foregroundInfo(progress: Float) = ForegroundInfo(NOTIFICATION_ID, notification(progress), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+    private fun foregroundInfo(progress: Float) =
+        ForegroundInfo(NOTIFICATION_ID, notification(progress), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
 
     private fun notificationManager() = applicationContext.getSystemService(NotificationManager::class.java)
 
@@ -59,7 +60,11 @@ class TimelapseExportWorker(
         val manager = notificationManager()
         if (manager.getNotificationChannel(CHANNEL_ID) == null) {
             manager.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, applicationContext.getString(R.string.timelapse_export_channel), NotificationManager.IMPORTANCE_LOW),
+                NotificationChannel(
+                    CHANNEL_ID,
+                    applicationContext.getString(R.string.timelapse_export_channel),
+                    NotificationManager.IMPORTANCE_LOW,
+                ),
             )
         }
         return CHANNEL_ID

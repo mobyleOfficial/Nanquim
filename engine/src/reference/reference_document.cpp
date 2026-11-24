@@ -174,7 +174,8 @@ std::optional<LoadedDocument> readDocumentFolder(const std::string& folder, std:
       const io::TileReadResult result =
           io::readDocumentTile(surfaceFolder, coordinate, surface.format, tile.data(), format);
       if (result == io::TileReadResult::Corrupt) {
-        document.warnings.push_back(surface.folder + "/" + io::documentTileRelativePath(coordinate) +
+        document.warnings.push_back(surface.folder + "/" +
+                                    io::documentTileRelativePath(coordinate) +
                                     ": corrupt, treated as empty");
         continue;
       }
@@ -188,12 +189,12 @@ std::optional<LoadedDocument> readDocumentFolder(const std::string& folder, std:
 }
 
 Image renderDocument(const LoadedDocument& document) {
-  Image result = composeLayerTree(document.tree, document.width, document.height,
-                                  [&document](canvas::LayerId id) -> const Image* {
-                                    auto found = document.surfaces.find(id);
-                                    return found == document.surfaces.end() ? nullptr
-                                                                            : &found->second;
-                                  });
+  Image result =
+      composeLayerTree(document.tree, document.width, document.height,
+                       [&document](canvas::LayerId id) -> const Image* {
+                         auto found = document.surfaces.find(id);
+                         return found == document.surfaces.end() ? nullptr : &found->second;
+                       });
   quantize(result, document.tree.pixelFormat);
   if (canvas::isLinear(document.tree.pixelFormat)) {
     result = encodedToSrgb(result);

@@ -1,5 +1,10 @@
 package com.mobyle.nanquim.formats.nanquim
 
+import com.mobyle.nanquim.document.animation.AnimationSettings
+import com.mobyle.nanquim.document.animation.OnionBlend
+import com.mobyle.nanquim.document.animation.OnionSkin
+import com.mobyle.nanquim.document.animation.PlaybackMode
+import com.mobyle.nanquim.document.layer.RgbaColor
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -12,11 +17,6 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.put
-import com.mobyle.nanquim.document.animation.AnimationSettings
-import com.mobyle.nanquim.document.animation.OnionBlend
-import com.mobyle.nanquim.document.animation.OnionSkin
-import com.mobyle.nanquim.document.animation.PlaybackMode
-import com.mobyle.nanquim.document.layer.RgbaColor
 
 object AnimationJson {
     const val FILE = "animation.json"
@@ -117,7 +117,8 @@ object AnimationJson {
     private fun JsonObject.string(key: String) = (this[key] as? JsonPrimitive)?.contentOrNull
 
     private fun JsonObject.color(key: String): RgbaColor? {
-        val values = (this[key] as? JsonArray)?.mapNotNull { (it as? JsonPrimitive)?.doubleOrNull?.toFloat()?.coerceIn(0f, 1f) } ?: return null
+        val values =
+            (this[key] as? JsonArray)?.mapNotNull { (it as? JsonPrimitive)?.doubleOrNull?.toFloat()?.coerceIn(0f, 1f) } ?: return null
         if (values.size < 3) return null
         return RgbaColor(values[0], values[1], values[2], values.getOrElse(3) { 1f })
     }

@@ -1,0 +1,48 @@
+name: Deploy Android Dev
+run-name: Build and deploy dev from ${{ github.ref_name }} - By ${{ github.actor }}
+
+on:
+  push:
+    branches: [dev]
+    paths-ignore:
+      - '.github/**'
+      - '**.md'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-android-dev
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # Dev builds get no AdMob ids on purpose: real ads in a tester build would
+      # count as invalid traffic, so the devRelease APK ships with ads off.
+      - uses: ./.github/actions/setup-android-release
+        with:
+          package-name: com.mobyle.nanquim.dev
+          keystore-base64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          keystore-password: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          key-alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          key-password: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          google-services-json-base64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          firebase-credentials-base64: ${{ secrets.FIREBASE_CREDENTIALS_BASE64 }}
+
+      # Builds the signed devRelease APK with the next versionCode and uploads it
+      # to Firebase App Distribution.
+      - name: Run fastlane Android Dev
+        run: bundle exec fastlane android distribute_dev_build
+
+      - name: Keep the APK as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nanquim-${{ env.VERSION_NAME }}-${{ env.VERSION_CODE }}
+          path: app/build/outputs/apk/dev/release/*.apk
+          if-no-files-found: error
+          retention-days: 30

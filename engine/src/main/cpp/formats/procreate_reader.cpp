@@ -8,6 +8,7 @@
 #include <climits>
 #include <cstring>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "canvas/layer_tree.h"
@@ -62,11 +63,11 @@ uint8_t unpremultiply(uint8_t channel, uint8_t alpha) {
 
 class ProcreateImporter {
  public:
-  ProcreateImporter(InputSource& source, std::string folder, const ImportLimits& limits,
+  ProcreateImporter(InputSource& source, std::string folder, ImportLimits limits,
                     bool compositeOnly)
       : source_(source),
         folder_(std::move(folder)),
-        limits_(limits),
+        limits_(std::move(limits)),
         compositeOnly_(compositeOnly) {}
 
   ImportResult run();

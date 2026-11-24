@@ -1,17 +1,23 @@
 package com.mobyle.nanquim.canvas.selection
 
+import com.mobyle.nanquim.engine.Point
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.engine.Point
 import kotlin.math.PI
 import kotlin.math.abs
 
 class SelectionGeometryTest {
     private fun area(points: List<Point>): Double =
-        abs(points.indices.sumOf { index -> val a = points[index]; val b = points[(index + 1) % points.size]; a.x * b.y - b.x * a.y }) / 2
+        abs(
+            points.indices.sumOf { index ->
+                val a = points[index]
+                val b = points[(index + 1) % points.size]
+                a.x * b.y - b.x * a.y
+            },
+        ) / 2
 
     @Test
     fun `ellipse stays within the tolerance`() {
@@ -73,7 +79,13 @@ class SelectionEditorTest {
         editor.down(Point(51.0, 79.0), zoom)
         editor.move(Point(50.0, 120.0), zoom, constrain = false)
         editor.up(Point(50.0, 120.0), zoom)
-        assertEquals(120.0, (editor.pending as PendingSelection.Path).nodes.last().point.y)
+        assertEquals(
+            120.0,
+            (editor.pending as PendingSelection.Path)
+                .nodes
+                .last()
+                .point.y,
+        )
         editor.down(Point(1.0, 1.0), zoom)
         assertEquals(SelectionEditor.Result.Apply, editor.up(Point(1.0, 1.0), zoom))
         assertNotNull(editor.takePending()?.polygon())

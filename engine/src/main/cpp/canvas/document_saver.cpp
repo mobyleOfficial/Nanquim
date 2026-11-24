@@ -141,7 +141,8 @@ void DocumentSaver::start() {
   }
   for (const auto& [id, saved] : savedSurfaces_) {
     auto requestedFolder = requestedFolders.find(id);
-    const bool moved = requestedFolder != requestedFolders.end() && requestedFolder->second != saved.folder;
+    const bool moved =
+        requestedFolder != requestedFolders.end() && requestedFolder->second != saved.folder;
     if ((requestedFolder == requestedFolders.end() && !tileStore_.hasLayer(id)) || moved) {
       save.transaction->removeAfterCommit(saved.folder);
       save.removedFolders.push_back(saved.folder);
@@ -224,11 +225,11 @@ void DocumentSaver::pollReadbacks() {
       finishTile(generation_, key, version, TileOutcome::Failed);
       continue;
     }
-    ioPool_.post([this, job = jobFor(key, version), pixels = std::move(pixels),
-                  post = postToRenderThread_] {
-      const TileOutcome outcome = stageTile(job, pixels);
-      post([this, job, outcome] { finishTile(job.generation, job.key, job.version, outcome); });
-    });
+    ioPool_.post(
+        [this, job = jobFor(key, version), pixels = std::move(pixels), post = postToRenderThread_] {
+          const TileOutcome outcome = stageTile(job, pixels);
+          post([this, job, outcome] { finishTile(job.generation, job.key, job.version, outcome); });
+        });
   }
 }
 
@@ -260,8 +261,7 @@ DocumentSaver::TileOutcome DocumentSaver::stageTile(const TileJob& job,
     return TileOutcome::Implicit;
   }
   std::vector<uint8_t> fileTile(io::documentTileBytes(job.format));
-  io::engineTileToFile(pixels.data(), job.format, job.placement, fileTile.data(),
-                       job.engineFormat);
+  io::engineTileToFile(pixels.data(), job.format, job.placement, fileTile.data(), job.engineFormat);
   const std::vector<uint8_t> encoded = io::encodeDocumentTile(fileTile.data(), job.format);
   return !encoded.empty() && job.transaction->stageFile(path, encoded) ? TileOutcome::Written
                                                                        : TileOutcome::Failed;
@@ -307,9 +307,10 @@ void DocumentSaver::commitIfReady() {
     }
     io::SurfaceIndex index;
     index.tiles.assign(tiles.begin(), tiles.end());
-    std::sort(index.tiles.begin(), index.tiles.end(), [](TileCoordinate left, TileCoordinate right) {
-      return left.row != right.row ? left.row < right.row : left.column < right.column;
-    });
+    std::sort(index.tiles.begin(), index.tiles.end(),
+              [](TileCoordinate left, TileCoordinate right) {
+                return left.row != right.row ? left.row < right.row : left.column < right.column;
+              });
     index.revision = 1;
     files.push_back({surface.folder + "/index.json", io::writeSurfaceIndexJson(index)});
   }
@@ -342,9 +343,9 @@ void DocumentSaver::finishSave(uint64_t generation, bool ok, std::string error) 
   result.requestId = save.request.requestId;
   result.ok = ok;
   result.error = std::move(error);
-  result.milliseconds = std::chrono::duration<double, std::milli>(
-                            std::chrono::steady_clock::now() - save.start)
-                            .count();
+  result.milliseconds =
+      std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - save.start)
+          .count();
   if (ok) {
     for (const auto& [key, version] : save.written) {
       tileStore_.markSavedToFile(key, version);

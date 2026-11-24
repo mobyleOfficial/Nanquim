@@ -1,15 +1,5 @@
 package com.mobyle.nanquim.command
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.double
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.put
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.document.command.AppState
@@ -28,6 +18,16 @@ import com.mobyle.nanquim.document.guide.PerspectiveGuide
 import com.mobyle.nanquim.document.guide.SymmetryGuide
 import com.mobyle.nanquim.document.guide.SymmetryKind
 import com.mobyle.nanquim.document.guide.VanishingPoint
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.put
 
 object GuideCommandIds {
     const val SET = "guide.set"
@@ -148,6 +148,7 @@ private fun registerPerspectiveCommands(
         canvas.changeGuides(canvas.guides.copy(type = GuideType.Perspective, perspective = change))
         return CommandResult.Success(canvas.guides.toJson())
     }
+
     fun spec(
         id: String,
         titleRes: Int,
@@ -158,7 +159,9 @@ private fun registerPerspectiveCommands(
         if (result is CommandResult.Success) canvas.selectVanishingPoint(canvas.guides.perspective.points.lastIndex)
         result
     }
-    registry.register(spec(GuideCommandIds.PERSPECTIVE_MOVE, R.string.command_guide_perspective_move, listOf(index) + coordinates)) { _, arguments ->
+    registry.register(
+        spec(GuideCommandIds.PERSPECTIVE_MOVE, R.string.command_guide_perspective_move, listOf(index) + coordinates),
+    ) { _, arguments ->
         val point = VanishingPoint(number(arguments, "x"), number(arguments, "y"))
         apply(canvas.guides.perspective.moving(number(arguments, "index").toInt(), point))
     }

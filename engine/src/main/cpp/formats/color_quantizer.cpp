@@ -135,9 +135,8 @@ std::vector<Rgb8> choosePalette(const uint8_t* rgba, size_t pixelCount, size_t m
 
   std::vector<Box> boxes{measure(samples, 0, samples.size())};
   while (boxes.size() < maximumColors) {
-    auto widest = std::max_element(boxes.begin(), boxes.end(), [](const Box& a, const Box& b) {
-      return a.range < b.range;
-    });
+    auto widest = std::max_element(boxes.begin(), boxes.end(),
+                                   [](const Box& a, const Box& b) { return a.range < b.range; });
     if (widest->range <= 0 || widest->end - widest->begin < 2) {
       break;
     }
@@ -145,7 +144,8 @@ std::vector<Rgb8> choosePalette(const uint8_t* rgba, size_t pixelCount, size_t m
     const auto axis = static_cast<size_t>(box.axis);
     const auto first = samples.begin() + static_cast<std::ptrdiff_t>(box.begin);
     const auto last = samples.begin() + static_cast<std::ptrdiff_t>(box.end);
-    std::sort(first, last, [axis](const Sample& a, const Sample& b) { return a.lab[axis] < b.lab[axis]; });
+    std::sort(first, last,
+              [axis](const Sample& a, const Sample& b) { return a.lab[axis] < b.lab[axis]; });
     size_t middle = box.begin + (box.end - box.begin) / 2;
     const float value = samples[middle].lab[axis];
     size_t split = middle;
@@ -257,7 +257,8 @@ uint8_t PaletteMapper::nearest(int32_t red, int32_t green, int32_t blue) {
   blue = std::clamp(blue, 0, 255);
   constexpr int32_t kShift = 8 - kCacheBits;
   const size_t key = cellOf(red, green, blue);
-  for (int16_t member = cellFirst_[key]; member >= 0; member = cellNext_[static_cast<size_t>(member)]) {
+  for (int16_t member = cellFirst_[key]; member >= 0;
+       member = cellNext_[static_cast<size_t>(member)]) {
     const Rgb8& color = palette_[static_cast<size_t>(member)];
     if (color[0] == red && color[1] == green && color[2] == blue) {
       return static_cast<uint8_t>(member);

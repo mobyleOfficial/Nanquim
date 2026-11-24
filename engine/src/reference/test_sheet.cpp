@@ -26,9 +26,9 @@ struct Region2048 {
 };
 
 constexpr Region2048 kRegions[] = {
-    {SheetItem::A, 64, 64, 1984, 288},     {SheetItem::B, 64, 320, 1984, 544},
-    {SheetItem::C, 64, 576, 1984, 928},    {SheetItem::D, 64, 960, 1000, 1248},
-    {SheetItem::E, 1048, 960, 1984, 1248}, {SheetItem::F, 64, 1280, 1000, 1440},
+    {SheetItem::A, 64, 64, 1984, 288},      {SheetItem::B, 64, 320, 1984, 544},
+    {SheetItem::C, 64, 576, 1984, 928},     {SheetItem::D, 64, 960, 1000, 1248},
+    {SheetItem::E, 1048, 960, 1984, 1248},  {SheetItem::F, 64, 1280, 1000, 1440},
     {SheetItem::I, 1048, 1280, 1984, 1440}, {SheetItem::G, 64, 1472, 1984, 1984},
 };
 
@@ -50,7 +50,8 @@ std::vector<stroke::InputSample> samplePath(const std::function<PathSample(doubl
     previous = next;
   }
   const double duration = std::max(length / speed, kSampleIntervalMilliseconds);
-  const auto count = std::max(1, static_cast<int>(std::ceil(duration / kSampleIntervalMilliseconds)));
+  const auto count =
+      std::max(1, static_cast<int>(std::ceil(duration / kSampleIntervalMilliseconds)));
   std::vector<stroke::InputSample> samples;
   for (int index = 0; index <= count; ++index) {
     const PathSample point = path(static_cast<double>(index) / count);
@@ -97,8 +98,8 @@ double defaultBrushSize(const stroke::BrushParameters& brush) {
 }
 
 double defaultBrushOpacity(const stroke::BrushParameters& brush) {
-  return brush.limits.minOpacity +
-         (brush.limits.maxOpacity - brush.limits.minOpacity) * std::clamp(brush.defaults.opacity, 0.0, 1.0);
+  return brush.limits.minOpacity + (brush.limits.maxOpacity - brush.limits.minOpacity) *
+                                       std::clamp(brush.defaults.opacity, 0.0, 1.0);
 }
 
 scene::Scene testSheetScene(const stroke::LoadedBrush& brush, double scale, double sizePixels,
@@ -154,8 +155,7 @@ scene::Scene testSheetScene(const stroke::LoadedBrush& brush, double scale, doub
     add(samplePath(line(x, 1320, x + 40, 1400, constantPressure), kMediumSpeed, scale), size,
         kSaturated);
   }
-  const double largest =
-      std::min(brush.parameters.limits.maxSize, kMaximumSizeInRegion) * scale;
+  const double largest = std::min(brush.parameters.limits.maxSize, kMaximumSizeInRegion) * scale;
   add(samplePath(line(300, 1660, 1750, 1660, [](double) { return 1.0; }), kMediumSpeed, scale),
       largest, kInk);
   add(samplePath(line(160, 1930, 1888, 1930, [](double) { return 1.0; }), kMediumSpeed, scale),
@@ -185,7 +185,8 @@ std::vector<uint8_t> renderSheetTemplate(double scale) {
     if (x < 0 || y < 0 || x >= size || y >= size) {
       return;
     }
-    uint8_t* pixel = &pixels[(static_cast<size_t>(y) * static_cast<size_t>(size) + static_cast<size_t>(x)) * 4];
+    uint8_t* pixel =
+        &pixels[(static_cast<size_t>(y) * static_cast<size_t>(size) + static_cast<size_t>(x)) * 4];
     pixel[0] = pixel[1] = pixel[2] = gray;
   };
   constexpr uint8_t kOutline = 170;

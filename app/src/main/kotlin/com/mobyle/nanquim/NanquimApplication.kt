@@ -10,20 +10,7 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.color.ColorProfileLibrary
-import com.mobyle.nanquim.color.PaletteLibrary
-import com.mobyle.nanquim.color.builtInPalettes
-import com.mobyle.nanquim.text.FontLibrary
-import com.mobyle.nanquim.document.color.ColorState
-import com.mobyle.nanquim.canvas.adjust.GradientLibrary
+import com.mobyle.nanquim.ads.GalleryAds
 import com.mobyle.nanquim.automation.CanvasAutomationHost
 import com.mobyle.nanquim.automation.ControlChannel
 import com.mobyle.nanquim.brush.ActiveBrushes
@@ -36,41 +23,63 @@ import com.mobyle.nanquim.brush.library.BrushLibraryDatabase
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.canvas.MemoryBudgetPolicy
 import com.mobyle.nanquim.canvas.ResourceLayerNames
+import com.mobyle.nanquim.canvas.ResumeState
+import com.mobyle.nanquim.canvas.adjust.GradientLibrary
+import com.mobyle.nanquim.color.ColorProfileLibrary
+import com.mobyle.nanquim.color.PaletteLibrary
+import com.mobyle.nanquim.color.builtInPalettes
 import com.mobyle.nanquim.command.CommandDispatcher
+import com.mobyle.nanquim.command.FeedbackTexts
 import com.mobyle.nanquim.command.NanquimAppState
 import com.mobyle.nanquim.command.ShareSheet
 import com.mobyle.nanquim.command.createAppCommandRegistry
+import com.mobyle.nanquim.command.registerFeedbackCommands
 import com.mobyle.nanquim.command.registerHelpCommands
-import com.mobyle.nanquim.help.Help
 import com.mobyle.nanquim.diagnostics.DiagnosticsCollector
 import com.mobyle.nanquim.diagnostics.DiagnosticsExporter
 import com.mobyle.nanquim.diagnostics.ShapeTraceRecorder
-import com.mobyle.nanquim.diagnostics.TouchSessionRecorder
 import com.mobyle.nanquim.diagnostics.StylusObservationRecorder
+import com.mobyle.nanquim.diagnostics.TouchSessionRecorder
 import com.mobyle.nanquim.document.ArtworkStorage
 import com.mobyle.nanquim.document.DocumentPersistence
+import com.mobyle.nanquim.document.color.ColorState
+import com.mobyle.nanquim.document.command.CommandContext
+import com.mobyle.nanquim.document.command.CommandResult
+import com.mobyle.nanquim.engine.Engine
+import com.mobyle.nanquim.engine.EngineConfig
+import com.mobyle.nanquim.engine.Renderer
+import com.mobyle.nanquim.feedback.AppInfo
+import com.mobyle.nanquim.feedback.AppLinks
+import com.mobyle.nanquim.feedback.FeedbackActions
+import com.mobyle.nanquim.feedback.FeedbackKind
+import com.mobyle.nanquim.feedback.ReviewPrompt
 import com.mobyle.nanquim.gallery.ArtworkTransfer
 import com.mobyle.nanquim.gallery.Gallery
 import com.mobyle.nanquim.gallery.GalleryDatabase
 import com.mobyle.nanquim.gallery.GalleryDocumentsProvider
 import com.mobyle.nanquim.gallery.GalleryNames
 import com.mobyle.nanquim.gallery.SampleArtworks
-import com.mobyle.nanquim.ui.settings.SupportLink
-import com.mobyle.nanquim.ui.settings.parseSupportLinks
-import com.mobyle.nanquim.navigation.AppNavigator
+import com.mobyle.nanquim.help.Help
 import com.mobyle.nanquim.keyboard.KeyboardShortcutSettings
 import com.mobyle.nanquim.macro.Macros
+import com.mobyle.nanquim.navigation.AppNavigator
 import com.mobyle.nanquim.settings.AppSettings
 import com.mobyle.nanquim.settings.InputSettings
 import com.mobyle.nanquim.settings.QuickMenuSettings
 import com.mobyle.nanquim.settings.StorageCleaner
 import com.mobyle.nanquim.telemetry.Telemetry
+import com.mobyle.nanquim.text.FontLibrary
+import com.mobyle.nanquim.ui.settings.SupportLink
+import com.mobyle.nanquim.ui.settings.parseSupportLinks
 import com.mobyle.nanquim.widget.WidgetUpdates
-import com.mobyle.nanquim.document.command.CommandContext
-import com.mobyle.nanquim.document.command.CommandResult
-import com.mobyle.nanquim.engine.Engine
-import com.mobyle.nanquim.engine.EngineConfig
-import com.mobyle.nanquim.engine.Renderer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Locale
 
@@ -81,10 +90,14 @@ class NanquimApplication : Application() {
         Telemetry.create(
             this,
             analyticsEnabled = BuildConfig.BUILD_TYPE != "benchmark",
+            userAllows = appSettings.usageStatistics,
         )
     }
 
     var appStartReported = false
+
+    /** Set by the first activity of the process once it has opened or restored what the launch asked for. */
+    var launchHandled = false
 
     override fun onCreate() {
         super.onCreate()
@@ -106,6 +119,7 @@ class NanquimApplication : Application() {
         val renderer = developerRenderer() ?: appSettings.renderer
         appSettings.startedRenderer = renderer
         telemetry.memoryBudgetChanged(memoryBudgetPolicy.currentBytes)
+        reportInterruptedShaderCompile()
         Engine(EngineConfig(memoryBudgetPolicy.currentBytes, scratchDirectory().absolutePath, renderer = renderer)).also { engine ->
             applicationScope.launch { engine.unrecoverableError.filterNotNull().collect(telemetry::engineFailed) }
             engine.requestGpuInfo { info ->
@@ -278,9 +292,30 @@ class NanquimApplication : Application() {
         }
     }
 
-    val help: Help by lazy { Help(getSharedPreferences(Help.PREFERENCES_NAME, MODE_PRIVATE)) }
+    val help: Help by lazy {
+        Help(getSharedPreferences(Help.PREFERENCES_NAME, MODE_PRIVATE)).also { help ->
+            help.onWelcomeFinished = { completed, card -> telemetry.welcomeFinished(completed, card) }
+        }
+    }
 
     val appSettings: AppSettings by lazy { AppSettings(getSharedPreferences(AppSettings.PREFERENCES_NAME, MODE_PRIVATE)) }
+
+    val resumeState: ResumeState by lazy { ResumeState(getSharedPreferences(ResumeState.PREFERENCES_NAME, MODE_PRIVATE)) }
+
+    val galleryAds: GalleryAds by lazy { GalleryAds(this, allowedByUser = appSettings.galleryAdsThisLaunch) }
+
+    val reviewPrompt: ReviewPrompt by lazy { ReviewPrompt(getSharedPreferences(ReviewPrompt.PREFERENCES_NAME, MODE_PRIVATE)) }
+
+    val feedbackActions: FeedbackActions by lazy { FeedbackActions(this) }
+
+    /** Version, device and renderer for bug reports, without the engine: a report must work even when the engine does not start. */
+    fun appInfo(): AppInfo =
+        AppInfo(
+            version = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+            device = "${Build.MANUFACTURER} ${Build.MODEL}",
+            android = "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
+            renderer = (appSettings.activeRenderer ?: appSettings.renderer).let(AppSettings::rendererId),
+        )
 
     val storageCleaner: StorageCleaner by lazy { StorageCleaner(artworkStorage.root, cacheDir) }
 
@@ -345,14 +380,57 @@ class NanquimApplication : Application() {
             manualUrl = { getString(R.string.help_manual_url) },
             openUrl = { url ->
                 runCatching {
-                    startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                    startActivity(
+                        android.content
+                            .Intent(
+                                android.content.Intent.ACTION_VIEW,
+                                Uri.parse(url),
+                            ).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
                 }.isSuccess
             },
             installSamples = sampleArtworks::install,
             supportLinks = ::supportLinks,
         )
+        registerFeedbackCommands(
+            registry = registry,
+            actions = feedbackActions,
+            appSettings = appSettings,
+            appInfo = ::appInfo,
+            texts =
+                FeedbackTexts(
+                    shareApp = { getString(R.string.share_app_text, AppLinks.PLAY_STORE_WEB) },
+                    emailSubject = { kind ->
+                        getString(
+                            if (kind ==
+                                FeedbackKind.Bug
+                            ) {
+                                R.string.feedback_email_subject_bug
+                            } else {
+                                R.string.feedback_email_subject_feature
+                            },
+                        )
+                    },
+                    emailBody = { kind, info ->
+                        getString(
+                            if (kind ==
+                                FeedbackKind.Bug
+                            ) {
+                                R.string.feedback_email_body_bug
+                            } else {
+                                R.string.feedback_email_body_feature
+                            },
+                            info.summary(),
+                        )
+                    },
+                ),
+            onUsageStatisticsChanged = telemetry::setCollectionEnabled,
+        )
         registry.onExecuted = { commandId, arguments, result ->
-            if (result is CommandResult.Success) macros.record(commandId, arguments)
+            if (result is CommandResult.Success) {
+                macros.record(commandId, arguments)
+                if (commandId in REVIEW_MOMENTS) reviewPrompt.artworkExported()
+            }
         }
         CommandDispatcher(
             registry = registry,
@@ -410,6 +488,17 @@ class NanquimApplication : Application() {
 
     private fun scratchDirectory(): File = File(cacheDir, "engine").apply { mkdirs() }
 
+    /**
+     * The engine leaves this marker behind when the GPU driver crashes the process while it
+     * compiles a shader; report which program it was, so the native crash can be traced to it.
+     */
+    private fun reportInterruptedShaderCompile() {
+        val marker = File(scratchDirectory(), "shaders/$SHADER_COMPILING_MARKER")
+        val lines = runCatching { marker.readLines() }.getOrNull() ?: return
+        marker.delete()
+        telemetry.shaderCompileInterrupted(program = lines.getOrNull(0).orEmpty(), driver = lines.getOrNull(1).orEmpty())
+    }
+
     private fun developerRenderer(): Renderer? {
         val value =
             runCatching {
@@ -421,7 +510,18 @@ class NanquimApplication : Application() {
 
     private companion object {
         const val COLOR_SAVE_INTERVAL_MILLIS = 500L
+
+        /** Kept in sync with ShaderVariantCache::kCompilingMarker in the engine. */
+        const val SHADER_COMPILING_MARKER = "compiling.txt"
         const val MEMORY_SAMPLE_INTERVAL_MILLISECONDS = 2_000L
         const val QUICK_MENU_PREFERENCES = "quick-menu"
+
+        /** Commands after which the person has just finished something they liked: a good moment to ask for a review. */
+        val REVIEW_MOMENTS =
+            setOf(
+                com.mobyle.nanquim.command.TransferCommandIds.SHARE,
+                com.mobyle.nanquim.command.TransferCommandIds.EXPORT_IMAGE,
+                com.mobyle.nanquim.command.TimelapseCommandIds.EXPORT,
+            )
     }
 }

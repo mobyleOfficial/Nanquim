@@ -20,11 +20,12 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.ui.common.ScreenHeader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonObject
 
 data class CreditEntry(
     val section: String,
@@ -44,13 +45,24 @@ fun parseCredits(markdown: String): List<CreditEntry> {
             continue
         }
         if (!line.startsWith("|")) continue
-        val cells = line.trim().trim('|').split('|').map { it.trim().replace("`", "") }
+        val cells =
+            line
+                .trim()
+                .trim('|')
+                .split('|')
+                .map { it.trim().replace("`", "") }
         if (cells.all { it.matches(Regex("-+")) }) continue
         if (header.isEmpty()) {
             header = cells.map { it.lowercase() }
             continue
         }
-        fun cell(name: String) = header.indexOf(name).takeIf { it >= 0 }?.let(cells::getOrNull).orEmpty()
+
+        fun cell(name: String) =
+            header
+                .indexOf(name)
+                .takeIf { it >= 0 }
+                ?.let(cells::getOrNull)
+                .orEmpty()
         if (header.contains("scope") && cell("scope") != "app") continue
         val name = cell("library").ifEmpty { cell("path") }
         val use = cell("use").ifEmpty { listOf(cell("author"), cell("source")).filter { it.isNotEmpty() }.joinToString(" · ") }
@@ -62,6 +74,7 @@ fun parseCredits(markdown: String): List<CreditEntry> {
 @Composable
 fun AboutScreen(
     assets: AssetManager,
+    onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,
 ) {
     val credits by produceState(emptyList<CreditEntry>()) {
@@ -76,13 +89,29 @@ fun AboutScreen(
             HorizontalDivider()
             LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
                 item {
-                    Text(stringResource(R.string.settings_version, BuildConfig.VERSION_NAME), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(vertical = 12.dp))
-                    Text(stringResource(R.string.about_license), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom = 12.dp))
+                    Text(
+                        stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(vertical = 12.dp),
+                    )
+                    Text(
+                        stringResource(R.string.about_license),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 4.dp),
+                    )
+                    LegalLinks(onCommand)
+                    HorizontalDivider()
                 }
                 items(credits) { entry ->
                     Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                         Text(entry.name, style = MaterialTheme.typography.bodyLarge)
-                        if (entry.use.isNotEmpty()) Text(entry.use, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        if (entry.use.isNotEmpty()) {
+                            Text(
+                                entry.use,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                         Text(entry.license, style = MaterialTheme.typography.labelMedium)
                     }
                     HorizontalDivider()

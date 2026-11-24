@@ -3,6 +3,9 @@ package com.mobyle.nanquim.engine
 import android.util.Log
 import android.view.MotionEvent
 import androidx.test.platform.app.InstrumentationRegistry
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.document.layer.addRasterLayer
+import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import org.junit.After
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertNull
@@ -11,9 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.document.layer.addRasterLayer
-import com.mobyle.nanquim.document.layer.toEngineLayerTree
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -82,7 +82,11 @@ class HistoryMemoryTest(
             }
         }
         val shade = (index % 10) / 10f
-        engine.beginStroke(StrokeTool.Paint, 1, StrokeStyle(sizePx = 900f, opacity = 0.5f, red = shade, green = 0.3f, blue = 1 - shade, historyEntry = index.toLong()))
+        engine.beginStroke(
+            StrokeTool.Paint,
+            1,
+            StrokeStyle(sizePx = 900f, opacity = 0.5f, red = shade, green = 0.3f, blue = 1 - shade, historyEntry = index.toLong()),
+        )
         engine.addStrokeSamples(samples)
         engine.endStroke()
     }
@@ -102,7 +106,10 @@ class HistoryMemoryTest(
                 val stats = stats()
                 stats.history?.let { peakHistoryRam = maxOf(peakHistoryRam, it.ramBytes) }
                 stats.tiles?.let { peakTileBytes = maxOf(peakTileBytes, it.gpuBytes + it.ramBytes) }
-                Log.i(TAG, "after $index strokes: history ${stats.history}, tiles ${stats.tiles?.gpuBytes} GPU + ${stats.tiles?.ramBytes} RAM")
+                Log.i(
+                    TAG,
+                    "after $index strokes: history ${stats.history}, tiles ${stats.tiles?.gpuBytes} GPU + ${stats.tiles?.ramBytes} RAM",
+                )
             }
         }
         var settled = stats()

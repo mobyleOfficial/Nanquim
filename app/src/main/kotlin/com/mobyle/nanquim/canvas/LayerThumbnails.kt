@@ -4,12 +4,12 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import com.mobyle.nanquim.document.layer.DocumentState
+import com.mobyle.nanquim.engine.Engine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.mobyle.nanquim.document.layer.DocumentState
-import com.mobyle.nanquim.engine.Engine
 
 class LayerThumbnails(
     private val engine: Engine,
@@ -43,7 +43,11 @@ class LayerThumbnails(
         if (surfaces.isEmpty()) return
         requestInFlight = true
         lastRequestMillis = System.currentTimeMillis()
-        engine.requestThumbnails(surfaces.map { it.first }.toIntArray(), surfaces.map { it.second }.toBooleanArray(), MAX_SIDE_PX) { render ->
+        engine.requestThumbnails(
+            surfaces.map { it.first }.toIntArray(),
+            surfaces.map { it.second }.toBooleanArray(),
+            MAX_SIDE_PX,
+        ) { render ->
             requestInFlight = false
             if (render.error == null && render.width > 0) {
                 val cellWidth = render.width / surfaces.size

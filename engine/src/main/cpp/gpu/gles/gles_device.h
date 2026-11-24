@@ -57,14 +57,14 @@ class GlesDevice final : public rhi::Device, private rhi::CommandContext {
   void registerComputeProgram(const std::string& name, std::string source) override;
   const rhi::Pipeline* computePipeline(const rhi::ComputePipelineDescription& description,
                                        std::string& errorMessage) override;
-  bool readsDestination() const override { return destinationRead_; }
+  [[nodiscard]] bool readsDestination() const override { return destinationRead_; }
   rhi::CommandContext& commands() override { return *this; }
-  int32_t maxTextureSize() const override { return maxTextureSize_; }
-  bool isRenderable(rhi::Format format) const override;
-  bool supportsTimerQueries() const override { return timerQueriesSupported_; }
+  [[nodiscard]] int32_t maxTextureSize() const override { return maxTextureSize_; }
+  [[nodiscard]] bool isRenderable(rhi::Format format) const override;
+  [[nodiscard]] bool supportsTimerQueries() const override { return timerQueriesSupported_; }
   std::unique_ptr<rhi::TimerQuery> createTimerQuery() override;
   bool timerResultsDisjoint() override;
-  std::string infoJson() const override;
+  [[nodiscard]] std::string infoJson() const override;
 
  private:
   void beginPass(const rhi::RenderTarget& target, rhi::LoadAction load,

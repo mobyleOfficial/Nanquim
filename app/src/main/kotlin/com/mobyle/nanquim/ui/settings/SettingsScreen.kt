@@ -1,5 +1,6 @@
 package com.mobyle.nanquim.ui.settings
 
+import android.text.format.Formatter
 import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -21,35 +21,37 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import com.mobyle.nanquim.BuildConfig
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.command.AppCommandIds
+import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.command.GestureCommandIds
+import com.mobyle.nanquim.command.HelpCommandIds
 import com.mobyle.nanquim.command.KeyboardCommandIds
 import com.mobyle.nanquim.command.QuickShapeCommandIds
 import com.mobyle.nanquim.settings.AppSettings
@@ -57,16 +59,13 @@ import com.mobyle.nanquim.settings.InputSettings
 import com.mobyle.nanquim.settings.StorageCleaner
 import com.mobyle.nanquim.settings.StorageUsage
 import com.mobyle.nanquim.settings.ThemeMode
-import android.text.format.Formatter
-import androidx.compose.material3.FilterChip
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.ui.platform.LocalContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.command.HelpCommandIds
 import com.mobyle.nanquim.ui.common.CurveEditor
 import com.mobyle.nanquim.ui.common.ScreenHeader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -78,6 +77,8 @@ fun SettingsScreen(
     onCommand: (String, JsonObject) -> Unit,
     onBack: () -> Unit,
     onOpenDiagnostics: () -> Unit,
+    onOpenAdChoices: (() -> Unit)? = null,
+    adsAvailable: Boolean = false,
 ) {
     var storageRefresh by remember { mutableIntStateOf(0) }
     val usage by produceState<StorageUsage?>(null, storageRefresh) { value = withContext(Dispatchers.IO) { storage.usage() } }
@@ -187,11 +188,38 @@ fun SettingsScreen(
                     Switch(checked = appSettings.projectedCanvas, onCheckedChange = null)
                 }
                 Text(stringResource(R.string.settings_projected_canvas_hint), style = MaterialTheme.typography.bodySmall)
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .toggleable(
+                            value = appSettings.confirmExit,
+                            role = Role.Switch,
+                            onValueChange = {
+                                onCommand(AppCommandIds.SETTINGS_CONFIRM_EXIT, JsonObject(mapOf("enabled" to JsonPrimitive(it))))
+                            },
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(stringResource(R.string.settings_confirm_exit), modifier = Modifier.weight(1f))
+                    Switch(checked = appSettings.confirmExit, onCheckedChange = null)
+                }
                 HorizontalDivider()
                 Text(stringResource(R.string.settings_storage_title), style = MaterialTheme.typography.titleMedium)
                 usage?.let { current ->
-                    Text(stringResource(R.string.settings_storage_artworks, current.artworkCount, Formatter.formatShortFileSize(LocalContext.current, current.artworkBytes)))
-                    Text(stringResource(R.string.settings_storage_cache, Formatter.formatShortFileSize(LocalContext.current, current.cacheBytes)))
+                    Text(
+                        stringResource(
+                            R.string.settings_storage_artworks,
+                            current.artworkCount,
+                            Formatter.formatShortFileSize(LocalContext.current, current.artworkBytes),
+                        ),
+                    )
+                    Text(
+                        stringResource(
+                            R.string.settings_storage_cache,
+                            Formatter.formatShortFileSize(LocalContext.current, current.cacheBytes),
+                        ),
+                    )
                 }
                 TextButton(onClick = {
                     onCommand(AppCommandIds.SETTINGS_CLEAR_CACHE, JsonObject(emptyMap()))
@@ -214,21 +242,28 @@ fun SettingsScreen(
                     }
                 }
                 HorizontalDivider()
-                TextButton(onClick = { onCommand(AppCommandIds.SUPPORT_OPEN, JsonObject(emptyMap())) }) { Text(stringResource(R.string.settings_support)) }
-                TextButton(onClick = { onCommand(AppCommandIds.ABOUT_OPEN, JsonObject(emptyMap())) }) { Text(stringResource(R.string.settings_about)) }
-                Box(Modifier.height(8.dp))
+                FeedbackSection(appSettings, onCommand, onOpenAdChoices, adsAvailable)
+                HorizontalDivider()
+                TextButton(
+                    onClick = { onCommand(AppCommandIds.SUPPORT_OPEN, JsonObject(emptyMap())) },
+                ) { Text(stringResource(R.string.settings_support)) }
+                TextButton(
+                    onClick = { onCommand(AppCommandIds.ABOUT_OPEN, JsonObject(emptyMap())) },
+                ) { Text(stringResource(R.string.settings_about)) }
+                HorizontalDivider()
+                // The last item of the list; a long press opens Diagnostics.
+                Text(
+                    text = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .combinedClickable(onClick = {}, onLongClick = onOpenDiagnostics)
+                            .padding(vertical = 14.dp),
+                )
             }
-            HorizontalDivider()
-            Text(
-                text = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 48.dp)
-                        .combinedClickable(onClick = {}, onLongClick = onOpenDiagnostics)
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
-            )
         }
     }
 }

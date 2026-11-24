@@ -52,8 +52,8 @@ import com.mobyle.nanquim.canvas.input.CanvasTool
 import com.mobyle.nanquim.color.ColorProfileLibrary
 import com.mobyle.nanquim.command.CanvasInfoCommandIds
 import com.mobyle.nanquim.command.CanvasSizeCommandIds
-import com.mobyle.nanquim.command.MacroCommandIds
 import com.mobyle.nanquim.command.ColorProfileCommandIds
+import com.mobyle.nanquim.command.MacroCommandIds
 import com.mobyle.nanquim.document.layer.CanvasAnchor
 import com.mobyle.nanquim.document.layer.PixelFormat
 import com.mobyle.nanquim.engine.Point

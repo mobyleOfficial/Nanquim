@@ -11,13 +11,6 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.color.PaletteLibrary
 import com.mobyle.nanquim.command.PaletteCommandIds
@@ -26,6 +19,13 @@ import com.mobyle.nanquim.document.color.ColorValue
 import com.mobyle.nanquim.document.layer.RgbaColor
 import com.mobyle.nanquim.formats.palette.Palette
 import com.mobyle.nanquim.formats.palette.PaletteSwatch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)

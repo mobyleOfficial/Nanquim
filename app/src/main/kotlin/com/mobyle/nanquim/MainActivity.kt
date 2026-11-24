@@ -1,6 +1,8 @@
 package com.mobyle.nanquim
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Process
 import android.os.SystemClock
@@ -11,6 +13,7 @@ import android.view.Menu
 import android.view.Window
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -24,9 +27,17 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -36,35 +47,38 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import com.mobyle.nanquim.canvas.CanvasSession
 import com.mobyle.nanquim.command.AppCommandIds
 import com.mobyle.nanquim.command.BrushCommandIds
 import com.mobyle.nanquim.command.CanvasCommandIds
 import com.mobyle.nanquim.command.DocumentCommandIds
+import com.mobyle.nanquim.command.FeedbackCommandIds
 import com.mobyle.nanquim.command.GalleryCommandIds
+import com.mobyle.nanquim.command.HelpCommandIds
 import com.mobyle.nanquim.command.PaletteCommandIds
+import com.mobyle.nanquim.command.TimelapseCommandIds
 import com.mobyle.nanquim.command.ToolCommandIds
 import com.mobyle.nanquim.command.TransferCommandIds
 import com.mobyle.nanquim.command.VideoCommandIds
 import com.mobyle.nanquim.display.ProjectedCanvas
+import com.mobyle.nanquim.document.animation.playedFrames
+import com.mobyle.nanquim.document.command.CommandErrorCode
+import com.mobyle.nanquim.document.command.CommandResult
+import com.mobyle.nanquim.engine.EngineEvent
+import com.mobyle.nanquim.feedback.FeedbackKind
+import com.mobyle.nanquim.feedback.requestInAppReview
+import com.mobyle.nanquim.formats.NanquimFileType
 import com.mobyle.nanquim.gallery.ExportOptions
 import com.mobyle.nanquim.gallery.GalleryError
 import com.mobyle.nanquim.gallery.ImportTarget
@@ -76,30 +90,23 @@ import com.mobyle.nanquim.settings.ThemeMode
 import com.mobyle.nanquim.ui.brush.BrushEditorScreen
 import com.mobyle.nanquim.ui.canvas.CanvasScreen
 import com.mobyle.nanquim.ui.canvas.canvasSurroundColor
+import com.mobyle.nanquim.ui.common.AdsNoticeDialog
+import com.mobyle.nanquim.ui.common.ExitDialog
 import com.mobyle.nanquim.ui.common.ProvideWindowLayout
 import com.mobyle.nanquim.ui.diagnostics.DiagnosticsScreen
 import com.mobyle.nanquim.ui.diagnostics.LatencyTestScreen
 import com.mobyle.nanquim.ui.diagnostics.ShapeTraceScreen
 import com.mobyle.nanquim.ui.diagnostics.TouchSessionScreen
 import com.mobyle.nanquim.ui.gallery.ExportAnimation
-import com.mobyle.nanquim.ui.help.ToolTipCard
-import com.mobyle.nanquim.ui.help.WelcomeOverlay
-import com.mobyle.nanquim.command.HelpCommandIds
-import com.mobyle.nanquim.command.TimelapseCommandIds
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.ui.gallery.ExportDialog
+import com.mobyle.nanquim.ui.gallery.GalleryBanner
 import com.mobyle.nanquim.ui.gallery.GalleryScreen
 import com.mobyle.nanquim.ui.gallery.IncomingFileDialog
 import com.mobyle.nanquim.ui.gallery.NewCanvasScreen
 import com.mobyle.nanquim.ui.gallery.TransferReportDialog
+import com.mobyle.nanquim.ui.help.CanvasTourCard
+import com.mobyle.nanquim.ui.help.ToolTipCard
+import com.mobyle.nanquim.ui.help.WelcomeOverlay
 import com.mobyle.nanquim.ui.settings.AboutScreen
 import com.mobyle.nanquim.ui.settings.GestureSettingsScreen
 import com.mobyle.nanquim.ui.settings.KeyboardShortcutsScreen
@@ -108,14 +115,20 @@ import com.mobyle.nanquim.ui.settings.SupportScreen
 import com.mobyle.nanquim.ui.theme.LocalDarkTheme
 import com.mobyle.nanquim.ui.theme.NanquimTheme
 import com.mobyle.nanquim.ui.transition.ArtworkCloseOverlay
-import com.mobyle.nanquim.ui.transition.BlockingLoadingIndicator
 import com.mobyle.nanquim.ui.transition.ArtworkClosingCover
 import com.mobyle.nanquim.ui.transition.ArtworkLoadingIndicator
 import com.mobyle.nanquim.ui.transition.ArtworkOpenOverlay
-import com.mobyle.nanquim.document.animation.playedFrames
-import com.mobyle.nanquim.document.command.CommandResult
-import com.mobyle.nanquim.engine.EngineEvent
-import com.mobyle.nanquim.formats.NanquimFileType
+import com.mobyle.nanquim.ui.transition.BlockingLoadingIndicator
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,22 +147,37 @@ class MainActivity : ComponentActivity() {
                     ThemeMode.Light -> false
                     ThemeMode.Dark -> true
                 }
+            // The default edge-to-edge style follows the system's dark mode, so a Light app on a dark
+            // system kept white status bar icons on a light background. Follow the app's theme instead.
+            DisposableEffect(darkTheme) {
+                val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkTheme }
+                enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+                onDispose {}
+            }
             NanquimTheme(darkTheme = darkTheme) {
                 ProvideWindowLayout { NanquimApp(application) }
             }
         }
-        if (savedInstanceState == null && !openTestDocumentFromIntent(application, intent)) {
+        // Once per process, not once per fresh activity: after the system ends the process in the background, the activity
+        // comes back with a saved state but everything else starts from scratch, and the open artwork must come back too.
+        val processStart = !application.launchHandled
+        application.launchHandled = true
+        if (processStart && !openTestDocumentFromIntent(application, intent)) {
+            val savedScreens = savedInstanceState?.getStringArrayList(STATE_SCREENS)
             lifecycleScope.launch {
                 val (screenWidth, screenHeight) = displayResolution()
                 application.gallery.seedPresets(screenWidth, screenHeight)
                 application.gallery.sync()
                 if (application.help.automatic) application.sampleArtworks.installOnce()
-                val requested = takeArtworkToOpen(intent)
+                val requested = if (savedInstanceState == null) takeArtworkToOpen(intent) else null
                 if (requested != null) {
                     application.gallery.openFromOutside(requested)
-                } else if (application.canvasSession.documentSession == null) {
-                    application.gallery.restoreLastOpen()
+                } else if (application.canvasSession.documentSession == null && application.gallery.restoreLastOpen()) {
+                    application.canvasSession.artwork
+                        ?.id
+                        ?.let { application.resumeState.restore(application.canvasSession, it) }
                 }
+                savedScreens?.let { application.navigator.restore(it, artworkOpen = application.canvasSession.documentSession != null) }
             }
         }
         val windowCallback = window.callback
@@ -178,9 +206,31 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                snapshotFlow {
+                    application.reviewPrompt.pending && application.navigator.current == AppDestination.Gallery &&
+                        application.help.automatic
+                }.collect { ready ->
+                    if (ready) {
+                        application.reviewPrompt.asked()
+                        requestInAppReview(this@MainActivity)
+                    }
+                }
+            }
+        }
         application.startControlChannel(intent?.getStringExtra(EXTRA_CONTROL_TOKEN))
+        // Before the wait below: lifecycleScope starts it immediately, so the cards must already count as shown.
         if (savedInstanceState == null) application.help.showWelcomeIfFirstLaunch()
         if (savedInstanceState == null) incomingFileOf(intent)?.let { application.incomingFile = it }
+        lifecycleScope.launch {
+            // Consent and ads wait for the introduction to end and the gallery to show, so nothing interrupts a first launch.
+            snapshotFlow { !application.help.welcomeVisible && application.navigator.current == AppDestination.Gallery }.first { it }
+            if (!application.help.automatic) return@launch
+            // The one-time note on ads (shown by NanquimApp) comes before any consent form or banner.
+            if (application.galleryAds.enabled) snapshotFlow { application.appSettings.adsNoticeSeen }.first { it }
+            application.galleryAds.start(this@MainActivity)
+        }
     }
 
     private fun measureAppStart(
@@ -270,6 +320,11 @@ class MainActivity : ComponentActivity() {
             ).also { it.start() }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putStringArrayList(STATE_SCREENS, ArrayList((application as NanquimApplication).navigator.snapshot()))
+    }
+
     override fun onStop() {
         projectedCanvas?.stop()
         projectedCanvas = null
@@ -277,6 +332,7 @@ class MainActivity : ComponentActivity() {
         val application = application as NanquimApplication
         val session = application.canvasSession
         val state = session.artwork?.let { session.document }
+        application.resumeState.save(session)
         val startedAt = SystemClock.elapsedRealtime()
         session.persistence.saveNow(withThumbnail = true) { saved ->
             if (state != null) application.telemetry.artworkSavedInBackground(state, SystemClock.elapsedRealtime() - startedAt, saved)
@@ -313,6 +369,7 @@ class MainActivity : ComponentActivity() {
 
         private const val EXTRA_CONTROL_TOKEN = "com.mobyle.nanquim.extra.CONTROL_TOKEN"
         private const val EXTRA_TEST_FILL = "com.mobyle.nanquim.extra.TEST_FILL"
+        private const val STATE_SCREENS = "screens"
     }
 }
 
@@ -324,6 +381,13 @@ private fun NanquimApp(application: NanquimApplication) {
     val dispatcher = application.commandDispatcher
     val engine = application.engine
     val session = application.canvasSession
+    val feedbackCommand: (String, JsonObject) -> Unit = { commandId, arguments ->
+        dispatcher.dispatch(commandId, arguments) { result ->
+            if (result is CommandResult.Failure && result.code == CommandErrorCode.HandlerFailed) {
+                Toast.makeText(context, R.string.feedback_open_failed, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     LaunchedEffect(engine) {
         engine.events.collect { event ->
@@ -397,7 +461,15 @@ private fun NanquimApp(application: NanquimApplication) {
             application.colorProfileLibrary.entries
                 .filter { it.info.colorSpace == com.mobyle.nanquim.engine.ProfileColorSpace.Cmyk && it.info.convertsTo }
                 .map { it.id to it.name }
-        val animationState = session.document?.takeIf { it.animation.enabled && (ids.isEmpty() || ids == listOfNotNull(session.artwork?.id)) }
+        val animationState =
+            session.document?.takeIf {
+                it.animation.enabled && (
+                    ids.isEmpty() || ids ==
+                        listOfNotNull(
+                            session.artwork?.id,
+                        )
+                )
+            }
         ExportDialog(
             artworkCount = count,
             cmykProfiles = cmykProfiles,
@@ -448,6 +520,31 @@ private fun NanquimApp(application: NanquimApplication) {
         TransferReportDialog(report = report, onDismiss = { application.transfer.report = null })
     }
     val panelOpen = brushUi.libraryTool != null || session.layersPanelVisible || session.colorPanelVisible
+    var confirmingExit by remember { mutableStateOf(false) }
+    val gallery = application.gallery
+    val atGallery = navigator.current == AppDestination.Gallery && !navigator.canGoBack
+    BackHandler(enabled = atGallery && (gallery.selecting || gallery.openStackId != null || application.appSettings.confirmExit)) {
+        when {
+            gallery.selecting -> gallery.changeSelecting(false)
+            gallery.openStackId != null -> gallery.openStackId = null
+            else -> confirmingExit = true
+        }
+    }
+    if (atGallery && application.galleryAds.enabled && application.help.automatic && !application.help.welcomeVisible &&
+        !application.appSettings.adsNoticeSeen
+    ) {
+        AdsNoticeDialog(onDismiss = application.appSettings::markAdsNoticeSeen)
+    }
+    if (confirmingExit) {
+        ExitDialog(
+            onExit = { dontAskAgain ->
+                confirmingExit = false
+                if (dontAskAgain) dispatcher.dispatch(AppCommandIds.SETTINGS_CONFIRM_EXIT, buildJsonObject { put("enabled", false) })
+                (context as? Activity)?.finish()
+            },
+            onDismiss = { confirmingExit = false },
+        )
+    }
     BackHandler(enabled = navigator.canGoBack || session.debugPanelVisible || panelOpen) {
         when {
             navigator.current == AppDestination.BrushEditor -> dispatcher.dispatch(BrushCommandIds.EDITOR_CANCEL)
@@ -474,6 +571,8 @@ private fun NanquimApp(application: NanquimApplication) {
                     fadeOut(tween(SCREEN_FADE_OUT_MILLIS))
             }
         },
+        // The fade passes through transparency between screens; without this the black window background flashes through.
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         label = "screen",
     ) { destination ->
         when (destination) {
@@ -485,6 +584,10 @@ private fun NanquimApp(application: NanquimApplication) {
                     onPhoto = { photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                     onShare = { ids -> exportIds = ids },
                     onOpenSettings = { dispatcher.dispatch(AppCommandIds.SETTINGS_OPEN) },
+                    banner =
+                        application.galleryAds.takeIf { it.enabled && it.ready && !application.help.welcomeVisible }?.let { ads ->
+                            { modifier -> GalleryBanner(ads.bannerUnitId, modifier) }
+                        },
                 )
             AppDestination.NewCanvas ->
                 NewCanvasScreen(
@@ -508,7 +611,10 @@ private fun NanquimApp(application: NanquimApplication) {
                     onAddImage = { importLauncher.launch(arrayOf("image/*", "video/*")) },
                     onCommand = { commandId, arguments ->
                         dispatcher.dispatch(commandId, arguments.toJsonObject()) { result ->
-                            timelapseNotice(commandId, result)?.let { Toast.makeText(context, resources.getString(it), Toast.LENGTH_LONG).show() }
+                            timelapseNotice(
+                                commandId,
+                                result,
+                            )?.let { Toast.makeText(context, resources.getString(it), Toast.LENGTH_LONG).show() }
                         }
                     },
                 )
@@ -517,9 +623,16 @@ private fun NanquimApp(application: NanquimApplication) {
                     inputSettings = application.inputSettings,
                     appSettings = application.appSettings,
                     storage = application.storageCleaner,
-                    onCommand = { commandId, arguments -> dispatcher.dispatch(commandId, arguments) },
+                    onCommand = feedbackCommand,
                     onBack = navigator::back,
                     onOpenDiagnostics = { dispatcher.dispatch(AppCommandIds.DIAGNOSTICS_OPEN) },
+                    onOpenAdChoices =
+                        if (application.galleryAds.privacyOptionsRequired) {
+                            { (context as? Activity)?.let(application.galleryAds::showPrivacyOptions) }
+                        } else {
+                            null
+                        },
+                    adsAvailable = BuildConfig.ADS_ENABLED,
                 )
             AppDestination.Diagnostics ->
                 DiagnosticsScreen(
@@ -562,11 +675,23 @@ private fun NanquimApp(application: NanquimApplication) {
                     onCommand = { commandId, arguments -> dispatcher.dispatch(commandId, arguments) },
                     onBack = navigator::back,
                 )
-            AppDestination.About -> AboutScreen(assets = context.assets, onBack = navigator::back)
+            AppDestination.About -> AboutScreen(assets = context.assets, onCommand = feedbackCommand, onBack = navigator::back)
             AppDestination.Support ->
                 SupportScreen(
                     links = remember { application.supportLinks() },
-                    onOpenLink = { index -> dispatcher.dispatch(HelpCommandIds.SUPPORT_OPEN_LINK, buildJsonObject { put("index", index) }) },
+                    onOpenLink = { index ->
+                        dispatcher.dispatch(HelpCommandIds.SUPPORT_OPEN_LINK, buildJsonObject { put("index", index) })
+                    },
+                    onShareApp = { feedbackCommand(FeedbackCommandIds.SHARE_APP, buildJsonObject {}) },
+                    onReport = { channel ->
+                        feedbackCommand(
+                            FeedbackCommandIds.REPORT,
+                            buildJsonObject {
+                                put("kind", FeedbackKind.Bug.id)
+                                put("channel", channel.id)
+                            },
+                        )
+                    },
                     onBack = navigator::back,
                 )
             AppDestination.LatencyTest -> LatencyTestScreen(engine = engine, onBack = navigator::back)
@@ -643,8 +768,19 @@ private fun NanquimApp(application: NanquimApplication) {
             ToolTipCard(tip, onDismiss = { dispatcher.dispatch(HelpCommandIds.TIP_DISMISS) })
         }
     }
+    LaunchedEffect(navigator.current, help.welcomeVisible, session.documentShown) {
+        if (navigator.current == AppDestination.Canvas && session.documentShown) help.canvasShown()
+    }
+    val tourStep = help.tourStep
+    if (tourStep != null && navigator.current == AppDestination.Canvas) {
+        CanvasTourCard(tourStep, onNext = help::nextTourStep, onSkip = help::finishTour)
+    }
     if (help.welcomeVisible) {
-        WelcomeOverlay(help)
+        // From the gallery the last card opens a new canvas; when replayed from Settings it just closes.
+        WelcomeOverlay(
+            help,
+            onStartDrawing = if (navigator.current == AppDestination.Gallery) ({ navigator.open(AppDestination.NewCanvas) }) else null,
+        )
         BackHandler { dispatcher.dispatch(HelpCommandIds.WELCOME_FINISH) }
     }
 }

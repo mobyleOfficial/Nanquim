@@ -84,7 +84,8 @@ class TreeCompositor {
         const double alpha = source.rgba[offset + 3];
         for (size_t channel = 0; channel < 3; ++channel) {
           const double color = linear_ ? canvas::srgbToLinearValue(tint[channel]) : tint[channel];
-          source.rgba[offset + channel] += (color * alpha - source.rgba[offset + channel]) * tint[3];
+          source.rgba[offset + channel] +=
+              (color * alpha - source.rgba[offset + channel]) * tint[3];
         }
       }
     }

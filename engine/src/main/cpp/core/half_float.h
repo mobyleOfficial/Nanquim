@@ -32,7 +32,8 @@ inline uint16_t floatToHalf(float value) {
     }
     return static_cast<uint16_t>(sign | half);
   }
-  auto half = static_cast<uint32_t>((static_cast<uint32_t>(halfExponent) << 10U) | (mantissa >> 13U));
+  auto half =
+      static_cast<uint32_t>((static_cast<uint32_t>(halfExponent) << 10U) | (mantissa >> 13U));
   const uint32_t remainder = mantissa & 0x1FFFU;
   if (remainder > 0x1000U || (remainder == 0x1000U && (half & 1U) != 0)) {
     ++half;

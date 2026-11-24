@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -32,10 +32,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.mobyle.nanquim.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import com.mobyle.nanquim.R
 import java.io.File
 
 @Composable
@@ -51,7 +51,15 @@ fun TimelapseReplay(
                         val retriever = MediaMetadataRetriever()
                         try {
                             retriever.setDataSource(file.path)
-                            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()?.takeIf { it > 0 }?.let { file to it }
+                            retriever
+                                .extractMetadata(
+                                    MediaMetadataRetriever.METADATA_KEY_DURATION,
+                                )?.toLongOrNull()
+                                ?.takeIf { it > 0 }
+                                ?.let {
+                                    file to
+                                        it
+                                }
                         } finally {
                             retriever.release()
                         }
@@ -88,14 +96,22 @@ fun TimelapseReplay(
     LaunchedEffect(view) {
         while (true) {
             val video = view
-            if (video != null && !seeking && clips.isNotEmpty()) position = (starts.getOrElse(clip) { 0L } + video.currentPosition).toFloat()
+            if (video != null && !seeking &&
+                clips.isNotEmpty()
+            ) {
+                position = (starts.getOrElse(clip) { 0L } + video.currentPosition).toFloat()
+            }
             delay(POSITION_MILLIS)
         }
     }
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         AndroidView(factory = { context -> VideoView(context).also { view = it } }, modifier = Modifier.align(Alignment.Center))
         Column(
-            Modifier.align(Alignment.BottomCenter).fillMaxWidth().windowInsetsPadding(WindowInsets.safeDrawing).padding(16.dp),
+            Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Slider(

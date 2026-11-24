@@ -48,8 +48,7 @@ private fun List<LayerNode>.inserting(
     }
 }
 
-private fun LayerNode.containsId(id: Int): Boolean =
-    this.id == id || (this is LayerGroup && children.any { it.containsId(id) })
+private fun LayerNode.containsId(id: Int): Boolean = this.id == id || (this is LayerGroup && children.any { it.containsId(id) })
 
 fun DocumentState.withActiveLayer(id: Int?): DocumentState {
     if (id != null && find(id) == null) fail("No layer $id")
@@ -314,13 +313,18 @@ fun DocumentState.groupLayers(
     val ordered = roots.sortedBy { order.indexOf(it) }
     val topmost = ordered.last()
     val topPosition = positionOf(topmost)!!
-    val movingBelow = ordered.count { other -> other != topmost && positionOf(other)!!.let { it.parentId == topPosition.parentId && it.index < topPosition.index } }
+    val movingBelow =
+        ordered.count { other ->
+            other != topmost &&
+                positionOf(other)!!.let { it.parentId == topPosition.parentId && it.index < topPosition.index }
+        }
     var remaining = layers
     ordered.forEach { remaining = remaining.without(it) }
     val groupId = nextId
     val group = LayerGroup(groupId, name, children = ordered.map { find(it)!! })
     val insertAt = topPosition.index - movingBelow
-    return copy(layers = remaining.inserting(group, topPosition.parentId, insertAt), activeLayerId = groupId, nextId = groupId + 1) to groupId
+    return copy(layers = remaining.inserting(group, topPosition.parentId, insertAt), activeLayerId = groupId, nextId = groupId + 1) to
+        groupId
 }
 
 fun DocumentState.ungroup(groupId: Int): DocumentState {

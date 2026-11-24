@@ -1,11 +1,11 @@
 package com.mobyle.nanquim.formats.palette
 
+import com.mobyle.nanquim.document.layer.RgbaColor
+import com.mobyle.nanquim.formats.interchange.ImportWarning
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import com.mobyle.nanquim.document.layer.RgbaColor
-import com.mobyle.nanquim.formats.interchange.ImportWarning
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 

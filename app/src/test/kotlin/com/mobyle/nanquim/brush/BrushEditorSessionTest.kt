@@ -1,10 +1,10 @@
 package com.mobyle.nanquim.brush
 
+import com.mobyle.nanquim.document.brush.BrushDocument
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
-import com.mobyle.nanquim.document.brush.BrushDocument
 
 class BrushEditorSessionTest {
     private fun document(linked: Boolean) =

@@ -49,7 +49,7 @@ void accumulateEdge(const Edge& edge, int32_t rows, int32_t width, std::vector<d
   const double dxdy = (edge.x1 - edge.x0) / (edge.y1 - edge.y0);
   const int32_t firstRow = std::max(0, static_cast<int32_t>(std::floor(topY)));
   const int32_t endRow = std::min(rows, static_cast<int32_t>(std::ceil(bottomY)));
-  const auto stride = static_cast<size_t>(width + 2);
+  const auto stride = static_cast<size_t>(width) + 2;
   for (int32_t row = firstRow; row < endRow; ++row) {
     const double segmentTop = std::max(static_cast<double>(row), topY);
     const double segmentBottom = std::min(static_cast<double>(row + 1), bottomY);
@@ -131,7 +131,7 @@ TileCoverageMap rasterizePolygon(const std::vector<PolygonPoint>& points, int32_
     clipEdgeHorizontally({from.x - firstColumn, from.y, to.x - firstColumn, to.y}, 0.0,
                          static_cast<double>(width), edges);
   }
-  const auto stride = static_cast<size_t>(width + 2);
+  const auto stride = static_cast<size_t>(width) + 2;
   std::vector<double> buffer;
   const int32_t firstTileRow = firstRow / kTileSizePixels;
   const int32_t endTileRow = (endRow + kTileSizePixels - 1) / kTileSizePixels;

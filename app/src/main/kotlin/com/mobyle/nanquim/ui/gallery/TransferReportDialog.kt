@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mobyle.nanquim.R
-import com.mobyle.nanquim.gallery.TransferReport
 import com.mobyle.nanquim.formats.interchange.ImportWarning
+import com.mobyle.nanquim.gallery.TransferReport
 
 @Composable
 fun TransferReportDialog(
