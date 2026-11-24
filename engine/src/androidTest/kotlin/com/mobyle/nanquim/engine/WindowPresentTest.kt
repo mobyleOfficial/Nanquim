@@ -138,8 +138,14 @@ class WindowPresentTest {
                                 "first update of ${after.firstFrontBufferSampleCount} strokes after " +
                                 "${after.inputToFirstFrontBufferMedianMilliseconds} ms (median)",
                         )
-                        if (during.frontBufferSampleCount == 0) failures += "$renderer: no front-buffered update while the pen was down"
-                        if (after.firstFrontBufferSampleCount != 3) {
+                        Log.i(TAG, "$renderer: front buffer supported ${during.frontBufferSupported}")
+                        if (!during.frontBufferSupported) {
+                            if (during.frontBufferSampleCount != 0) {
+                                failures += "$renderer: front-buffered updates without front-buffer support"
+                            }
+                        } else if (during.frontBufferSampleCount == 0) {
+                            failures += "$renderer: no front-buffered update while the pen was down"
+                        } else if (after.firstFrontBufferSampleCount != 3) {
                             failures += "$renderer: ${after.firstFrontBufferSampleCount} strokes front-buffered, 3 expected"
                         }
                         instrumentation.runOnMainSync { engine.detachSurface() }

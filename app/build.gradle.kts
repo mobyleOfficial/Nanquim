@@ -53,6 +53,13 @@ val galleryBannerId: String? = localProperty("admob.galleryBannerId")
 val adsTestDeviceIds: String = localProperty("admob.testDeviceIds").orEmpty()
 val adsDebugGeography: String = localProperty("admob.debugGeography").orEmpty().uppercase()
 
+// A malformed id still builds and ships, but every ad request fails and the gallery shows an empty banner slot.
+require(admobAppId == null || admobAppId.matches(Regex("""ca-app-pub-\d+~\d+"""))) {
+    "admob.appId must look like ca-app-pub-0000000000000000~0000000000, not $admobAppId"
+}
+require(galleryBannerId == null || galleryBannerId.matches(Regex("""ca-app-pub-\d+/\d+"""))) {
+    "admob.galleryBannerId must look like ca-app-pub-0000000000000000/0000000000, not $galleryBannerId"
+}
 require(adsDebugGeography in setOf("", "EEA", "REGULATED_US_STATE", "OTHER")) {
     "admob.debugGeography must be EEA, REGULATED_US_STATE or OTHER, not $adsDebugGeography"
 }
@@ -79,7 +86,7 @@ android {
         // Bumped by one for every Play upload. The deploy workflows pass -PversionCode with the next number after the
         // latest Firebase App Distribution release (never below this one).
         versionCode = providers.gradleProperty("versionCode").orNull?.toInt() ?: 4
-        versionName = "1.1.0"
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Consent testing is for debug builds only; see the AdMob settings above.
         buildConfigField("String", "ADS_TEST_DEVICE_IDS", "\"\"")
@@ -108,7 +115,8 @@ android {
         }
         release {
             signingConfig = signingConfigs.findByName("release")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             buildConfigField("boolean", "DEVELOPER_TOOLS", "false")
             val adsConfigured = admobAppId != null && galleryBannerId != null
@@ -208,10 +216,21 @@ dependencies {
     implementation(libs.play.review.ktx)
     implementation(libs.play.services.ads)
     implementation(libs.user.messaging.platform)
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     ksp(libs.androidx.room.compiler)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit.jupiter)
+    testImplementation(platform(libs.koin.bom))
+    testImplementation(libs.koin.test)
     testRuntimeOnly(libs.junit.platform.launcher)
 
     androidTestImplementation(libs.androidx.test.ext.junit)

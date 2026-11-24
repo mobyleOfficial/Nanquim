@@ -23,7 +23,7 @@ from kill_test import adb, launch, stroke_samples, wait_for_artwork
 
 SIZE = 1000
 AUTHORITY = "com.mobyle.nanquim.documents"
-TEST = "com.mobyle.nanquim.gallery.GalleryDocumentsProviderTest"
+TEST = "com.mobyle.nanquim.data.gallery.GalleryDocumentsProviderTest"
 RUNNER = "com.mobyle.nanquim.test/androidx.test.runner.AndroidJUnitRunner"
 
 

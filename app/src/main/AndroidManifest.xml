@@ -120,7 +120,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
         <provider
-            android:name=".gallery.GalleryDocumentsProvider"
+            android:name=".data.gallery.GalleryDocumentsProvider"
             android:authorities="${applicationId}.documents"
             android:exported="true"
             android:grantUriPermissions="true"
@@ -141,7 +141,7 @@
                 android:resource="@xml/recent_artwork_widget_info" />
         </receiver>
         <activity
-            android:name=".widget.RecentArtworkWidgetConfigureActivity"
+            android:name=".presentation.widget.RecentArtworkWidgetConfigureActivity"
             android:exported="true"
             android:label="@string/widget_configure_title"
             android:theme="@style/Theme.Nanquim">
