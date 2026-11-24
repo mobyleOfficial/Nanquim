@@ -21,7 +21,7 @@ import time
 from kill_test import adb, launch, stroke_samples, wait_for_artwork
 
 SIZE = 1000
-TEST = "com.mobyle.nanquim.widget.RecentArtworkWidgetTest"
+TEST = "com.mobyle.nanquim.presentation.widget.RecentArtworkWidgetTest"
 RUNNER = "com.mobyle.nanquim.test/androidx.test.runner.AndroidJUnitRunner"
 
 

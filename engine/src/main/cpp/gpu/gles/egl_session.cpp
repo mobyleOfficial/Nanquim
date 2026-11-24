@@ -1,6 +1,7 @@
 #include "gpu/gles/egl_session.h"
 
 #include <EGL/eglext.h>
+#include <GLES3/gl3.h>
 
 #include <cstdio>
 
@@ -116,8 +117,12 @@ bool EglSession::attachWindow(ANativeWindow* window, std::string& errorMessage) 
     return false;
   }
   eglSwapInterval(display_, 1);
+  // ANGLE (the system GLES on Xclipse GPUs) accepts EGL_SINGLE_BUFFER but never shows the
+  // single-buffered frames: strokes stay invisible until the pen lifts.
+  const auto* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+  const bool angle = renderer != nullptr && std::string(renderer).rfind("ANGLE", 0) == 0;
   singleBufferSupported_ =
-      mutableConfig_ && hasExtension(display_, "EGL_ANDROID_front_buffer_auto_refresh") &&
+      !angle && mutableConfig_ && hasExtension(display_, "EGL_ANDROID_front_buffer_auto_refresh") &&
       eglSurfaceAttrib(display_, windowSurface_, EGL_FRONT_BUFFER_AUTO_REFRESH_ANDROID, EGL_TRUE) ==
           EGL_TRUE;
   frameTimestampsEnabled_ = false;
