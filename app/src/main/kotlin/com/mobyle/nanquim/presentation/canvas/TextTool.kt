@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -47,6 +49,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.IntOffset
@@ -192,6 +195,27 @@ fun TextKeyboard(session: CanvasSession) {
     LaunchedEffect(view) { view?.showKeyboard() }
     LaunchedEffect(editing.text, editing.selectionStart, editing.selectionEnd) { view?.syncFromEditor() }
     DisposableEffect(Unit) { onDispose { view?.hideKeyboard() } }
+    KeepTextAboveKeyboard(session)
+}
+
+/** Pans the canvas when the keyboard and the text bar would cover the box being typed in. */
+@Composable
+private fun KeepTextAboveKeyboard(session: CanvasSession) {
+    val density = LocalDensity.current
+    val keyboard = WindowInsets.ime.getBottom(density)
+    val keyboardTop = LocalView.current.rootView.height - keyboard
+    val clearance = with(density) { TEXT_KEYBOARD_CLEARANCE.toPx() }
+    val minimum = with(density) { TEXT_MINIMUM_BOX.toPx() }
+    val geometry = session.textEditor.editing?.geometry
+    LaunchedEffect(keyboard, geometry?.height) {
+        if (keyboard == 0 || geometry == null) return@LaunchedEffect
+        val toScreen = textToScreen(session, geometry) ?: return@LaunchedEffect
+        val height = maxOf(geometry.height, minimum)
+        val bottom = maxOf(toScreen(0f, height).y, toScreen(geometry.width, height).y)
+        val overlap = bottom + clearance - keyboardTop
+        // The keyboard slides in over several frames; following it frame by frame keeps the box in view without overshooting.
+        if (overlap > 0) session.viewport.panBy(0.0, overlap.toDouble(), animate = false)
+    }
 }
 
 @Composable
@@ -395,6 +419,9 @@ private fun fontFamilyOf(entry: FontEntry): FontFamily? =
     }
 
 private val TEXT_MINIMUM_BOX = 24.dp
+
+// Room for the text bar that sits on the keyboard, plus a margin.
+private val TEXT_KEYBOARD_CLEARANCE = 96.dp
 private val TEXT_HANDLE_RADIUS = 10.dp
 private val TEXT_PANEL_WIDTH = 560.dp
 private val TEXT_LABEL_WIDTH = 110.dp
