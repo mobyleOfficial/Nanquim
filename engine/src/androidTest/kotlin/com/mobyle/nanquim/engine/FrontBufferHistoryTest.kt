@@ -33,10 +33,11 @@ class FrontBufferHistoryTest {
         val intent =
             Intent(context, ProbeSurfaceActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         val activity = instrumentation.startActivitySync(intent) as ProbeSurfaceActivity
-        val scratch = File(context.cacheDir, "front-buffer-history-test").apply {
-            deleteRecursively()
-            mkdirs()
-        }
+        val scratch =
+            File(context.cacheDir, "front-buffer-history-test").apply {
+                deleteRecursively()
+                mkdirs()
+            }
         try {
             val surface = activity.awaitSurface(10)
             assertNotNull("The window has no surface", surface)
