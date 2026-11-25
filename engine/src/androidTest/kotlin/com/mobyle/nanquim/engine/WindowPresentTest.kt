@@ -2,6 +2,7 @@ package com.mobyle.nanquim.engine
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
@@ -71,7 +72,9 @@ class WindowPresentTest {
                 }
                 assertEquals(gles.width, vulkan.width)
                 assertEquals(gles.height, vulkan.height)
-                val (largest, outside) = difference(gles, vulkan)
+                // The latency dot is a raw clear that bypasses color management, so on a device where
+                // only Vulkan gets a Display P3 surface (realme C53) it is a different red in each.
+                val (largest, outside) = difference(gles, vulkan, excluded = latencyDot)
                 Log.i(TAG, "$name: largest difference $largest, $outside channels beyond 2")
                 if (outside > gles.width * gles.height * 3 / 1000) failures += "$name: $outside channels beyond 2/255 (largest $largest)"
                 val dot = vulkan.getPixel(60, 80)
@@ -241,6 +244,7 @@ class WindowPresentTest {
     private fun difference(
         first: Bitmap,
         second: Bitmap,
+        excluded: Rect? = null,
     ): Pair<Int, Int> {
         val a = IntArray(first.width * first.height)
         val b = IntArray(a.size)
@@ -249,6 +253,7 @@ class WindowPresentTest {
         var largest = 0
         var outside = 0
         for (index in a.indices) {
+            if (excluded != null && excluded.contains(index % first.width, index / first.width)) continue
             for (shift in intArrayOf(0, 8, 16)) {
                 val difference = abs((a[index] shr shift and 0xFF) - (b[index] shr shift and 0xFF))
                 largest = maxOf(largest, difference)
@@ -261,5 +266,8 @@ class WindowPresentTest {
     private companion object {
         const val TAG = "WindowPresent"
         const val SETTLE_MILLISECONDS = 1500L
+
+        /** The latency test dot at (60, 80): kLatencyTestDotRadiusPixels around it, plus a pixel of margin. */
+        val latencyDot = Rect(60 - 25, 80 - 25, 60 + 25, 80 + 25)
     }
 }

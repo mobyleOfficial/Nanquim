@@ -155,7 +155,10 @@ class EngineContext {
   void setDirtyTileOverlay(bool enabled);
   void keepGpuAwake(std::chrono::milliseconds duration);
   void pokeGpu();
-  void setDisplayColor(std::vector<uint16_t> lut, bool displayP3);
+  // srgbLut is for when the presenter cannot give the window a Display P3 surface (GLES without
+  // EGL_EXT_gl_colorspace_display_p3_passthrough): lut encodes for Display P3 and would show wrong
+  // colors on an sRGB surface. Both are empty when no conversion is needed.
+  void setDisplayColor(std::vector<uint16_t> lut, std::vector<uint16_t> srgbLut, bool displayP3);
   void setSelectionDisplay(std::optional<canvas::LayerId> selection, bool dimOutside);
   void setMemoryBudget(int64_t bytes);
 
