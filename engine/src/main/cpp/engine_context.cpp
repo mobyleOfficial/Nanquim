@@ -1113,12 +1113,12 @@ void EngineContext::setDirtyTileOverlay(bool enabled) {
   });
 }
 
-void EngineContext::setDisplayColor(std::vector<uint16_t> lut, bool displayP3) {
-  post([this, lut = std::move(lut), displayP3] {
+void EngineContext::setDisplayColor(std::vector<uint16_t> lut, std::vector<uint16_t> srgbLut,
+                                    bool displayP3) {
+  post([this, lut = std::move(lut), srgbLut = std::move(srgbLut), displayP3] {
     if (!eglReady_) {
       return;
     }
-    viewportRenderer_->setDisplayLut(lut);
     const bool wasDisplayP3 = presenter_->isDisplayP3();
     presenter_->setDisplayP3(displayP3);
     if (presenter_->isDisplayP3() != wasDisplayP3 && window_ != nullptr) {
@@ -1128,7 +1128,9 @@ void EngineContext::setDisplayColor(std::vector<uint16_t> lut, bool displayP3) {
         callbacks_->onError(EngineErrorCode::WindowSurfaceFailed, errorMessage, true);
       }
     }
-    NANQUIM_LOG_INFO("Display color: %s, %s", lut.empty() ? "no LUT" : "LUT",
+    const std::vector<uint16_t>& shown = displayP3 && !presenter_->isDisplayP3() ? srgbLut : lut;
+    viewportRenderer_->setDisplayLut(shown);
+    NANQUIM_LOG_INFO("Display color: %s, %s", shown.empty() ? "no LUT" : "LUT",
                      presenter_->isDisplayP3() ? "Display P3 surface" : "sRGB surface");
     frameRequested_ = true;
   });
