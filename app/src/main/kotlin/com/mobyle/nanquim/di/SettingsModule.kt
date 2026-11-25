@@ -3,6 +3,7 @@ package com.mobyle.nanquim.di
 import android.content.Context.MODE_PRIVATE
 import com.mobyle.nanquim.R
 import com.mobyle.nanquim.data.document.ArtworkStorage
+import com.mobyle.nanquim.data.engine.defaultRenderer
 import com.mobyle.nanquim.data.settings.repositories.AppSettingsRepositoryImpl
 import com.mobyle.nanquim.data.settings.repositories.InputSettingsRepositoryImpl
 import com.mobyle.nanquim.data.settings.repositories.KeyboardShortcutsRepositoryImpl
@@ -22,7 +23,10 @@ private const val QUICK_MENU_PREFERENCES = "quick-menu"
 val settingsModule =
     module {
         single<AppSettingsRepository> {
-            AppSettingsRepositoryImpl(androidContext().getSharedPreferences(AppSettingsRepositoryImpl.PREFERENCES_NAME, MODE_PRIVATE))
+            AppSettingsRepositoryImpl(
+                androidContext().getSharedPreferences(AppSettingsRepositoryImpl.PREFERENCES_NAME, MODE_PRIVATE),
+                defaultRenderer(),
+            )
         }
 
         single<InputSettingsRepository> {

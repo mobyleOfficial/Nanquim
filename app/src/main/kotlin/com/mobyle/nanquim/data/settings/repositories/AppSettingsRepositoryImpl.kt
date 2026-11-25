@@ -12,6 +12,7 @@ import com.mobyle.nanquim.domain.settings.repositories.AppSettingsRepository
 
 class AppSettingsRepositoryImpl(
     private val preferences: SharedPreferences,
+    defaultRenderer: Renderer = Renderer.Gles,
 ) : AppSettingsRepository {
     override var themeMode: ThemeMode by mutableStateOf(ThemeMode.fromId(preferences.getString(KEY_THEME, null)) ?: ThemeMode.System)
         private set
@@ -28,7 +29,7 @@ class AppSettingsRepositoryImpl(
         preferences.edit { putString(KEY_COLORS, state.toJson()) }
     }
 
-    override var renderer: Renderer by mutableStateOf(Renderer.fromId(preferences.getString(KEY_RENDERER, null)) ?: Renderer.Gles)
+    override var renderer: Renderer by mutableStateOf(Renderer.fromId(preferences.getString(KEY_RENDERER, null)) ?: defaultRenderer)
         private set
 
     override var activeRenderer: Renderer? by mutableStateOf(null)
