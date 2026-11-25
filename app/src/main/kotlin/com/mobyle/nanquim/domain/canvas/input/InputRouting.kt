@@ -115,13 +115,16 @@ class PalmRejection(
 
     val stylusPresent: Boolean get() = stylusHovering || stylusTouching
 
-    fun fingersAllowed(timeMillis: Long): Boolean {
+    fun fingersAllowed(
+        timeMillis: Long,
+        graceMillis: Long = this.graceMillis,
+    ): Boolean {
         if (stylusHovering || stylusTouching) return false
         val leftAt = stylusLeftAtMillis ?: return true
         return timeMillis - leftAt >= graceMillis
     }
 
     companion object {
-        const val DEFAULT_GRACE_MILLIS = 300L
+        const val DEFAULT_GRACE_MILLIS = 350L
     }
 }
