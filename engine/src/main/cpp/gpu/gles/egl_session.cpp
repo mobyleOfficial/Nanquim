@@ -3,6 +3,9 @@
 #include <EGL/eglext.h>
 #include <GLES3/gl3.h>
 
+#include <sys/system_properties.h>
+
+#include <cctype>
 #include <cstdio>
 
 namespace nanquim::gpu::gles {
@@ -18,6 +21,30 @@ std::string describeEglError(const char* operation) {
   char message[96];
   std::snprintf(message, sizeof(message), "%s failed (EGL error 0x%04x)", operation, eglGetError());
   return message;
+}
+
+std::string lowercaseProperty(const char* name) {
+  char value[PROP_VALUE_MAX] = {};
+  __system_property_get(name, value);
+  std::string text(value);
+  for (char& character : text) {
+    character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
+  }
+  return text;
+}
+
+// Unisoc's BufferQueue (realme C53, Android 15) stops taking the shared buffer after a few switches
+// between EGL_SINGLE_BUFFER and EGL_BACK_BUFFER: queueBuffer fails with -22 and the next
+// dequeueBuffer blocks the render thread for good.
+bool isUnisoc() {
+  const std::string manufacturer = lowercaseProperty("ro.soc.manufacturer");
+  if (manufacturer == "unisoc" || manufacturer == "spreadtrum") {
+    return true;
+  }
+  const std::string platform = lowercaseProperty("ro.board.platform");
+  return platform.rfind("ums", 0) == 0 ||
+         (platform.size() > 2 && platform.rfind("sp", 0) == 0 &&
+          std::isdigit(static_cast<unsigned char>(platform[2])) != 0);
 }
 
 }  // namespace
@@ -118,11 +145,11 @@ bool EglSession::attachWindow(ANativeWindow* window, std::string& errorMessage) 
   }
   eglSwapInterval(display_, 1);
   // ANGLE (the system GLES on Xclipse GPUs) accepts EGL_SINGLE_BUFFER but never shows the
-  // single-buffered frames: strokes stay invisible until the pen lifts.
+  // single-buffered frames: strokes stay invisible until the pen lifts. Unisoc hangs switching it.
   const auto* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
   const bool angle = renderer != nullptr && std::string(renderer).rfind("ANGLE", 0) == 0;
   singleBufferSupported_ =
-      !angle && mutableConfig_ && hasExtension(display_, "EGL_ANDROID_front_buffer_auto_refresh") &&
+      !angle && !isUnisoc() && mutableConfig_ && hasExtension(display_, "EGL_ANDROID_front_buffer_auto_refresh") &&
       eglSurfaceAttrib(display_, windowSurface_, EGL_FRONT_BUFFER_AUTO_REFRESH_ANDROID, EGL_TRUE) ==
           EGL_TRUE;
   frameTimestampsEnabled_ = false;
