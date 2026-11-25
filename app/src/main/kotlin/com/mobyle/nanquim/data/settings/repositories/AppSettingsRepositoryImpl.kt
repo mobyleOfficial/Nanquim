@@ -29,8 +29,24 @@ class AppSettingsRepositoryImpl(
         preferences.edit { putString(KEY_COLORS, state.toJson()) }
     }
 
-    override var renderer: Renderer by mutableStateOf(Renderer.fromId(preferences.getString(KEY_RENDERER, null)) ?: defaultRenderer)
+    override var renderer: Renderer by mutableStateOf(savedRenderer(defaultRenderer))
         private set
+
+    /**
+     * Where Vulkan is the default (Unisoc), GLES has no front buffer, so a GLES choice saved before that
+     * default existed moves to Vulkan once. Choosing GLES again afterwards sticks.
+     */
+    private fun savedRenderer(defaultRenderer: Renderer): Renderer {
+        val saved = Renderer.fromId(preferences.getString(KEY_RENDERER, null)) ?: return defaultRenderer
+        if (defaultRenderer != Renderer.Vulkan || saved != Renderer.Gles || preferences.getBoolean(KEY_VULKAN_DEFAULT_MIGRATED, false)) {
+            return saved
+        }
+        preferences.edit {
+            putString(KEY_RENDERER, Renderer.Vulkan.id)
+            putBoolean(KEY_VULKAN_DEFAULT_MIGRATED, true)
+        }
+        return Renderer.Vulkan
+    }
 
     override var activeRenderer: Renderer? by mutableStateOf(null)
 
@@ -88,7 +104,10 @@ class AppSettingsRepositoryImpl(
 
     override fun changeRenderer(renderer: Renderer) {
         this.renderer = renderer
-        preferences.edit { putString(KEY_RENDERER, renderer.id) }
+        preferences.edit {
+            putString(KEY_RENDERER, renderer.id)
+            putBoolean(KEY_VULKAN_DEFAULT_MIGRATED, true)
+        }
     }
 
     companion object {
@@ -97,6 +116,7 @@ class AppSettingsRepositoryImpl(
         private const val KEY_PROJECTED_CANVAS = "projectedCanvas"
         private const val KEY_COLORS = "colors"
         private const val KEY_RENDERER = "renderer"
+        private const val KEY_VULKAN_DEFAULT_MIGRATED = "vulkanDefaultMigrated"
         private const val KEY_RECORD_TIMELAPSE = "recordTimelapse"
         private const val KEY_USAGE_STATISTICS = "usageStatistics"
         private const val KEY_CONFIRM_EXIT = "confirmExit"
