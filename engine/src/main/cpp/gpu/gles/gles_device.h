@@ -135,6 +135,10 @@ class GlesDevice final : public rhi::Device, private rhi::CommandContext {
   uint32_t boundStorageBuffers_ = 0;
   bool destinationRead_ = false;
   Framebuffer framebuffer_;
+  // Bound between passes instead of the window (framebuffer 0): Mali's GLES driver flushes the
+  // bound framebuffer in glFenceSync, and after eglSwapBuffers on an EGL_SINGLE_BUFFER surface the
+  // window has no color buffer, so the flush dereferences null. Nothing is ever attached to it.
+  Framebuffer idleFramebuffer_;
   Framebuffer readFramebuffer_;
   Framebuffer copyFramebuffer_;
   VertexArray emptyVertexArray_;
