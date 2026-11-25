@@ -4346,12 +4346,18 @@ void EngineContext::renderFrame() {
   if (compositor_->dirtyTileCount() > 0) {
     ++incompleteFrames_;
   }
+  // The frame fence goes in before the swap: Mali's GLES driver (SM-X510) dereferences null in
+  // glFenceSync when it runs right after eglSwapBuffers on an EGL_SINGLE_BUFFER surface. The
+  // fence still covers all of the frame's drawing, which is what the frames-in-flight limit
+  // waits on.
+  if (singleBuffered) {
+    singleBufferFrameFences_.push_back(device_->commands().insertFence());
+  }
   presenter_->present();
   gpuProfiler_.endFrame();
   collectLatencies();
   const auto swapEnd = std::chrono::steady_clock::now();
   if (singleBuffered) {
-    singleBufferFrameFences_.push_back(device_->commands().insertFence());
     lastSwapTime_.reset();
     return;
   }

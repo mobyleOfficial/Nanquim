@@ -635,6 +635,12 @@
     <string name="settings_pressure_value">Pressão %1$d%%</string>
     <string name="settings_smoothing">Suavização (todos os pincéis)</string>
     <string name="settings_quick_shape_title">QuickShape</string>
+    <string name="settings_touch_mode">Modo toque</string>
+    <string name="settings_touch_mode_hint">Desenhe com um dedo ou com uma caneta de ponta de borracha. Dois dedos continuam movendo, aproximando e girando a tela.</string>
+    <string name="touch_mode_prompt_title">Ligar o Modo toque?</string>
+    <string name="touch_mode_prompt_message">O Modo toque permite desenhar com um dedo ou com uma caneta de ponta de borracha. Você pode desligá-lo quando quiser nas Configurações.</string>
+    <string name="touch_mode_prompt_yes">Sim</string>
+    <string name="touch_mode_prompt_no">Não</string>
     <string name="settings_haptics">Vibrar quando formas e ângulos encaixam</string>
     <string name="command_settings_haptics">Definir a vibração de encaixe</string>
     <string name="settings_quick_shape_enabled">Segurar a caneta parada no fim do traço para transformá-lo em forma</string>
