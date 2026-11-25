@@ -648,7 +648,7 @@
     <string name="settings_quick_shape_delay_value">%1$d ms</string>
     <string name="command_settings_palm_support">Definir o apoio da palma</string>
     <string name="settings_palm_support_title">Apoio da palma</string>
-    <string name="settings_palm_support_hint">O quanto um toque grande é tratado como palma apoiada e ignorado. Desligado ignora os dedos só enquanto a caneta está perto.</string>
+    <string name="settings_palm_support_hint">O quanto um toque grande é tratado como palma apoiada e ignorado, e quanto tempo depois de afastar a caneta os dedos voltam a contar. Mais baixo deixa a pinça funcionar mais cedo depois de desenhar. Desligado ignora os dedos só enquanto a caneta está perto.</string>
     <string name="settings_palm_support_off">Desligado</string>
     <string name="settings_palm_support_low">Baixo</string>
     <string name="settings_palm_support_medium">Médio</string>

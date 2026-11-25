@@ -868,7 +868,14 @@ JNIEXPORT jstring JNICALL Java_com_mobyle_nanquim_engine_Engine_nativeSetDisplay
   if (nanquim::color::needsDisplayLut(profile, proof, display)) {
     lut = nanquim::color::buildDisplayLut(profile, proof, display, error);
   }
-  fromHandle(handle)->setDisplayColor(std::move(lut), displayP3 == JNI_TRUE);
+  // The render thread falls back to this one when the window cannot get a Display P3 surface.
+  std::vector<uint16_t> srgbLut;
+  if (display != nanquim::color::DisplaySpace::Srgb && error.empty() &&
+      nanquim::color::needsDisplayLut(profile, proof, nanquim::color::DisplaySpace::Srgb)) {
+    srgbLut = nanquim::color::buildDisplayLut(profile, proof, nanquim::color::DisplaySpace::Srgb,
+                                              error);
+  }
+  fromHandle(handle)->setDisplayColor(std::move(lut), std::move(srgbLut), displayP3 == JNI_TRUE);
   return error.empty() ? nullptr : environment->NewStringUTF(error.c_str());
 }
 

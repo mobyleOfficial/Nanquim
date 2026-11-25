@@ -408,6 +408,8 @@ bool hasExtension(const char* name) {
 GlesDevice::GlesDevice(EGLDisplay display, ShaderVariantCache& shaderCache)
     : display_(display), shaderCache_(shaderCache) {
   framebuffer_ = createFramebuffer();
+  idleFramebuffer_ = createFramebuffer();
+  glBindFramebuffer(GL_FRAMEBUFFER, idleFramebuffer_.name());
   readFramebuffer_ = createFramebuffer();
   copyFramebuffer_ = createFramebuffer();
   emptyVertexArray_ = createVertexArray();
@@ -700,7 +702,7 @@ void GlesDevice::endPass() {
   glDisable(GL_BLEND);
   unbindResources();
   glBindVertexArray(0);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, idleFramebuffer_.name());
   scissor_.reset();
 }
 
@@ -955,8 +957,7 @@ void GlesDevice::copyTexture(const rhi::Texture& source, const rhi::Rect& source
                     sourceRect.y + sourceRect.height, destinationX, destinationY,
                     destinationX + sourceRect.width, destinationY + sourceRect.height,
                     GL_COLOR_BUFFER_BIT, GL_NEAREST);
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, idleFramebuffer_.name());
 }
 
 std::optional<ReadLayout> GlesDevice::bindForRead(const rhi::Texture& texture) {
@@ -997,7 +998,7 @@ bool GlesDevice::readTexture(const rhi::Texture& texture, const rhi::Rect& rect,
   glReadPixels(rect.x, rect.y, rect.width, rect.height, GL_RGBA, layout->type,
                floats.empty() ? out : floats.data());
   glPixelStorei(GL_PACK_ALIGNMENT, alignment);
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, idleFramebuffer_.name());
   if (!floats.empty()) {
     readToFormat(floats.data(), *layout, static_cast<uint8_t*>(out), pixelCount);
   }
@@ -1024,7 +1025,7 @@ std::unique_ptr<rhi::Readback> GlesDevice::readTextureAsync(const rhi::Texture& 
       std::make_unique<GlesReadback>(*this, std::move(buffer), bytes, *layout, pixelCount,
                                      pixelCount * outputBytesPerPixel(*layout));
   glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, idleFramebuffer_.name());
   return readback;
 }
 

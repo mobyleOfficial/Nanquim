@@ -86,7 +86,7 @@ class TouchReplayTest {
                 up(1110, 3)
                 up(1120, 4)
             }
-        assertEquals(TouchReplay.Outcome(navigations = 2, undos = 1, redos = 1), replay(tap.events))
+        assertEquals(TouchReplay.Outcome(undos = 1, redos = 1), replay(tap.events))
         val pinch =
             Script().apply {
                 down(0, finger(0, 500f, 500f))
@@ -95,7 +95,7 @@ class TouchReplayTest {
                 up(200, 0)
                 up(210, 1)
             }
-        assertEquals(TouchReplay.Outcome(navigations = 1, cameraMoves = 10), replay(pinch.events))
+        assertEquals(TouchReplay.Outcome(navigations = 1, cameraMoves = 4), replay(pinch.events))
         val hold =
             Script().apply {
                 down(0, finger(0, 500f, 500f))
@@ -212,7 +212,69 @@ class TouchReplayTest {
                 up(300, 1)
                 up(310, 0)
             }
-        assertEquals(TouchReplay.Outcome(navigations = 1, canceledMoves = 2), replay(session.events))
+        assertEquals(TouchReplay.Outcome(), replay(session.events))
+    }
+
+    @Test
+    fun aPalmTheSystemCancelsSoonNeverMovesTheCamera() {
+        // Recorded on a Tab S7 FE: the pen leaves hover range, the hand lands as two "fingers" and the system cancels
+        // them when the pen comes back tens of milliseconds later.
+        val session =
+            Script().apply {
+                hover(-100, TouchAction.HoverEnter, 300f, 300f)
+                hover(0, TouchAction.HoverExit, 300f, 300f)
+                down(800, finger(0, 1350f, 1275f, major = 0f))
+                down(815, finger(1, 930f, 935f, major = 0f))
+                for (step in 1..4) move(815L + step * 8, finger(0, 1350f + step * 6, 1275f, 0f), finger(1, 930f, 935f, 0f))
+                cancel(870)
+                hover(870, TouchAction.HoverEnter, 300f, 300f)
+            }
+        assertEquals(TouchReplay.Outcome(), replay(session.events))
+    }
+
+    @Test
+    fun aContactThatLandedWhileThePenWasNearNeverJoinsAPinch() {
+        val session =
+            Script().apply {
+                hover(-100, TouchAction.HoverEnter, 300f, 300f)
+                hover(0, TouchAction.HoverExit, 300f, 300f)
+                down(320, finger(0, 1350f, 1275f, major = 0f))
+                down(700, finger(1, 930f, 935f, major = 0f))
+                for (step in 1..20) move(700L + step * 16, finger(0, 1350f - step * 8, 1275f, 0f), finger(1, 930f, 935f, 0f))
+                up(1100, 1)
+                up(1110, 0)
+            }
+        assertEquals(TouchReplay.Outcome(), replay(session.events))
+    }
+
+    @Test
+    fun aLowerPalmSupportLetsAPinchFollowThePenSooner() {
+        val session =
+            Script().apply {
+                hover(-100, TouchAction.HoverEnter, 300f, 300f)
+                hover(0, TouchAction.HoverExit, 300f, 300f)
+                down(250, finger(0, 500f, 500f))
+                down(260, finger(1, 700f, 500f))
+                for (step in 1..20) move(260L + step * 16, finger(0, 500f - step * 10, 500f), finger(1, 700f + step * 10, 500f))
+                up(600, 0)
+                up(610, 1)
+            }
+        assertEquals(TouchReplay.Outcome(), replay(session.events))
+        assertEquals(1, replay(session.events, PalmSupport.Low).navigations)
+    }
+
+    @Test
+    fun aContactBesideAPalmIsPartOfTheHand() {
+        val session =
+            Script().apply {
+                down(0, finger(0, 1200f, 1300f, major = 220f))
+                down(150, finger(1, 900f, 1250f, major = 60f))
+                for (step in 1..20) move(150L + step * 16, finger(0, 1200f, 1300f, major = 220f), finger(1, 900f - step * 8, 1250f))
+                up(700, 1)
+                up(710, 0)
+            }
+        assertEquals(TouchReplay.Outcome(), replay(session.events))
+        assertEquals(1, replay(session.events, PalmSupport.Off).navigations)
     }
 
     @Test
@@ -225,7 +287,7 @@ class TouchReplayTest {
                 move(42, finger(0, 540f, 500f), TouchPointer(1, PointerTool.Palm, 740f, 500f))
                 cancel(60)
             }
-        assertEquals(TouchReplay.Outcome(navigations = 1, canceledMoves = 1), replay(system.events))
+        assertEquals(TouchReplay.Outcome(), replay(system.events))
         val canceled =
             Script().apply {
                 down(0, finger(0, 500f, 500f))
@@ -247,8 +309,8 @@ class TouchReplayTest {
                 up(400, 0)
                 up(410, 1)
             }
-        assertEquals(TouchReplay.Outcome(navigations = 1, canceledMoves = 10), replay(session.events))
-        assertEquals(TouchReplay.Outcome(navigations = 1, cameraMoves = 10), replay(session.events, PalmSupport.Off))
+        assertEquals(TouchReplay.Outcome(navigations = 1, canceledMoves = 4), replay(session.events))
+        assertEquals(TouchReplay.Outcome(navigations = 1, cameraMoves = 4), replay(session.events, PalmSupport.Off))
         val older =
             Script().apply {
                 down(0, finger(0, 500f, 500f))
@@ -258,7 +320,7 @@ class TouchReplayTest {
                 up(700, 0)
                 up(710, 1)
             }
-        assertEquals(TouchReplay.Outcome(navigations = 1, cameraMoves = 30), replay(older.events))
+        assertEquals(TouchReplay.Outcome(navigations = 1, cameraMoves = 24), replay(older.events))
         val tap =
             Script().apply {
                 down(0, finger(0, 500f, 500f))
@@ -366,7 +428,7 @@ class TouchReplayTest {
                 up(130, 1)
             }
         assertEquals(
-            TouchReplay.Outcome(navigations = 1, undos = 1),
+            TouchReplay.Outcome(undos = 1),
             replayWith(tap.events, GestureBindings.defaults(fingerPainting = true)),
         )
     }
