@@ -5,8 +5,8 @@ import com.mobyle.nanquim.domain.settings.models.Renderer
 /**
  * The renderer used until the person picks one in Diagnostics. GLES everywhere but Unisoc: its
  * BufferQueue hangs when GLES switches the window in and out of single buffering, so the engine keeps
- * GLES double buffered there, while Vulkan's front-buffered swapchain draws strokes with the pen
- * down. Kept in step with isUnisoc() in the engine's egl_session.cpp.
+ * GLES double buffered there (singleBufferVerified() in the engine's egl_session.cpp only allows it
+ * on Adreno and Exynos Mali), while Vulkan's front-buffered swapchain draws strokes with the pen down.
  */
 fun defaultRenderer(): Renderer = if (isUnisoc()) Renderer.Vulkan else Renderer.Gles
 
