@@ -33,18 +33,29 @@ std::string lowercaseProperty(const char* name) {
   return text;
 }
 
-// Unisoc's BufferQueue (realme C53, Android 15) stops taking the shared buffer after a few switches
-// between EGL_SINGLE_BUFFER and EGL_BACK_BUFFER: queueBuffer fails with -22 and the next
-// dequeueBuffer blocks the render thread for good.
-bool isUnisoc() {
-  const std::string manufacturer = lowercaseProperty("ro.soc.manufacturer");
-  if (manufacturer == "unisoc" || manufacturer == "spreadtrum") {
+bool isExynos() {
+  if (lowercaseProperty("ro.soc.manufacturer") == "samsung") {
     return true;
   }
   const std::string platform = lowercaseProperty("ro.board.platform");
-  return platform.rfind("ums", 0) == 0 ||
-         (platform.size() > 2 && platform.rfind("sp", 0) == 0 &&
-          std::isdigit(static_cast<unsigned char>(platform[2])) != 0);
+  return platform.rfind("exynos", 0) == 0 || platform.rfind("s5e", 0) == 0 ||
+         platform.rfind("universal", 0) == 0;
+}
+
+// Switching a window between EGL_SINGLE_BUFFER and EGL_BACK_BUFFER is a path few apps take, and
+// each vendor breaks it differently, so it is only used on GPUs it was verified on. Elsewhere GLES
+// stays double buffered. Failures seen outside this list: Unisoc's and MediaTek's BufferQueues
+// reject the shared buffer after a few switches (queueBuffer -22, "state = SHARED") and the render
+// thread then blocks in dequeueBuffer for good (realme C53, Galaxy A15); on MediaTek's Mali-G52
+// (Redmi 14C, Moto G05, Tecno CN7c) the same state ends in a null dereference inside the driver.
+// ANGLE (the system GLES on Xclipse GPUs) never shows the single-buffered frames.
+// Verified: Adreno (SM-T735) and Mali on Exynos (Tab S9 FE / SM-X510, FrontBufferHistoryTest).
+bool singleBufferVerified(const char* renderer) {
+  if (renderer == nullptr) {
+    return false;
+  }
+  const std::string name(renderer);
+  return name.rfind("Adreno", 0) == 0 || (name.rfind("Mali", 0) == 0 && isExynos());
 }
 
 }  // namespace
@@ -144,12 +155,9 @@ bool EglSession::attachWindow(ANativeWindow* window, std::string& errorMessage) 
     return false;
   }
   eglSwapInterval(display_, 1);
-  // ANGLE (the system GLES on Xclipse GPUs) accepts EGL_SINGLE_BUFFER but never shows the
-  // single-buffered frames: strokes stay invisible until the pen lifts. Unisoc hangs switching it.
-  const auto* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-  const bool angle = renderer != nullptr && std::string(renderer).rfind("ANGLE", 0) == 0;
   singleBufferSupported_ =
-      !angle && !isUnisoc() && mutableConfig_ && hasExtension(display_, "EGL_ANDROID_front_buffer_auto_refresh") &&
+      singleBufferVerified(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) &&
+      mutableConfig_ && hasExtension(display_, "EGL_ANDROID_front_buffer_auto_refresh") &&
       eglSurfaceAttrib(display_, windowSurface_, EGL_FRONT_BUFFER_AUTO_REFRESH_ANDROID, EGL_TRUE) ==
           EGL_TRUE;
   frameTimestampsEnabled_ = false;
@@ -180,10 +188,13 @@ void EglSession::requestSingleBuffer(bool singleBuffer) {
                    singleBuffer ? EGL_SINGLE_BUFFER : EGL_BACK_BUFFER);
 }
 
+// The context reports the buffer the next frame draws into; the surface reports what was last
+// requested. They differ for a frame on Mali, which applies a switch at the next eglSwapBuffers
+// while Adreno applies it at once, and the frame's drawing and fences must follow the real buffer.
 bool EglSession::isSingleBuffered() const {
   EGLint renderBuffer = EGL_BACK_BUFFER;
   return windowSurface_ != EGL_NO_SURFACE &&
-         eglQuerySurface(display_, windowSurface_, EGL_RENDER_BUFFER, &renderBuffer) == EGL_TRUE &&
+         eglQueryContext(display_, context_, EGL_RENDER_BUFFER, &renderBuffer) == EGL_TRUE &&
          renderBuffer == EGL_SINGLE_BUFFER;
 }
 
